@@ -1,4 +1,5 @@
-# EiN.js **A Simple Entity Component System**
+# EiN.js 
+####A Simple Entity Component System####
 
 
 ## Installing
