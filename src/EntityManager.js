@@ -1,5 +1,3 @@
-import Utils from '../util/util.js'
-
 class EntityManager {
   constructor(){
     this.entities = [];
@@ -102,9 +100,6 @@ class EntityManager {
   }
 
   update(delta){
-    //Sort Systems By Priority First
-    // Utils.sortByKey(this.systems, 'priority');
-
     //Update all active systems
     this.systems.forEach(system => {
       if(system.active){
