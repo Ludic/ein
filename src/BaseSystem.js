@@ -1,21 +1,20 @@
 export default class BaseSystem {
-  constructor(active = true, priority = -1){
+  constructor(active = true, priority = -1, updateFunction){
     this.active = active;
     this.priority = priority;
+    this.updateFunction = updateFunction;
     this.entities = [];
   }
 
   //Overide
-  onEntityAdded(manager){
-    console.info("BaseSystem.onEntityAdded()");
-  }
+  onEntityAdded(manager){}
 
-  onEntityRemoved(manager){
-    console.info("BaseSystem.onEntityRemoved()");
-  }
+  onEntityRemoved(manager){}
 
   //Overide
   update(){
-    console.info("BaseSystem.onUpdate()");
+    if(this.updateFunction){
+      this.updateFunction();
+    }
   }
 };
