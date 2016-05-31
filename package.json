@@ -3,6 +3,7 @@
     "test": "./node_modules/.bin/mocha --compilers js:babel/register test/test"
   },
   "jspm": {
+    "main": "src/main.js",
     "dependencies": {
       "lodash": "npm:lodash@^3.10.1"
     },
