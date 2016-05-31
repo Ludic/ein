@@ -10,11 +10,11 @@
 
 ## Using
 ```javascript
-import EiN as ein from 'EiN'
+import em from 'EiN'
 
 var someEntity = new SomeEntity();
-ein.addEntity(sameEntity);
-ein.update(delta);
+em.addEntity(sameEntity);
+em.update(delta);
 ```
 
 ## Resources
