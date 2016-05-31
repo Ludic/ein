@@ -48,8 +48,14 @@ class EntityManager {
     this.entities.forEach(entity => {
       let hasAllProps = true;
       props.forEach(prop => {
-        if(!entity.hasOwnProperty(prop)){
-          hasAllProps = false;
+        if(typeof prop === 'object'){
+          if(!entity.hasOwnProperty(prop.name) || entity[prop.name] !== prop.value){
+            hasAllProps = false;
+          }
+        } else if(typeof prop === 'string'){
+          if(!entity.hasOwnProperty(prop)){
+            hasAllProps = false;
+          }
         }
       });
 
