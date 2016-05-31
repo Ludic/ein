@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "./node_modules/.bin/mocha --compilers js:babel/register test/test"
+    "test": "./node_modules/.bin/mocha --compilers js:babel/register test/*"
   },
   "jspm": {
     "main": "src/main.js",
