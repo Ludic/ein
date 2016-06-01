@@ -12,9 +12,9 @@ export default class BaseSystem {
   onEntityRemoved(manager){}
 
   //Overide
-  update(){
+  update(...args){
     if(this.updateFunction){
-      this.updateFunction();
+      this.updateFunction(...args);
     }
   }
 };
