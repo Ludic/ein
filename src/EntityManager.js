@@ -2,6 +2,7 @@ class EntityManager {
   constructor(){
     this.entities = [];
     this.systems = [];
+    this.listeners = {};
     this.nextEntityId = 0;
     this.nextSystemId = 0;
   }
@@ -105,6 +106,51 @@ class EntityManager {
     this.systems.sort((a,b) => (a.priority - b.priority));
   }
 
+  /* Events */
+  listenFor(eventName, listener, binder){
+    let group = this.listeners[eventName];
+    if(!group){
+      group = [];
+      this.listeners[eventName] = group;
+    }
+
+    let l = {};
+    l.eventName = eventName;
+    l.listener = listener;
+    l.binder = binder;
+
+    group.push(l);
+  }
+
+  notify(eventName){
+    let group = this.listeners[eventName];
+    if(group){
+      group.forEach((l)=>{
+        if('binder' in l){
+          l.listener.apply(l.binder,arguments);
+        } else {
+          l.listener.apply(l.listener, arguments);
+        }
+      });
+    }
+  }
+
+  removeListener(eventName, listener){
+    let group = this.listeners[eventName];
+
+    if(group){
+      for(let ix in group){
+        let l = group[ix];
+        if(l.listener===listener){
+          group.splice(ix,1);
+          break;
+        }
+      }
+    }
+  }
+
+
+  //Update
   update(delta){
     //Update all active systems
     this.systems.forEach(system => {

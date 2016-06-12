@@ -20,6 +20,18 @@ describe('addEntity', () => {
     em.addEntity(ent);
     expect(ent._id).to.equal(1);
   });
-
 });
+
+describe('sendEvent', () => {
+  it('it registers an event', () => {
+    let testEvent = function(e, arg){
+      expect(e).to.equal("TEST_EVENT");
+      expect(arg).to.equal(1);
+    }
+    em.listenFor("TEST_EVENT", testEvent, true);
+    em.notify("TEST_EVENT", 1);
+
+  });
+});
+
 
