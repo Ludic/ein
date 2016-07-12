@@ -85,6 +85,7 @@ class EntityManager {
     } else {
       system._id = this.nextSystemId++;
       this.systems.push(system);
+      system.onSystemAddedTo(this);
       this._sortSystems();
       return true;
     }
@@ -94,6 +95,7 @@ class EntityManager {
     let index = this.systems.indexOf(system);
     if(index > -1){
       this.systems.splice(index, 1);
+      system.onSystemRemovedFrom(this);
       this._sortSystems();
       return true;
     } else {
