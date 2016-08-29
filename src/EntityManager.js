@@ -24,10 +24,14 @@ class EntityManager {
     }
   }
 
-  removeEntity(entityId){
-    let index = this.entities.indexOf(system);
+  removeEntity(entity){
+    let index = this.entities.indexOf(entity);
     if(index > -1){
       this.entities.splice(index, 1);
+
+      this.systems.forEach(system => {
+        system.onEntityRemoved(this);
+      });
       return true;
     } else {
       console.warn("EntityManager.removeEntity(): Attempted to remove an Entity not in this.entities");
