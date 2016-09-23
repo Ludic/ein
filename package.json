@@ -1,4 +1,8 @@
 {
+  "name": "EiN",
+  "version": "1.0.0",
+  "description": "Entity Component System",
+  "format": "es6",
   "scripts": {
     "test": "./node_modules/.bin/mocha --compilers js:babel/register test/*"
   },
