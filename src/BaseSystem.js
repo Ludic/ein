@@ -11,6 +11,12 @@ export default class BaseSystem {
 
   onEntityRemoved(manager){}
 
+  onSystemAddedTo(manager){
+    this.em = manager;
+  }
+
+  onSystemRemovedFrom(manager){}
+
   //Overide
   update(...args){
     if(this.updateFunction){
