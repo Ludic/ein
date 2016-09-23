@@ -3,7 +3,14 @@
 
 
 ## Installing
-`jspm install EiN=github:SoftwareSyndicate/EiN@dev`
+
+#### jspm
+
+`jspm install ein=github:Ludic/ein`
+
+#### webpack
+
+`npm install github:Ludic/ein`
 
 ## Testing
 `npm run test`
