@@ -1,4 +1,4 @@
-class EntityManager {
+export default class EntityManager {
   constructor(){
     this.entities = [];
     this.systems = [];
@@ -163,5 +163,3 @@ class EntityManager {
   }
 
 };
-
-export default new EntityManager();
