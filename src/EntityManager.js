@@ -49,8 +49,7 @@ export default class EntityManager {
   }
 
   getEntitiesByProps(props){
-    let entities = [];
-    this.entities.forEach(entity => {
+    return this.entities.filter(entity => {
       let hasAllProps = true;
       props.forEach(prop => {
         if(typeof prop === 'object'){
@@ -63,12 +62,8 @@ export default class EntityManager {
           }
         }
       });
-
-      if(hasAllProps){
-        entities.push(entity);
-      }
+      return hasAllProps;
     });
-    return entities;
   }
 
   getEntitiesByClassName(className){
@@ -109,7 +104,14 @@ export default class EntityManager {
   }
 
   _sortSystems(){
-    this.systems.sort((a,b) => (a.priority - b.priority));
+    this.systems.sort((a,b) => {
+      let prio = (a.priority - b.priority)
+      if(prio === 0){
+        // if systems have the same priority, sort by _id
+        return (a._id - b._id)
+      }
+      return prio
+    });
   }
 
   /* Events */
