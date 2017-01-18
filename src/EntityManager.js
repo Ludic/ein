@@ -83,14 +83,13 @@ export default class EntityManager {
   /* Systems */
   addSystem(system){
     if(system.hasOwnProperty("_id")){
-      console.warn("EntityManager.addSystem(): Attempted to add a System with an existing _id ");
       return false;
     } else {
       system._id = this.nextSystemId++;
       this.systems.push(system);
       system.onSystemAddedTo(this);
       this._sortSystems();
-      return true;
+      return system;
     }
   }
 
@@ -102,10 +101,20 @@ export default class EntityManager {
       this._sortSystems();
       return true;
     } else {
-      console.warn("EntityManager.removeSystem(): Attempted to remove a System not in this.systems");
       return false;
     }
   }
+
+  getSystemById(id){
+    let found = false;
+    this.systems.forEach(system => {
+      if(system._id === id){
+        found = system;
+      }
+    });
+    return found;
+  }
+
 
   _sortSystems(){
     this.systems.sort((a,b) => (a.priority - b.priority));
@@ -154,7 +163,6 @@ export default class EntityManager {
     }
   }
 
-
   //Update
   update(delta){
     //Update all active systems
@@ -164,5 +172,4 @@ export default class EntityManager {
       }
     });
   }
-
 };

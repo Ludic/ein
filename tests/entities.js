@@ -5,8 +5,6 @@ import BaseSystem from '../src/BaseSystem.js'
 let assert = require('assert');
 
 describe('Entities', function() {
-  
-
   describe('EntityManager.addEntity()', function() {
     it('should push an entity on EntityManager.entities', function() {
       let ent = new BaseEntity();
@@ -100,6 +98,25 @@ describe('Entities', function() {
       assert.equal(result.length, 1);
     });
   });
+
+
+  describe('EntityManager.getEntitiesByClassName() ', function() {
+    it('should return an Array of Entities matching the provided class name', function() {
+      let em = new EntityManager();
+      let ent1 = new BaseEntity();
+      let ent2 = new BaseEntity();
+      let ent3 = {};
+      let className = ent1.constructor.name;
+      
+      em.addEntity(ent1);
+      em.addEntity(ent2);
+      em.addEntity(ent3);
+
+      let result = em.getEntitiesByClassName(className);
+      assert.equal(result.length, 2);
+    });
+  });
+
 
 
   
