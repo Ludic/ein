@@ -1,9 +1,10 @@
+/*
+ * ein dev config
+ */
+
+
 var path = require('path');
 var fs = require('fs');
-
-/*
-* ein dev config
-*/
 
 module.exports = {
   entry: "./src/main.js",

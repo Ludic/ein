@@ -5,6 +5,8 @@
   "format": "es6",
   "main": "src/main.js",
   "scripts": {
+    "test": "mocha-webpack --webpack-config webpack.config-test.js --watch \"tests/**/*.js\"",
+    "devtest": "webpack-dev-server --config ./webpack.test.config.js",
     "dev": "webpack --watch --config ./webpack.dev.config.js"
   },
   "repository": {
@@ -30,10 +32,13 @@
     "babel-preset-stage-1": "^6.16.0",
     "chai": "^3.2.0",
     "jspm": "^0.16.1",
-    "mocha": "^2.2.5",
+    "mocha": "^2.5.3",
+    "mocha-loader": "^1.1.0",
+    "mocha-webpack": "^1.0.0-beta.1",
     "sinon": "^1.16.1",
     "sinon-chai": "^2.8.0",
     "systemjs": "^0.18.14",
-    "webpack": "^2.2.0-rc.2"
+    "webpack": "^2.2.0-rc.7",
+    "webpack-dev-server": "^1.16.2"
   }
 }

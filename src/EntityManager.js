@@ -10,17 +10,16 @@ export default class EntityManager {
   /* Entities */
   addEntity(entity){
     if(entity.hasOwnProperty("_id")){
-      console.warn("EntityManager.addEntity(): Attempted to add an Entity with an existing _id ");
       return false;
     } else {
       entity._id = this.nextEntityId++;
       this.entities.push(entity);
 
-      //Notify Systems EntityAdded
+      //Notify Systems that an Entity was Added
       this.systems.forEach(system => {
-        system.onEntityAdded(this);
+        system.onEntityAdded(entity);
       });
-      return true;
+      return entity;
     }
   }
 
@@ -30,22 +29,22 @@ export default class EntityManager {
       this.entities.splice(index, 1);
 
       this.systems.forEach(system => {
-        system.onEntityRemoved(this);
+        system.onEntityRemoved(entity);
       });
       return true;
     } else {
-      console.warn("EntityManager.removeEntity(): Attempted to remove an Entity not in this.entities");
       return false;
     }
   }
 
-  getEnityById(id){
+  getEntityById(id){
+    let found = false;
     this.entities.forEach(entity => {
       if(entity._id === id){
-        return entity;
+        found = entity;
       }
     });
-    console.warn("EntityManager.getEnityById(): Attempted to get an Entity not in this.entities");
+    return found;
   }
 
   getEntitiesByProps(props){
