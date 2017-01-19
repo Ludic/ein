@@ -93,21 +93,40 @@ var BaseEntity = function BaseEntity() {
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var DEFAULTS = {
+  active: true,
+  priority: -1
+};
+
 var BaseSystem = function () {
   function BaseSystem() {
-    var active = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-    var priority = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
+    var active = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULTS.active;
+    var priority = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DEFAULTS.priority;
     var updateFunction = arguments[2];
 
     _classCallCheck(this, BaseSystem);
 
-    this.active = active;
-    this.priority = priority;
-    this.updateFunction = updateFunction;
+    if ((typeof active === 'undefined' ? 'undefined' : _typeof(active)) === 'object') {
+      // process options object if passed as first arg
+      this.options = Object.assign(DEFAULTS, active);
+    } else {
+      this.options = {
+        active: active,
+        priority: priority,
+        update: updateFunction
+      };
+    }
+    // assign all options to this object
+    for (var prop in this.options) {
+      var val = this.options[prop];
+      this[prop] = typeof val === 'function' ? val.bind(this) : val;
+    }
     this.entities = [];
   }
 
@@ -115,29 +134,25 @@ var BaseSystem = function () {
 
 
   _createClass(BaseSystem, [{
-    key: "onEntityAdded",
+    key: 'onEntityAdded',
     value: function onEntityAdded(manager) {}
   }, {
-    key: "onEntityRemoved",
+    key: 'onEntityRemoved',
     value: function onEntityRemoved(manager) {}
   }, {
-    key: "onSystemAddedTo",
+    key: 'onSystemAddedTo',
     value: function onSystemAddedTo(manager) {
       this.em = manager;
     }
   }, {
-    key: "onSystemRemovedFrom",
+    key: 'onSystemRemovedFrom',
     value: function onSystemRemovedFrom(manager) {}
 
     //Overide
 
   }, {
-    key: "update",
-    value: function update() {
-      if (this.updateFunction) {
-        this.updateFunction.apply(this, arguments);
-      }
-    }
+    key: 'update',
+    value: function update() {}
   }]);
 
   return BaseSystem;
@@ -221,8 +236,7 @@ var EntityManager = function () {
   }, {
     key: "getEntitiesByProps",
     value: function getEntitiesByProps(props) {
-      var entities = [];
-      this.entities.forEach(function (entity) {
+      return this.entities.filter(function (entity) {
         var hasAllProps = true;
         props.forEach(function (prop) {
           if ((typeof prop === "undefined" ? "undefined" : _typeof(prop)) === 'object') {
@@ -235,12 +249,8 @@ var EntityManager = function () {
             }
           }
         });
-
-        if (hasAllProps) {
-          entities.push(entity);
-        }
+        return hasAllProps;
       });
-      return entities;
     }
   }, {
     key: "getEntitiesByClassName",
@@ -288,7 +298,12 @@ var EntityManager = function () {
     key: "_sortSystems",
     value: function _sortSystems() {
       this.systems.sort(function (a, b) {
-        return a.priority - b.priority;
+        var prio = a.priority - b.priority;
+        if (prio === 0) {
+          // if systems have the same priority, sort by _id
+          return a._id - b._id;
+        }
+        return prio;
       });
     }
 
