@@ -2,11 +2,12 @@
  * ein test config
  */
 
-import nodeExternals from 'webpack-node-externals';
+var path = require('path');
+var fs = require('fs');
 
-export default {
+module.exports = {
+  entry: "./test/main.js",
   target: 'node',
-  externals: [nodeExternals()],
   module: {
     loaders: [
       {
