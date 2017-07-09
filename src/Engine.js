@@ -1,4 +1,4 @@
-export default class EntityManager {
+export default class Engine {
   constructor(){
     this.entities = [];
     this.systems = [];

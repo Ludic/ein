@@ -1,24 +1,25 @@
-import EntityManager from '../src/EntityManager.js'
+import Engine from '../src/Engine.js'
 import BaseEntity from '../src/BaseEntity.js'
 import BaseSystem from '../src/BaseSystem.js'
 
 let assert = require('assert');
 
 describe('Entities', function() {
-  describe('EntityManager.addEntity()', function() {
-    it('should push an entity on EntityManager.entities', function() {
+  describe('Engine.addEntity()', function() {
+    it('should push an entity on Engine.entities', function() {
       let ent = new BaseEntity();
-      let em = new EntityManager();
+      let em = new Engine();
       let result = em.addEntity(ent);
+      console.log("taco")
       assert.equal(result, ent);
       assert.equal(em.entities.length, 1);
     });
   });
 
-  describe('EntityManager.addEntity()', function() {
+  describe('Engine.addEntity()', function() {
     it('should not allow entites to be added with the same _id', function() {
       let ent = new BaseEntity();
-      let em = new EntityManager();
+      let em = new Engine();
       em.addEntity(ent);
       let result = em.addEntity(ent);
       assert.equal(result, false);
@@ -26,10 +27,10 @@ describe('Entities', function() {
     });
   });
 
-  describe('EntityManager.removeEntity() ', function() {
-    it('should remove an Entity on EntityManager.entities', function() {
+  describe('Engine.removeEntity() ', function() {
+    it('should remove an Entity on Engine.entities', function() {
       let ent = new BaseEntity();
-      let em = new EntityManager();
+      let em = new Engine();
       ent = em.addEntity(ent);
       let result = em.removeEntity(ent);
       assert.equal(result, true);
@@ -37,37 +38,37 @@ describe('Entities', function() {
     });
   });
 
-  describe('EntityManager.removeEntity() ', function() {
-    it('should fail to remove an Entity not in EntityManager.entities', function() {
+  describe('Engine.removeEntity() ', function() {
+    it('should fail to remove an Entity not in Engine.entities', function() {
       let ent = new BaseEntity();
-      let em = new EntityManager();
+      let em = new Engine();
       let result = em.removeEntity(ent);
       assert.equal(result, false);
       assert.equal(em.entities.length, 0);
     });
   });
 
-  describe('EntityManager.getEntityById() ', function() {
+  describe('Engine.getEntityById() ', function() {
     it('should return an Entity with the _id provided', function() {
       let ent = new BaseEntity();
-      let em = new EntityManager();
+      let em = new Engine();
       ent = em.addEntity(ent);
       let result = em.getEntityById(ent._id);
       assert.equal(result, ent); 
     });
   });
 
-  describe('EntityManager.getEntityById() ', function() {
+  describe('Engine.getEntityById() ', function() {
     it('should return an false if there is no Entity with the id provided', function() {
-      let em = new EntityManager();
+      let em = new Engine();
       let result = em.getEntityById(666);
       assert.equal(result, false); 
     });
   });
 
-  describe('EntityManager.getEntitiesByProps() ', function() {
+  describe('Engine.getEntitiesByProps() ', function() {
     it('should return an Array of Entities matching the provided properties', function() {
-      let em = new EntityManager();
+      let em = new Engine();
       let ent1 = new BaseEntity();
       ent1.taco = 1;
       
@@ -82,9 +83,9 @@ describe('Entities', function() {
     });
   });
 
-  describe('EntityManager.getEntitiesByProps() ', function() {
+  describe('Engine.getEntitiesByProps() ', function() {
     it('should return an Array of Entities matching the provided properties and values', function() {
-      let em = new EntityManager();
+      let em = new Engine();
       let ent1 = new BaseEntity();
       ent1.taco = 1;
       
@@ -100,9 +101,9 @@ describe('Entities', function() {
   });
 
 
-  describe('EntityManager.getEntitiesByClassName() ', function() {
+  describe('Engine.getEntitiesByClassName() ', function() {
     it('should return an Array of Entities matching the provided class name', function() {
-      let em = new EntityManager();
+      let em = new Engine();
       let ent1 = new BaseEntity();
       let ent2 = new BaseEntity();
       let ent3 = {};

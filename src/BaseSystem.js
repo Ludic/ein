@@ -16,23 +16,21 @@ export default class BaseSystem {
     }
     // assign all options to this object
     for(let prop in this.options){
-      let val = this.options[prop];
-      this[prop] = typeof val === 'function' ? val.bind(this) : val;
+      let val = this.options[prop]
+      this[prop] = typeof val === 'function' ? val.bind(this) : val
     }
-    this.entities = [];
+    this.entities = []
   }
 
-  //Overide
-  onEntityAdded(manager){}
+  onEntityAdded(entity){}
 
-  onEntityRemoved(manager){}
+  onEntityRemoved(entity){}
 
-  onSystemAddedTo(manager){
-    this.em = manager;
-  }
+  onSystemAddedTo(engine){ this.engine = engine }
 
-  onSystemRemovedFrom(manager){}
+  onSystemRemovedFrom(engine){}
 
-  //Overide
+  shouldUpdate(...args){  return true  }
+
   update(...args){}
 };
