@@ -5,7 +5,7 @@
   "format": "es6",
   "main": "src/main.js",
   "scripts": {
-    "test": "mocha-webpack --webpack-config webpack.config-test.js --watch \"tests/**/*.js\"",
+    "test": "mocha-webpack --webpack-config webpack.config-test.js --watch \"tests/**/*.js\" \"src/**/*.js\"",
     "dev": "webpack --watch --config ./webpack.dev.config.js"
   },
   "repository": {

@@ -10,7 +10,6 @@ describe('Entities', function() {
       let ent = new BaseEntity();
       let em = new Engine();
       let result = em.addEntity(ent);
-      console.log("taco")
       assert.equal(result, ent);
       assert.equal(em.entities.length, 1);
     });

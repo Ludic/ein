@@ -26,9 +26,9 @@ export default class BaseSystem {
 
   onEntityRemoved(entity){}
 
-  onSystemAddedTo(engine){ this.engine = engine }
+  onSystemAdded(engine, entities){ this.engine = engine; this.entities = entities }
 
-  onSystemRemovedFrom(engine){}
+  onSystemRemoved(engine){}
 
   shouldUpdate(...args){  return true  }
 
