@@ -10,7 +10,10 @@ export default class Engine {
 
   /* Entities */
   addEntity(entity){
-    if(entity.hasOwnProperty("_id")){
+    if(entity == null){
+      console.warn('Attempted to add null entity')
+      return false
+    } else if(entity.hasOwnProperty("_id")){
       return false;
     } else {
       entity._id = this.nextEntityId++;
@@ -152,7 +155,7 @@ export default class Engine {
     if(system.hasOwnProperty("_id")){
       return false;
     } else {
-      
+
       // Give the System an Id
       system._id = this.nextSystemId++;
 

@@ -11,7 +11,7 @@ export default class BaseSystem {
       this.options = {
         active,
         priority,
-        update: updateFunction
+        update: updateFunction || this.update,
       }
     }
     // assign all options to this object
