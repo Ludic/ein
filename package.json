@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Entity Component System",
   "format": "es6",
-  "main": "src/main.js",
+  "main": "dist/main.js",
   "scripts": {
     "test": "mocha-webpack --webpack-config webpack.config-test.js --watch \"tests/**/*.js\" \"src/**/*.js\"",
     "dev": "webpack --watch --config ./webpack.dev.config.js"
