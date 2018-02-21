@@ -1,11 +1,12 @@
 export default class Engine {
-  constructor(){
+  constructor(props){
     this.entities = []
     this.systems = []
     this.entityQueries = {}
     this.listeners = {}
     this.nextEntityId = 0
     this.nextSystemId = 0
+    this.props = props
   }
 
   /* Entities */
