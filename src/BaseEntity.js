@@ -4,4 +4,6 @@ export default class BaseEntity {
     this.priority = priority;
     this.needsDestroy = false;
   }
+
+  onDestroy(){}
 };

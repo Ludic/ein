@@ -30,7 +30,10 @@ export default class BaseSystem {
 
   onSystemRemoved(engine){}
 
+  onDestroy(...args){}
+
   shouldUpdate(...args){  return true  }
 
   update(...args){}
+
 };

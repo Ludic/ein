@@ -262,4 +262,15 @@ export default class Engine {
       }
     });
   }
-};
+
+  // Destroy
+  destroy(){
+    this.entities.forEach(entity => {
+      entity.onDestroy()
+    })
+
+    this.systems.forEach(system => {
+      system.onDestroy()
+    })
+  }
+}
