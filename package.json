@@ -4,6 +4,7 @@
   "description": "Entity Component System",
   "format": "es6",
   "main": "dist/main.js",
+  "types": "src/main.d.ts",
   "scripts": {
     "test": "mocha-webpack --webpack-config webpack.config-test.js --watch \"tests/**/*.js\" \"src/**/*.js\"",
     "dev": "webpack --watch --config ./webpack.dev.config.js"
