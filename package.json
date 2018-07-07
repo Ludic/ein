@@ -1,13 +1,14 @@
 {
   "name": "@ludic/ein",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Entity Component System",
   "format": "es6",
   "main": "dist/main.js",
   "types": "src/main.d.ts",
   "scripts": {
     "test": "mocha-webpack --webpack-config webpack.config-test.js --watch \"tests/**/*.js\" \"src/**/*.js\"",
-    "dev": "webpack --watch --config ./webpack.dev.config.js"
+    "dev": "webpack --watch --config ./webpack.dev.config.js",
+    "build": "webpack --config ./webpack.dev.config.js"
   },
   "repository": {
     "type": "git",
