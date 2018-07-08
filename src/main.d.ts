@@ -15,20 +15,20 @@ declare namespace ein {
     update?: ()=>void;
   }
 
-  export class BaseSystem {
+  export class BaseSystem<T extends BaseEntity> {
     active: boolean;
     priority: number;
     needsDestroy: boolean;
-    entities: BaseEntity[];
+    entities: T[];
     _id: number;
     constructor(options: SystemOptions);
-    constructor(active?: boolean, priority?: number, updateFunction?: ()=>void);
-    onEntityAdded(entity: BaseEntity);
-    onEntityRemoved(entity: BaseEntity);
-    onSystemAdded(engine: Engine, entities: BaseEntity[]);
-    onSystemRemoved(engine: Engine);
+    constructor(active?: boolean, priority?: number, updateFunction?: (delta: number, engine?: Engine)=>void);
+    onEntityAdded(entity: T): void;
+    onEntityRemoved(entity: T): void;
+    onSystemAdded(engine: Engine, entities: T[]): void;
+    onSystemRemoved(engine: Engine): void;
     shouldUpdate(): boolean;
-    update(delta: number);
+    update(delta: number, engine?: Engine): void;
   }
 
   export class Engine {
