@@ -9,7 +9,7 @@
     "dev": "tsc -w",
     "build": "rimraf lib && tsc",
     "install": "npm run build",
-    "test": "npm run build && nyc mocha --require ts-node/register -r tsconfig-paths/register -r source-map-support/register --recursive \"./tests/**/*.spec.ts\"",
+    "test": "npm run build && nyc mocha --require ts-node/register -r tsconfig-paths/register -r source-map-support/register --recursive \"./tests/**/*.spec.ts\""
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,10 @@
-export default class Entity {
+export class Entity {
+  constructor(){
+
+  }
+}
+
+export class EntityManager {
   constructor(){
 
   }
