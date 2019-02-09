@@ -1,5 +1,8 @@
 // import {Entity, EntityManager } from './entity'
-import System from './system'
+
+import Signal from './signal'
+import Listener from './listener'
+import Component from './component'
 
 
 /**
@@ -18,8 +21,10 @@ import System from './system'
  *
  */
 export default class Engine {
-  // private updating: boolean
-  // private Listener
+  private updating: boolean
+  // private listener: Listener
+
+  // private componentAdded: Listener<Entity>
 
   constructor(){
 
