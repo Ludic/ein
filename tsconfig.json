@@ -15,7 +15,18 @@
     "noImplicitThis": true,
     "noEmitOnError": true,
     "strictNullChecks": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "types": [
+      "node",
+      "mocha",
+      "chai",
+      "sinon"
+    ],
+    "paths": {
+      "@src/*" : ["src/*"],
+      "@lib/*" : ["lib/*"],
+      "@tests/*": ["tests/*"]
+    }
   },
   "include": [
     "src",

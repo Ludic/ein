@@ -1,4 +1,4 @@
-import Engine from './engine'
+import { Engine } from './engine'
 
 /**
  * Abstract class for processing sets of {@link Entity} objects.
@@ -39,9 +39,7 @@ export abstract class System {
 	 * The update method called every tick.
 	 * @param deltaTime The time passed since last frame in seconds.
 	 */
-	public update(deltaTime: number): void {
-
-	}
+	public update(deltaTime: number): void {}
 
 	/** @return Whether or not the system should be processed. */
 	public checkProcessing(): boolean {
@@ -71,13 +69,34 @@ export abstract class System {
 }
 
 
+/**
+ * Gets notified of {@link System} related events.
+ */
+export interface SystemListener {
+  /**
+	 * Called whenever an {@link System} is added to {@link Engine} or a specific {@link Family} See
+	 * {@link Engine#addSystemListener(SystemListener)} and {@link Engine#addSystemListener(Family, SystemListener)}
+	 * @param entity
+	 */
+	systemAdded(system: System): void
+
+	/**
+	 * Called whenever an {@link System} is removed from {@link Engine} or a specific {@link Family} See
+	 * {@link Engine#addSystemListener(SystemListener)} and {@link Engine#addSystemListener(Family, SystemListener)}
+	 * @param entity
+	 */
+	systemRemoved(system: System): void
+}
+
 
 export class SystemManager {
-	private systemComparator: SystemComparator  = new SystemComparator()
 	private systems: System[] = []
-	// private ImmutableArray<EntitySystem> immutableSystems = new ImmutableArray<EntitySystem>(systems);
 	private systemsByClass: object = {}
 	private listener: SystemListener
+
+  // TODO not using these
+  // private systemComparator: SystemComparator  = new SystemComparator()
+	// private ImmutableArray<System> immutableSystems = new ImmutableArray<System>(systems)
 
 	constructor(listener: SystemListener) {
 		this.listener = listener
@@ -85,51 +104,46 @@ export class SystemManager {
 
 	public addSystem(system: System): void{
     // TODO check if system already exists, if so replace it
-		// const systemType: string = system.
-		// EntitySystem oldSytem = getSystem(systemType);
-
+		// const systemType: string =
+		// System oldSytem = getSystem(systemType)
 		// if (oldSytem != null) {
-		// 	removeSystem(oldSytem);
+		// 	removeSystem(oldSytem)
 		// }
 
     // TODO
+    // systemsByClass.put(systemType, system);
+
 		this.systems.push(system)
-		// systemsByClass.put(systemType, system);
-		this.systems.sort(systemComparator)
+		this.systems.sort(this.systemComparator)
 		this.listener.systemAdded(system)
 	}
 
-	public void removeSystem(EntitySystem system){
-		if(systems.removeValue(system, true)) {
-			systemsByClass.remove(system.getClass());
-			listener.systemRemoved(system);
-		}
+	public removeSystem(system: System): void {
+    const i = this.systems.indexOf(system)
+    if(i > -1){
+		  this.systems.splice(i, 1)
+    }
+		this.listener.systemRemoved(system)
 	}
 
-	public void removeAllSystems() {
-		while(systems.size > 0) {
-			removeSystem(systems.first());
-		}
+	public removeAllSystems(): void {
+    // TODO for pooling operations -> not implemented
+    // this.systems.forEach((system: System) => {
+    //   this.removeSystem(entity)
+    // })
+    this.systems = []
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends EntitySystem> T getSystem(Class<T> systemType) {
-		return (T) systemsByClass.get(systemType);
+	// public getSystem(systemType: <T>):  <T extends System> T  {
+	// 	return (T) systemsByClass.get(systemType);
+	// }
+
+	public getSystems(): System[] {
+		return this.systems
 	}
 
-	public ImmutableArray<EntitySystem> getSystems() {
-		return immutableSystems;
+	private systemComparator(a: System, b: System): number {
+    return a.priority > b.priority ? 1 : (a.priority == b.priority) ? 0 : -1
 	}
 
-	private static class SystemComparator implements Comparator<EntitySystem>{
-		@Override
-		public int compare(EntitySystem a, EntitySystem b) {
-			return a.priority > b.priority ? 1 : (a.priority == b.priority) ? 0 : -1;
-		}
-	}
-
-	interface SystemListener {
-		systemAdded(system: EntitySystem): void
-		void systemRemoved(EntitySystem system)
-	}
 }

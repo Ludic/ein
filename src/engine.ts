@@ -1,302 +1,300 @@
-// import {Entity, EntityManager } from './entity'
-
 import Signal from './signal'
 import Listener from './listener'
-import Component from './component'
+
+import { IllegalStateException } from './exceptions'
+import { Component, ComponentManager } from './component'
+import { Entity, EntityListener, EntityManager } from './entity'
+import { System, SystemListener, SystemManager } from './system'
+import { Family, FamilyManager } from './family'
 
 
 /**
- * The heart of the Entity framework. It is responsible for keeping track of {@link Entity} and
- * managing {@link EntitySystem} objects. The Engine should be updated every tick via the {@link #update(float)} method.
+ * [[System]]s have no state and [[Component]]s have no behavior!!!!!
+
+
+ * The heart of the Entity framework. It is responsible for keeping track of[[Entity]] and
+ * managing [[System]] objects. The Engine should be updated every tick via the {@link #update(float)} method.
  *
  * With the Engine you can:
  *
  * <ul>
- * <li>Add/Remove {@link Entity} objects</li>
- * <li>Add/Remove {@link EntitySystem}s</li>
+ * <li>Add/Remove[[Entity]] objects</li>
+ * <li>Add/Remove [[System]]s</li>
  * <li>Obtain a list of entities for a specific {@link Family}</li>
  * <li>Update the main loop</li>
- * <li>Register/unregister {@link EntityListener} objects</li>
+ * <li>Register/unregister [[EntityListener]] objects</li>
  * </ul>
  *
  */
-export default class Engine {
+export class Engine {
+  // private static Family empty = Family.all().get();
+
+  private componentAdded: Listener<Entity>  = new ComponentListener(this)
+  private componentRemoved:  Listener<Entity>  = new ComponentListener(this)
+
+  private systemManager: SystemManager = new SystemManager(new EngineSystemListener(this))
+  private entityManager: EntityManager = new EntityManager(new EngineEntityListener(this))
+  public familyManager: FamilyManager = new FamilyManager(this.entityManager.getEntities())
+  private componentManager: ComponentManager = new ComponentManager()
+
   private updating: boolean
-  // private listener: Listener
 
-  // private componentAdded: Listener<Entity>
+  constructor(){}
 
-  constructor(){
 
+
+  /**
+   * Creates a new Entity object.
+   * @return @[[Entity]]
+   */
+  public createEntity(): Entity {
+  	return new Entity()
   }
 
 
+  /**
+   * Creates a new [[Component]]. To use that method your components must have a visible no-arg constructor
+   */
+  // TODO
+  // public  createComponent(componentType: Class<T>): <T extends Component> T {
+  // 	try {
+  // 		return ClassReflection.newInstance(componentType);
+  // 	} catch (ReflectionException e) {
+  // 		return null;
+  // 	}
+  // }
+
+  /**
+   * Adds an entity to this Engine.
+   * This will throw an IllegalArgumentException if the given entity
+   * was already registered with an engine.
+   */
+  public addEntity(entity: Entity): void {
+  	this.entityManager.addEntity(entity)
+  }
+
+  /**
+   * Removes an [[Entity]] from the [[Engine]]
+   */
+  public removeEntity(entity: Entity): void{
+  	this.entityManager.removeEntity(entity)
+  }
+
+  /**
+   * Removes all [[Entity]]s registered with this Engine.
+   */
+  public removeAllEntities(): void {
+  	this.entityManager.removeAllEntities()
+  }
+
+  /**
+   * Removes all [[Entity]]s of the given [[Family]]
+   */
+  // TODO
+  // public removeAllEntities(family: Family): void {
+  // 	this.entityManager.removeAllEntities(getEntitiesFor(family))
+  // }
+
+
+  /**
+   * Returns an {@link ImmutableArray} of[[Entity]] that is managed by the the Engine
+   *  but cannot be used to modify the state of the Engine. This Array is not Immutable in
+   *  the sense that its contents will not be modified, but in the sense that it only reflects
+   *  the state of the engine.
+   *
+   * The Array is Immutable in the sense that you cannot modify its contents through the API of
+   *  the {@link ImmutableArray} class, but is instead "Managed" by the Engine itself. The engine
+   *  may add or remove items from the array and this will be reflected in the returned array.
+   *
+   * This is an important note if you are looping through the returned entities and calling operations
+   *  that may add/remove entities from the engine, as the underlying iterator of the returned array
+   *  will reflect these modifications.
+   *
+   * The returned array will have entities removed from it if they are removed from the engine,
+   *   but there is no way to introduce new Entities through the array's interface, or remove
+   *   entities from the engine through the array interface.
+   *
+   *  Discussion of this can be found at https://github.com/libgdx/ashley/issues/224
+   *
+   * @return An unmodifiable array of entities that will match the state of the entities in the
+   *  engine.
+   */
+  public getEntities(): Entity[] {
+  	return this.entityManager.getEntities()
+  }
+
+  /**
+   * Adds the [[System]] to this Engine.
+   * If the Engine already had a system of the same class,
+   * the new one will replace the old one.
+   */
+  public addSystem(system: System): void{
+  	this.systemManager.addSystem(system)
+  }
+
+  /**
+   * Removes the [[System]] from this Engine.
+   */
+  public removeSystem(system: System): void{
+  	this.systemManager.removeSystem(system)
+  }
+
+  /**
+   * Removes all [[System]]s from this Engine.
+   */
+  public removeAllSystems(): void {
+  	this.systemManager.removeAllSystems()
+  }
+
+  // 	/**
+  // 	 * Quick [[System]] retrieval.
+  // 	 */
+  // 	@SuppressWarnings("unchecked")
+  // 	public <T extends EntitySystem> T getSystem(Class<T> systemType) {
+  // 		return systemManager.getSystem(systemType);
+  // 	}
+
+  /**
+   * @return immutable array of all [[System]]s managed by the [[Engine]]
+   */
+  public getSystems(): System[] {
+  	return this.systemManager.getSystems()
+  }
+
+  // 	/**
+  // 	 * Returns immutable collection of entities for the specified {@link Family}. Will return the same instance every time.
+  // 	 */
+  // TODO
+  // public getEntitiesFor(family: Family): Entity[]{
+  // 	return this.familyManager.getEntitiesFor(family)
+  // }
+
+  /**
+   * Adds an [[EntityListener]].
+   *
+   * The listener will be notified every time an entity is added/removed to/from the engine.
+   */
+  // TODO
+  // public addEntityListener(listener: EntityListener): void {
+  // 	this.addEntityListener(empty, 0, listener)
+  // }
+
+  /**
+   * Adds an [[EntityListener]]. The listener will be notified every time an entity is added/removed
+   * to/from the engine. The priority determines in which order the entity listeners will be called. Lower
+   * value means it will get executed first.
+   */
+  // TODO
+  // public addEntityListener(priority: number, listener: EntityListener): void {
+  // 	this.addEntityListener(empty, priority, listener)
+  // }
+
+  /**
+   * Adds an [[EntityListener]] for a specific {@link Family}.
+   *
+   * The listener will be notified every time an entity is added/removed to/from the given family.
+   */
+  // TODO
+  // public addEntityListener(family: Family, listener: EntityListener): void {
+  // 	this.addEntityListener(family, 0, listener)
+  // }
+
+  /**
+   * Adds an [[EntityListener]] for a specific {@link Family}. The listener will be notified every time an entity is
+   * added/removed to/from the given family. The priority determines in which order the entity listeners will be called. Lower
+   * value means it will get executed first.
+   */
+  public addEntityListener(family: Family, priority: number = 0, listener: EntityListener): void {
+  	// this.familyManager.addEntityListener(family, priority, listener)
+  }
+
+  /**
+   * Removes an [[EntityListener]]
+   */
+  // TODO
+  public removeEntityListener(listener: EntityListener): void {
+  	this.familyManager.removeEntityListener(listener)
+  }
+
+  /**
+   * Updates all the [[System]] in this Engine.
+   * @param deltaTime The time passed since the last frame.
+   */
+  public update(deltaTime: number): void{
+  	if(this.updating){
+  		throw new IllegalStateException("Cannot call update() on an Engine that is already updating.")
+  	}
+
+  	this.updating = true
+  	const systems: System[] = this.systemManager.getSystems()
+
+  	try {
+      systems.forEach((system: System) => {
+  			if(system.checkProcessing()) {
+  				system.update(deltaTime)
+  			}
+      })
+  	}
+  	finally {
+  		this.updating = false
+  	}
+  }
+
+  // TODO these used to be protected, js doesnt have nested classes -> at bottom
+  public addEntityInternal(entity: Entity): void {
+  	entity.componentAdded.add(this.componentAdded)
+  	entity.componentRemoved.add(this.componentRemoved)
+
+  	this.familyManager.updateFamilyMembership(entity)
+  }
+
+  public removeEntityInternal(entity: Entity): void {
+  	this.familyManager.updateFamilyMembership(entity)
+  	entity.componentAdded.remove(this.componentAdded)
+
+  	entity.componentRemoved.remove(this.componentRemoved)
+  }
 }
 
 
+class EngineSystemListener implements SystemListener {
+  engine: Engine
+  constructor(engine: Engine){
+    this.engine = engine
+  }
+	public systemAdded(system: System): void {
+		system.addedToEngineInternal(this.engine)
+	}
 
-// public class Engine {
-// 	private static Family empty = Family.all().get();
+	public systemRemoved(system: System): void {
+		system.removedFromEngineInternal(this.engine)
+	}
+}
 
-// 	private final Listener<Entity> componentAdded = new ComponentListener();
-// 	private final Listener<Entity> componentRemoved = new ComponentListener();
+class EngineEntityListener implements EntityListener {
+  engine: Engine
+  constructor(engine: Engine){
+    this.engine = engine
+  }
 
-// 	private SystemManager systemManager = new SystemManager(new EngineSystemListener());
-// 	private EntityManager entityManager = new EntityManager(new EngineEntityListener());
-// 	private ComponentOperationHandler componentOperationHandler = new ComponentOperationHandler(new EngineDelayedInformer());
-// 	private FamilyManager familyManager = new FamilyManager(entityManager.getEntities());
-// 	private boolean updating;
+	public entityAdded(entity: Entity): void {
+		this.engine.addEntityInternal(entity)
+	}
 
-// 	/**
-// 	 * Creates a new Entity object.
-// 	 * @return @{@link Entity}
-// 	 */
+	public entityRemoved(entity: Entity): void {
+		this.engine.removeEntityInternal(entity)
+	}
+}
 
-// 	public Entity createEntity () {
-// 		return new Entity();
-// 	}
 
-// 	/**
-// 	 * Creates a new {@link Component}. To use that method your components must have a visible no-arg constructor
-// 	 */
-// 	public <T extends Component> T createComponent (Class<T> componentType) {
-// 		try {
-// 			return ClassReflection.newInstance(componentType);
-// 		} catch (ReflectionException e) {
-// 			return null;
-// 		}
-// 	}
+class ComponentListener implements Listener<Entity> {
+  engine: Engine
+  constructor(engine: Engine){
+    this.engine = engine
+  }
 
-// 	/**
-// 	 * Adds an entity to this Engine.
-// 	 * This will throw an IllegalArgumentException if the given entity
-// 	 * was already registered with an engine.
-// 	 */
-// 	public void addEntity(Entity entity){
-// 		boolean delayed = updating || familyManager.notifying();
-// 		entityManager.addEntity(entity, delayed);
-// 	}
-
-// 	/**
-// 	 * Removes an entity from this Engine.
-// 	 */
-// 	public void removeEntity(Entity entity){
-// 		boolean delayed = updating || familyManager.notifying();
-// 		entityManager.removeEntity(entity, delayed);
-// 	}
-
-// 	/**
-// 	 * Removes all entities of the given {@link Family}.
-// 	 */
-// 	public void removeAllEntities(Family family) {
-// 		boolean delayed = updating || familyManager.notifying();
-// 		entityManager.removeAllEntities(getEntitiesFor(family), delayed);
-// 	}
-
-// 	/**
-// 	 * Removes all entities registered with this Engine.
-// 	 */
-// 	public void removeAllEntities() {
-// 		boolean delayed = updating || familyManager.notifying();
-// 		entityManager.removeAllEntities(delayed);
-// 	}
-
-// 	/**
-// 	 * Returns an {@link ImmutableArray} of {@link Entity} that is managed by the the Engine
-// 	 *  but cannot be used to modify the state of the Engine. This Array is not Immutable in
-// 	 *  the sense that its contents will not be modified, but in the sense that it only reflects
-// 	 *  the state of the engine.
-// 	 *
-// 	 * The Array is Immutable in the sense that you cannot modify its contents through the API of
-// 	 *  the {@link ImmutableArray} class, but is instead "Managed" by the Engine itself. The engine
-// 	 *  may add or remove items from the array and this will be reflected in the returned array.
-// 	 *
-// 	 * This is an important note if you are looping through the returned entities and calling operations
-// 	 *  that may add/remove entities from the engine, as the underlying iterator of the returned array
-// 	 *  will reflect these modifications.
-// 	 *
-// 	 * The returned array will have entities removed from it if they are removed from the engine,
-// 	 *   but there is no way to introduce new Entities through the array's interface, or remove
-// 	 *   entities from the engine through the array interface.
-// 	 *
-// 	 *  Discussion of this can be found at https://github.com/libgdx/ashley/issues/224
-// 	 *
-// 	 * @return An unmodifiable array of entities that will match the state of the entities in the
-// 	 *  engine.
-// 	 */
-// 	public ImmutableArray<Entity> getEntities() {
-// 		return entityManager.getEntities();
-// 	}
-
-// 	/**
-// 	 * Adds the {@link EntitySystem} to this Engine.
-// 	 * If the Engine already had a system of the same class,
-// 	 * the new one will replace the old one.
-// 	 */
-// 	public void addSystem(EntitySystem system){
-// 		systemManager.addSystem(system);
-// 	}
-
-// 	/**
-// 	 * Removes the {@link EntitySystem} from this Engine.
-// 	 */
-// 	public void removeSystem(EntitySystem system){
-// 		systemManager.removeSystem(system);
-// 	}
-
-// 	/**
-// 	 * Removes all systems from this Engine.
-// 	 */
-// 	public void removeAllSystems(){
-// 		systemManager.removeAllSystems();
-// 	}
-
-// 	/**
-// 	 * Quick {@link EntitySystem} retrieval.
-// 	 */
-// 	@SuppressWarnings("unchecked")
-// 	public <T extends EntitySystem> T getSystem(Class<T> systemType) {
-// 		return systemManager.getSystem(systemType);
-// 	}
-
-// 	/**
-// 	 * @return immutable array of all entity systems managed by the {@link Engine}.
-// 	 */
-// 	public ImmutableArray<EntitySystem> getSystems() {
-// 		return systemManager.getSystems();
-// 	}
-
-// 	/**
-// 	 * Returns immutable collection of entities for the specified {@link Family}. Will return the same instance every time.
-// 	 */
-// 	public ImmutableArray<Entity> getEntitiesFor(Family family){
-// 		return familyManager.getEntitiesFor(family);
-// 	}
-
-// 	/**
-// 	 * Adds an {@link EntityListener}.
-// 	 *
-// 	 * The listener will be notified every time an entity is added/removed to/from the engine.
-// 	 */
-// 	public void addEntityListener (EntityListener listener) {
-// 		addEntityListener(empty, 0, listener);
-// 	}
-
-// 	/**
-// 	 * Adds an {@link EntityListener}. The listener will be notified every time an entity is added/removed
-// 	 * to/from the engine. The priority determines in which order the entity listeners will be called. Lower
-// 	 * value means it will get executed first.
-// 	 */
-// 	public void addEntityListener (int priority, EntityListener listener) {
-// 		addEntityListener(empty, priority, listener);
-// 	}
-
-// 	/**
-// 	 * Adds an {@link EntityListener} for a specific {@link Family}.
-// 	 *
-// 	 * The listener will be notified every time an entity is added/removed to/from the given family.
-// 	 */
-// 	public void addEntityListener(Family family, EntityListener listener) {
-// 		addEntityListener(family, 0, listener);
-// 	}
-
-// 	/**
-// 	 * Adds an {@link EntityListener} for a specific {@link Family}. The listener will be notified every time an entity is
-// 	 * added/removed to/from the given family. The priority determines in which order the entity listeners will be called. Lower
-// 	 * value means it will get executed first.
-// 	 */
-// 	public void addEntityListener (Family family, int priority, EntityListener listener) {
-// 		familyManager.addEntityListener(family, priority, listener);
-// 	}
-
-// 	/**
-// 	 * Removes an {@link EntityListener}
-// 	 */
-// 	public void removeEntityListener (EntityListener listener) {
-// 		familyManager.removeEntityListener(listener);
-// 	}
-
-// 	/**
-// 	 * Updates all the systems in this Engine.
-// 	 * @param deltaTime The time passed since the last frame.
-// 	 */
-// 	public void update(float deltaTime){
-// 		if (updating) {
-// 			throw new IllegalStateException("Cannot call update() on an Engine that is already updating.");
-// 		}
-
-// 		updating = true;
-// 		ImmutableArray<EntitySystem> systems = systemManager.getSystems();
-// 		try {
-// 			for (int i = 0; i < systems.size(); ++i) {
-// 				EntitySystem system = systems.get(i);
-
-// 				if (system.checkProcessing()) {
-// 					system.update(deltaTime);
-// 				}
-
-// 				while(componentOperationHandler.hasOperationsToProcess() || entityManager.hasPendingOperations()) {
-// 					componentOperationHandler.processOperations();
-// 					entityManager.processPendingOperations();
-// 				}
-// 			}
-// 		}
-// 		finally {
-// 			updating = false;
-// 		}
-// 	}
-
-// 	protected void addEntityInternal(Entity entity) {
-// 		entity.componentAdded.add(componentAdded);
-// 		entity.componentRemoved.add(componentRemoved);
-// 		entity.componentOperationHandler = componentOperationHandler;
-
-// 		familyManager.updateFamilyMembership(entity);
-// 	}
-
-// 	protected void removeEntityInternal(Entity entity) {
-// 		familyManager.updateFamilyMembership(entity);
-
-// 		entity.componentAdded.remove(componentAdded);
-// 		entity.componentRemoved.remove(componentRemoved);
-// 		entity.componentOperationHandler = null;
-// 	}
-
-// 	private class ComponentListener implements Listener<Entity> {
-// 		@Override
-// 		public void receive(Signal<Entity> signal, Entity object) {
-// 			familyManager.updateFamilyMembership(object);
-// 		}
-// 	}
-
-// 	private class EngineSystemListener implements SystemListener {
-// 		@Override
-// 		public void systemAdded (EntitySystem system) {
-// 			system.addedToEngineInternal(Engine.this);
-// 		}
-
-// 		@Override
-// 		public void systemRemoved (EntitySystem system) {
-// 			system.removedFromEngineInternal(Engine.this);
-// 		}
-// 	}
-
-// 	private class EngineEntityListener implements EntityListener {
-// 		@Override
-// 		public void entityAdded (Entity entity) {
-// 			addEntityInternal(entity);
-// 		}
-
-// 		@Override
-// 		public void entityRemoved (Entity entity) {
-// 			removeEntityInternal(entity);
-// 		}
-// 	}
-
-// 	private class EngineDelayedInformer implements BooleanInformer {
-// 		@Override
-// 		public boolean value () {
-// 			return updating;
-// 		}
-// 	}
-// }
+	public receive(signal: Signal<Entity>, entity: Entity): void {
+    // TODO
+		// this.engine.familyManager.updateFamilyMembership(entity)
+	}
+}
