@@ -6,7 +6,7 @@ import Signal from './signal'
 export default interface Listener<T>{
   /**
 	 * @param signal The Signal that triggered event
-	 * @param object The object passed on dispatch
+	 * @param data The data passed on dispatch
 	 */
-	receive(signal: Signal<T>, T: object): void
+	receive(signal: Signal<T>, data: T): void
 }
