@@ -17,8 +17,8 @@ export class Entity {
   componentRemoved: Signal<Entity>
 
   // ComponentType.index  -> Component
-  componentMap = new Map()
-  components: Component[] = []
+  private componentMap = new Map()
+  private components: Component[] = []
 
   constructor(){
     this.componentAdded = new Signal<Entity>()
@@ -29,7 +29,6 @@ export class Entity {
 	 * Adds a [[Component]] to this Entity.
 	 * @return The Entity for easy chaining
 	 */
-  // TODO check if same component has already been added
 	public add<T extends Component>(component: Component): Entity {
     if(this.addInternal(component)){
       this.notifyComponentAdded()
@@ -90,9 +89,13 @@ export class Entity {
 	  }
   }
 
+  public getComponents(): Component[] {
+    return this.components
+  }
+
   // @return Whether or not the Entity has a {@link Component} for the specified class.
   public hasComponent(componentType: ComponentType): boolean {
-    return this.componentMap.has(componentType)
+    return this.componentMap.has(componentType.getIndex())
   }
 
   notifyComponentAdded(): void {
@@ -116,14 +119,14 @@ export class Entity {
 		  return false
 	  }
 
-    // TODO
-	  // if(oldComponent != null){
-	  // 	this.removeInternal(componentClass)
-	  // }
+	  if(oldComponent != null){
+	  	this.removeInternal(componentClass)
+	  }
 
 	  const componentTypeIndex: number = ComponentType.getIndexFor(componentClass)
 	  this.componentMap.set(componentTypeIndex, component)
 	  this.components.push(component)
+
     // TODO
 	  // componentBits.set(componentTypeIndex);
 
@@ -140,10 +143,12 @@ export class Entity {
 	  const removeComponent: Component = this.componentMap.get(componentTypeIndex)
 
 	  if(removeComponent != null){
-		  this.componentMap.set(componentTypeIndex, null)
+
+      // TODO Ashley sets this to null, instead of removing
+		  this.componentMap.delete(componentTypeIndex)
 
       // TODO -> Is the componentTypeIndex the same here?
-		  this.components = this.components.splice(this.components.indexOf(removeComponent), 1)
+		  this.components.splice(this.components.indexOf(removeComponent), 1)
 
       // TODO
 		  // componentBits.clear(componentTypeIndex);

@@ -55,12 +55,12 @@ export class ComponentType {
 	 * @param componentType The {@link Component} class
 	 * @return A ComponentType matching the Component Class
 	 */
-	public static getFor<T>(componentConstructor: Klass<T>): ComponentType {
-		let componentType: ComponentType = ComponentType.classMap.get(componentConstructor)
+	public static getFor<T>(componentClass: Klass<T>): ComponentType {
+		let componentType: ComponentType = ComponentType.classMap.get(componentClass)
 
 		if(!componentType){
 			componentType = new ComponentType()
-      ComponentType.classMap.set(componentConstructor, componentType)
+      ComponentType.classMap.set(componentClass, componentType)
 		}
 
 		return componentType
@@ -115,7 +115,7 @@ export class ComponentType {
  * @param <T> the class type of the {@link Component}.
  * @author David Saltares
  */
-class ComponentMapper<T extends Component> {
+export class ComponentMapper<T extends Component> {
 	private componentType: ComponentType
 
   constructor(componentClass: Klass<T>){
@@ -126,7 +126,7 @@ class ComponentMapper<T extends Component> {
 	 * @param componentClass Component class to be retrieved by the mapper.
 	 * @return New instance that provides fast access to the {@link Component} of the specified class.
 	 */
-	public static  getFor<T extends Component>(componentClass: Klass<T>): ComponentMapper<T> {
+	public static getFor<T extends Component>(componentClass: Klass<T>): ComponentMapper<T> {
 		return new ComponentMapper<T>(componentClass)
 	}
 

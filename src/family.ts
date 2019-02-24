@@ -88,8 +88,8 @@ export class FamilyManager {
 
   public updateFamilyMembership(entity: Entity): void {
     // console.log("\n updateFamilyMembership: ", entity)
-    const components = entity.components.map((c: Component) => c.constructor)
-    if(entity.components.length){
+    const components = entity.getComponents().map((c: Component) => c.constructor)
+    if(entity.getComponents().length){
 
       let currentFamily: Family = this.componentsToFamilyMap.get(components)
       let previousFamily = this.entityToFamilyMap.get(entity)
