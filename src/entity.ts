@@ -1,9 +1,11 @@
 import Signal from './signal'
 import Listener from './listener'
-import { Component } from './component'
+import { Component, ComponentType } from './component'
 import { IllegalStateException } from './exceptions'
 
-type Klass<T> = { new (...args: any[]): T }
+interface Klass<T> {
+  new(): T
+}
 
 /**
  * Simple containers of [[Component]]s that give them "data". The component's data is then processed by the [[System]]s.
@@ -14,8 +16,9 @@ export class Entity {
 	// Will dispatch an event when a component is removed.
   componentRemoved: Signal<Entity>
 
-	components: Component[] = []
-  componentMap = new WeakMap()
+  // ComponentType.index  -> Component
+  componentMap = new Map()
+  components: Component[] = []
 
   constructor(){
     this.componentAdded = new Signal<Entity>()
@@ -28,52 +31,68 @@ export class Entity {
 	 */
   // TODO check if same component has already been added
 	public add<T extends Component>(component: Component): Entity {
-    this.componentMap.set(component.constructor, component)
-    this.components.push(component)
-		this.notifyComponentAdded()
+    if(this.addInternal(component)){
+      this.notifyComponentAdded()
+		}
 	  return this
 	}
+
+  /**
+	 * Adds a {@link Component} to this Entity. If a {@link Component} of the same type already exists, it'll be replaced.
+	 * @return The Component for direct component manipulation (e.g. PooledComponent)
+	 */
+	public addAndReturn(component: Component): Component {
+	  this.add(component)
+		return component
+  }
 
 	/**
 	 * Removes the [[Component]] of the specified type. Since there is only ever one component of one type, we don't need an
 	 * instance reference.
 	 * @return The removed [[Component]], or null if the Entity did no contain such a component.
 	 */
-	public remove<T extends Component>(klass: Klass<T>): Component | null {
-    const component = this.componentMap.get(klass)
-    const deleted = this.componentMap.delete(klass)
-    if(deleted){
-      this.notifyComponentRemoved()
-      return component
-    } else {
-      return null
-    }
-	}
+  public remove<T extends Component>(componentClass: Klass<T>): Component | null {
+		const componentType: ComponentType = ComponentType.getFor(componentClass)
+		const componentTypeIndex: number = componentType.getIndex()
 
-	/** Removes all the [[Components]] from the Entity. */
-  // TODO
-	public removeAll(): void {
-    // this.components.forEach((c: Component) => {
-    //   this.remove(c)
-    // })
-	}
-
-	/**
-	 * Retrieve a component from this {@link Entity} by class. <em>Note:</em> the preferred way of retrieving {@link Component}s is
-	 * using {@link ComponentMapper}s. This method is provided for convenience; using a ComponentMapper provides O(1) access to
-	 * components while this method provides only O(logn).
-	 * @param componentClass the class of the component to be retrieved.
-	 * @return the instance of the specified {@link Component} attached to this {@link Entity}, or null if no such
-	 *         {@link Component} exists.
-	 */
-  public getComponentByClass<T extends Component>(klass: Klass<T>): T {
-    return this.componentMap.get(klass)
+		const removeComponent: Component = this.componentMap.get(componentTypeIndex)
+		if(removeComponent != null && this.removeInternal(componentClass) != null) {
+			this.notifyComponentRemoved()
+		}
+		return removeComponent
   }
 
+	/** Removes all the [[Components]] from the Entity. */
+  public removeAll(): void {
+    this.components.forEach((c: Component) => {
+      this.remove(c.constructor.prototype)
+    })
+  }
+
+  /**
+   * Retrieve a component from this {@link Entity} by class. <em>Note:</em> the preferred way of retrieving {@link Component}s is
+   * using {@link ComponentMapper}s. This method is provided for convenience; using a ComponentMapper provides O(1) access to
+   * components while this method provides only O(logn).
+   * @param componentClass the class of the component to be retrieved.
+   * @return the instance of the specified {@link Component} attached to this {@link Entity}, or null if no such
+   *         {@link Component} exists.
+   */
+  public getComponentForClass<T extends Component>(componentClass: Klass<T>): T | null {
+	  return this.getComponent(ComponentType.getFor(componentClass))
+  }
+
+  public getComponent<T extends Component>(componentType: ComponentType): T | null {
+	  const componentTypeIndex: number = componentType.getIndex()
+	  if (componentTypeIndex < this.components.length) {
+		  return this.componentMap.get(componentType.getIndex())
+	  } else {
+		  return null
+	  }
+  }
 
   // @return Whether or not the Entity has a {@link Component} for the specified class.
-  public hasComponent<T extends Component>(klass: Klass<T>): boolean {
-    return this.componentMap.has(klass)
+  public hasComponent(componentType: ComponentType): boolean {
+    return this.componentMap.has(componentType)
   }
 
   notifyComponentAdded(): void {
@@ -83,6 +102,58 @@ export class Entity {
   notifyComponentRemoved(): void {
     this.componentRemoved.dispatch(this)
   }
+
+
+  /**
+   * @param component
+   * @return whether or not the component was added.
+   */
+  addInternal(component: Component): boolean {
+	  const componentClass = component.constructor.prototype
+	  const oldComponent: Component | null = this.getComponentForClass(componentClass)
+
+	  if(component == oldComponent){
+		  return false
+	  }
+
+    // TODO
+	  // if(oldComponent != null){
+	  // 	this.removeInternal(componentClass)
+	  // }
+
+	  const componentTypeIndex: number = ComponentType.getIndexFor(componentClass)
+	  this.componentMap.set(componentTypeIndex, component)
+	  this.components.push(component)
+    // TODO
+	  // componentBits.set(componentTypeIndex);
+
+	  return true
+  }
+
+  /**
+   * @param componentClass
+   * @return the component if the specified class was found and removed. Otherwise, null
+   */
+  removeInternal<T>(componentClass: Klass<T>): Component | null {
+	  const componentType: ComponentType = ComponentType.getFor(componentClass)
+	  const componentTypeIndex: number = componentType.getIndex();
+	  const removeComponent: Component = this.componentMap.get(componentTypeIndex)
+
+	  if(removeComponent != null){
+		  this.componentMap.set(componentTypeIndex, null)
+
+      // TODO -> Is the componentTypeIndex the same here?
+		  this.components = this.components.splice(this.components.indexOf(removeComponent), 1)
+
+      // TODO
+		  // componentBits.clear(componentTypeIndex);
+
+		  return removeComponent
+	  }
+
+	  return null
+  }
+
 }
 
 

@@ -33,4 +33,15 @@ describe('Components', () => {
     assert.notEqual(componentType2.getIndex(), ComponentType.getIndexFor(ComponentA))
   })
 
+  it('should have the same prototype for Class and instance', async () => {
+    const componentA = new ComponentA()
+    const componentB = new ComponentB()
+
+	  assert.equal(componentA.constructor.prototype, ComponentA.prototype)
+	  assert.equal(componentB.constructor.prototype, ComponentB.prototype)
+
+	  assert.notEqual(componentA.constructor.prototype, ComponentB.prototype)
+	  assert.notEqual(componentB.constructor.prototype, ComponentA.prototype)
+  })
+
 })

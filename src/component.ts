@@ -10,7 +10,7 @@ interface Klass<T> {
   new(): T
 }
 
-export class Component {}
+export interface Component {}
 
 /**
  * Does things when you add / remove [[Components]] from [[Entities]]
@@ -36,7 +36,7 @@ export class ComponentManager {
  * @author Stefan Bachmann
  */
 export class ComponentType {
-  // componentInstance.constructor -> ComponentType
+  // componentInstance.constructor.prototype -> ComponentType
   private static classMap = new WeakMap
   // private static ObjectMap<Class<? extends Component>, ComponentType> assignedComponentTypes = new ObjectMap<Class<? extends Component>, ComponentType>();
   private static typeIndex: number = 0
@@ -103,8 +103,40 @@ export class ComponentType {
 	public equals(obj: Object): boolean {
 		if(this == obj) return true
 		if(obj == null) return false
-		if(this.constructor.name != obj.constructor.name) return false
+		if(this.constructor.prototype != obj.constructor.prototype) return false
 		let other: ComponentType = obj as ComponentType
 		return this.index == other.index;
+	}
+}
+
+
+/**
+ * Provides super fast {@link Component} retrieval from {@Link Entity} objects.
+ * @param <T> the class type of the {@link Component}.
+ * @author David Saltares
+ */
+class ComponentMapper<T extends Component> {
+	private componentType: ComponentType
+
+  constructor(componentClass: Klass<T>){
+		this.componentType = ComponentType.getFor(componentClass)
+  }
+
+	/**
+	 * @param componentClass Component class to be retrieved by the mapper.
+	 * @return New instance that provides fast access to the {@link Component} of the specified class.
+	 */
+	public static  getFor<T extends Component>(componentClass: Klass<T>): ComponentMapper<T> {
+		return new ComponentMapper<T>(componentClass)
+	}
+
+	/** @return The {@link Component} of the specified class belonging to entity. */
+	public get<T extends Component>(entity: Entity): T | null {
+		return entity.getComponent<T>(this.componentType)
+	}
+
+	/** @return Whether or not entity has the component of the specified class. */
+	public has(entity: Entity): boolean {
+		return entity.hasComponent(this.componentType)
 	}
 }
