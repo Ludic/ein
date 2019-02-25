@@ -53,8 +53,8 @@ export class Entity {
   public remove<T extends Component>(componentClass: Klass<T>): Component | null {
 		const componentType: ComponentType = ComponentType.getFor(componentClass)
 		const componentTypeIndex: number = componentType.getIndex()
-
 		const removeComponent: Component = this.componentMap.get(componentTypeIndex)
+
 		if(removeComponent != null && this.removeInternal(componentClass) != null) {
 			this.notifyComponentRemoved()
 		}
@@ -63,9 +63,9 @@ export class Entity {
 
 	/** Removes all the [[Components]] from the Entity. */
   public removeAll(): void {
-    this.components.forEach((c: Component) => {
-      this.remove(c.constructor.prototype)
-    })
+    while(this.components.length){
+      this.remove(this.components[0].constructor.prototype)
+    }
   }
 
   /**
