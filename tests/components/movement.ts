@@ -1,4 +1,4 @@
-import { Component } from '@lib/component'
+import Component from '@lib/Component'
 
 export default class MovementComponent implements Component {
 	public velocityX: number

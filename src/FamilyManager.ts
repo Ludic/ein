@@ -1,24 +1,11 @@
-import { Component } from './component'
-import { Entity, EntityListener } from './entity'
+import Component from './Component'
+import Family from './Family'
+import Entity from './Entity'
+import EntityListener from './EntityListener'
 
-type Klass<T> = { new (...args: any[]): T }
-/**
- * Represents a group of [[Component]]s. It is used to describe what [[Entity]] objects a [[System]] should
- * process. Example: {@code Family.all(PositionComponent.class, VelocityComponent.class).get()} Families can't be instantiated
- * directly but must be accessed via a builder ( start with {@code Family.all()}, {@code Family.one()} or {@code Family.exclude()}
- * ), this is to avoid duplicate families that describe the same components.
- */
+interface Klass<T> { new(): T }
 
-export class Family {
-  components: Component[]
-  entities: Entity[]
-  constructor(components: Component[] = [], entities: Entity[] = []){
-    this.components = components
-    this.entities = entities
-  }
-}
-
-export class FamilyManager {
+export default class FamilyManager {
   // Family -> Entity[]
   familyToEntitesMap = new WeakMap
   // Component[] => Family
@@ -39,9 +26,7 @@ export class FamilyManager {
   }
 
   public getOrCreateFamily(components: string[]): Family {
-    console.log("getOrCreateFamily: ", components)
     let family = this.componentsToFamilyMap.get(components)
-    console.log("getOrCreateFamily: ", family)
     if(family){
       return family
     } else {
@@ -87,7 +72,6 @@ export class FamilyManager {
   }
 
   public updateFamilyMembership(entity: Entity): void {
-    // console.log("\n updateFamilyMembership: ", entity)
     const components = entity.getComponents().map((c: Component) => c.constructor)
     if(entity.getComponents().length){
 

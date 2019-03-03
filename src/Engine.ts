@@ -1,14 +1,22 @@
-import Signal from './signal'
-import Listener from './listener'
+import Signal from './Signal'
+import Listener from './Listener'
+
+import Component from './Component'
+import ComponentManager from './ComponentManager'
+
+import Family from './Family'
+import FamilyManager from './FamilyManager'
+
+import Entity from './Entity'
+import EntityListener  from './EntityListener'
+import EntityManager  from './EntityManager'
+
+import System from './System'
+import SystemListener from './SystemListener'
+import SystemManager from './SystemManager'
 
 type Klass<T> = { new (...args: any[]): T }
-
 import { IllegalStateException } from './exceptions'
-import { Component, ComponentManager } from './component'
-import { Entity, EntityListener, EntityManager } from './entity'
-import { System, SystemListener, SystemManager } from './system'
-import { Family, FamilyManager } from './family'
-
 
 /**
  * [[System]]s have no state and [[Component]]s have no behavior!!!!!
@@ -28,7 +36,7 @@ import { Family, FamilyManager } from './family'
  * </ul>
  *
  */
-export class Engine {
+export default class Engine {
   // private static Family empty = Family.all().get();
 
   private componentAdded: Listener<Entity>  = new ComponentListener(this)
@@ -183,7 +191,6 @@ export class Engine {
 
   // TODO these used to be protected, js doesnt have nested classes -> at bottom
   public addEntityInternal(entity: Entity): void {
-    console.log("\nengine.addEntityInternal\n")
   	entity.componentAdded.add(this.componentAdded)
   	entity.componentRemoved.add(this.componentRemoved)
 
@@ -219,7 +226,6 @@ class EngineEntityListener implements EntityListener {
   }
 
 	public entityAdded(entity: Entity): void {
-    console.log("EngineEntityListener: entityAdded()")
 		this.engine.addEntityInternal(entity)
 	}
 
@@ -236,7 +242,6 @@ class ComponentListener implements Listener<Entity> {
   }
 
 	public receive(signal: Signal<Entity>, entity: Entity): void {
-    console.log("ComponentListener: ", entity)
 		this.engine.familyManager.updateFamilyMembership(entity)
 	}
 }

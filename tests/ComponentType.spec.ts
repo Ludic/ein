@@ -1,12 +1,13 @@
 import { assert } from 'chai'
+import Component from '@lib/Component'
+import ComponentType from '@lib/ComponentType'
 
-import { Component, ComponentType } from '@lib/component'
 import MovementComponent from '@tests/components/movement'
 
 class ComponentA implements Component {}
 class ComponentB implements Component {}
 
-describe('Components', () => {
+describe('ComponentType', () => {
 
   it('should have a valid ComponentType', async () => {
     assert.isNotNull(ComponentType.getFor(ComponentA))

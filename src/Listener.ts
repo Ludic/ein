@@ -1,4 +1,4 @@
-import Signal from './signal'
+import Signal from './Signal'
 
 /**
  * A simple Listener interface used to listen to a {@link Signal}.

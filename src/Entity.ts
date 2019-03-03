@@ -1,16 +1,14 @@
-import Signal from './signal'
-import Listener from './listener'
-import { Component, ComponentType } from './component'
-import { IllegalStateException } from './exceptions'
+import Signal from './Signal'
+import Listener from './Listener'
+import Component from './Component'
+import ComponentType from './ComponentType'
 
-interface Klass<T> {
-  new(): T
-}
+interface Klass<T> { new(): T }
 
 /**
  * Simple containers of [[Component]]s that give them "data". The component's data is then processed by the [[System]]s.
  */
-export class Entity {
+export default class Entity {
 	// Will dispatch an event when a component is added.
 	componentAdded: Signal<Entity>
 	// Will dispatch an event when a component is removed.
@@ -158,57 +156,4 @@ export class Entity {
 
 	  return null
   }
-
-}
-
-
-// Manages the addition / removal of entity
-export class EntityManager {
-	private listener: EntityListener
-	private entities: Entity[] = []
-
-	constructor(listener: EntityListener) {
-		this.listener = listener
-	}
-
-	public addEntity(entity: Entity): void {
-    if(this.entities.indexOf(entity) > -1){
-      throw new IllegalStateException("Entity has already been added \n" + entity)
-    }
-		this.entities.push(entity)
-		this.listener.entityAdded(entity)
-	}
-
-	public removeEntity(entity: Entity): void {
-    const i = this.entities.indexOf(entity)
-    if(i > -1){
-		  this.entities.splice(i, 1)
-      this.listener.entityRemoved(entity)
-    }
-	}
-
-	public removeAllEntities(): void {
-    this.entities = []
-	}
-
-  public getEntities(): Entity[] {
-    return this.entities
-  }
-}
-
-// Get notified of [[Entity]] related events.
-export interface EntityListener {
-	/**
-	 * Called whenever an [[Entity]] is added to {@link Engine} or a specific {@link Family} See
-	 * {@link Engine#addEntityListener(EntityListener)} and {@link Engine#addEntityListener(Family, EntityListener)}
-	 * @param entity
-	 */
-  entityAdded(entity: Entity): void
-
-  /**
-   * Called whenever an [[Entity]] is removed from {@link Engine} or a specific {@link Family} See
-   * {@link Engine#addEntityListener(EntityListener)} and {@link Engine#addEntityListener(Family, EntityListener)}
-   * @param entity
-   */
-  entityRemoved(entity: Entity): void
 }

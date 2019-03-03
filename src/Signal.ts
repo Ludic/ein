@@ -1,4 +1,4 @@
-import Listener from './listener'
+import Listener from './Listener'
 
 export default class Signal<T> {
   private listeners: Listener<T>[]

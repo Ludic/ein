@@ -1,6 +1,7 @@
-import { System } from '@lib/system'
-import { Engine } from '@lib/engine'
-import { Entity, EntityListener } from '@lib/entity'
+import Entity from '@lib/Entity'
+import EntityListener from '@lib/EntityListener'
+import System from '@lib/System'
+import Engine from '@lib/Engine'
 
 import PositionComponent from '@tests/components/position'
 

@@ -1,8 +1,12 @@
 import { assert } from 'chai'
-import Listener from '@lib/listener'
-import Signal from '@lib/signal'
-import { Component, ComponentType, ComponentManager, ComponentMapper } from '@lib/component'
-import { Entity, EntityListener } from '@lib/entity'
+import Listener from '@lib/Listener'
+import Signal from '@lib/Signal'
+import Component from '@lib/Component'
+import ComponentType from '@lib/ComponentType'
+import ComponentManager from '@lib/ComponentManager'
+import ComponentMapper from '@lib/ComponentMapper'
+import Entity from '@lib/Entity'
+import EntityListener from '@lib/EntityListener'
 
 class ComponentA implements Component {}
 class ComponentB implements Component {}
@@ -23,7 +27,7 @@ interface Klass<T> {
 const am: ComponentMapper<ComponentA> = ComponentMapper.getFor(ComponentA.prototype as Klass<ComponentA>)
 const bm: ComponentMapper<ComponentB> = ComponentMapper.getFor(ComponentB.prototype as Klass<ComponentB>)
 
-describe('Entities', () => {
+describe('Entity', () => {
 
   it('should addAndReturnComponent()', async () => {
     const entity: Entity = new Entity()

@@ -1,4 +1,4 @@
-import { Component } from '@lib/component'
+import Component from '@lib/Component'
 
 export default class PositionComponent implements Component {
 	public x: number

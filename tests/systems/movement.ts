@@ -1,12 +1,12 @@
-import { System } from '@lib/system'
-import { Engine } from '@lib/engine'
-import { Component } from '@lib/component'
-import { Entity, EntityListener } from '@lib/entity'
-import { Family } from '@lib/family'
+import Component from '@lib/Component'
+import Family from '@lib/Family'
+import Entity from '@lib/Entity'
+import EntityListener from '@lib/EntityListener'
+import System from '@lib/System'
+import { Engine } from '@lib/Engine'
 
 import PositionComponent from '@tests/components/position'
 import MovementComponent from '@tests/components/movement'
-
 
 export default class MovementSystem extends System {
 	public entities: Entity[]
