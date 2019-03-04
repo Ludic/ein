@@ -44,5 +44,23 @@ export default class Bits {
 		this.bits[word] &= ~(1 << (index & 0x3F))
 	}
 
+  /** Returns the "logical size" of this bitset: the index of the highest set bit in the bitset plus one. Returns zero if the
+	 * bitset contains no set bits.
+	 *
+	 * @return the logical size of this bitset */
+	public length(): number {
+		let bits: Float64Array = this.bits
+	  for(let word: number = bits.length - 1; word >= 0; --word) {
+		  let bitsAtWord = bits[word]
+		  if (bitsAtWord != 0) {
+			  for (let bit = 63; bit >= 0; --bit) {
+				  if ((bitsAtWord & (1 << (bit & 0x3F))) != 0) {
+					  return (word << 6) + bit + 1
+				  }
+			  }
+		  }
+	  }
+	  return 0
+  }
 
 }

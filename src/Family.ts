@@ -13,71 +13,161 @@ type Klass<T> = { new (...args: any[]): T }
  */
 
 export default class Family {
-  components: Component[]
-  entities: Entity[]
-  constructor(components: Component[] = [], entities: Entity[] = []){
-    this.components = components
-    this.entities = entities
-  }
+  private static families: Map<String, Family> = new Map<String, Family>()
+	private static familyIndex: number = 0
+	// private static readonly builder: Builder = new Builder()
+	private static readonly zeroBits: Bits = new Bits()
 
-  static Builder = class {
-    private allBits: Bits = ZERO_BITS
-	  private oneBits: Bits = ZERO_BITS
-	  private excludeBits: Bits = ZERO_BITS
+	private readonly allBits: Bits
+	private readonly one: Bits
+	private readonly exclude: Bits
+	private readonly index: number
 
-	  Builder() {
+	/** Private constructor, use static method Family.getFamilyFor() */
+	private Family(allBits: Bits, any: Bits, exclude :Bits) {
+		// this.allBits = allBits
+		// this.one = any
+		// this.exclude = exclude
+		// this.index = familyIndex++
+	}
 
-	  }
+	/** @return This family's unique index */
+	public getIndex(): number {
+		return this.index
+	}
 
-	  /**
-	   * Resets the builder instance
-	   * @return A Builder singleton instance to get a family
-	   */
-	  public reset(): FamilyBuilder {
-		  this.allBits = ZERO_BITS
-		  this.oneBits = ZERO_BITS
-		  this.excludeBits = ZERO_BITS
-		  return this
-	  }
+	// /** @return Whether the entity matches the family requirements or not */
+	// public matches(entity: Entity): boolean {
+	// 	const entityComponentBits: Bits = entity.getComponentBits()
 
-	  /**
-	   * @param componentTypes entities will have to contain all of the specified components.
-	   * @return A Builder singleton instance to get a family
-	   */
-	  public all<T extends Component>(componentClasses: Array<Klass<T>>): FamilyBuilder {
-		  this.allBits = ComponentType.getBitsFor(componentClasses)
-		  return this
-	  }
+	// 	if (!entityComponentBits.containsAll(this.allBits)) {
+	// 		return false
+	// 	}
 
-	  /**
-	   * @param componentTypes entities will have to contain at least one of the specified components.
-	   * @return A Builder singleton instance to get a family
-	   */
-	  public one<T extends Component>(componentClasses: Array<Klass<T>>): FamilyBuilder {
-		  this.oneBits = ComponentType.getBitsFor(componentClasses)
-		  return this
-	  }
+	// 	if (!this.one.isEmpty() && !this.one.intersects(entityComponentBits)) {
+	// 		return false
+	// 	}
 
-	  /**
-	   * @param componentTypes entities cannot contain any of the specified components.
-	   * @return A Builder singleton instance to get a family
-	   */
-	  public exclude<T extends Component>(componentClasses: Array<Klass<T>>): FamilyBuilder {
-		  this.excludeBits = ComponentType.getBitsFor(componentClasses)
-		  return this
-	  }
+	// 	if (!this.exclude.isEmpty() && this.exclude.intersects(entityComponentBits)) {
+	// 		return false
+	// 	}
 
-	  /** @return A family for the configured component types */
-	  public get(): Family {
-		  const hash: string = this.getFamilyHash(this.allBits, this.oneBits, this.excludeBits)
-		  let family: Family = this.families.get(hash, null)
-		  if(family == null) {
-			  family = new Family(this.allBits, this.oneBits, this.excludeBits)
-			  this.families.put(hash, family)
-		  }
-		  return family;
-	  }
+	// 	return true
+	// }
+
+	// /**
+	//  * @param componentTypes entities will have to contain all of the specified components.
+	//  * @return A Builder singleton instance to get a family
+	//  */
+	// public static readonly all(componentClasses: Array<Klass<any>>): Builder {
+	// 	return this.builder.reset().all(componentClasses)
+	// }
+
+	// /**
+	//  * @param componentTypes entities will have to contain at least one of the specified components.
+	//  * @return A Builder singleton instance to get a family
+	//  */
+	// public static readonly one(componentClasses: Array<Klass<any>>): Builder {
+	// 	return this.builder.reset().one(componentClasses)
+	// }
+
+	// /**
+	//  * @param componentTypes entities cannot contain any of the specified components.
+	//  * @return A Builder singleton instance to get a family
+	//  */
+	// public static readonly exclude(componentClasses: Array<Klass<any>>): Builder {
+	// 	return this.builder.reset().exclude(componentClasses)
+	// }
 
 
-  }
+	// public hashCode(): number {
+	// 	return this.index
+	// }
+
+	// public equals(family: Family): boolean {
+	// 	return this == family
+	// }
+
+	// private static getFamilyHash(allBits: Bits, one: Bits, exclude: Bits): string {
+	// 	let hash = ""
+	// 	if (!this.allBits.isEmpty()) {
+	// 		hash = hash + "{all:" + this.getBitsString(this.allBits) + "}"
+	//   }
+	// 	if (!this.one.isEmpty()) {
+  //     hash = hash + "{one:" + this.getBitsString(this.one) + "}"
+	// 	}
+	// 	if (!this.exclude.isEmpty()) {
+  //     hash = hash + "{exclude:" + this.getBitsString(this.exclude) + "}"
+	// 	}
+	// 	return stringBuilder.toString();
+	// }
+
+	// private static getBitsString(bits: Bits): string {
+  //   let bitString = ""
+	// 	const numBits: number = bits.length()
+	// 	for (let i=0; i<numBits; ++i) {
+  //     bitString += bits.get(i) ? "1" : "0"
+	// 	}
+	// 	return bitString
+  // }
 }
+
+
+// export class Builder {
+// 	// private allBits: Bits = zeroBits
+// 	// private one: Bits = zeroBits
+// 	// private exclude: Bits = zeroBits
+
+// 	constructor(){
+
+// 	}
+
+// 	/**
+// 	 * Resets the builder instance
+// 	 * @return A Builder singleton instance to get a family
+// 	 */
+// 	public reset(): Builder {
+// 		// this.allBits = zeroBits
+// 		// this.one = zeroBits
+// 		// this.exclude = zeroBits
+// 		return this
+// 	}
+
+// 	/**
+// 	 * @param componentTypes entities will have to contain all of the specified components.
+// 	 * @return A Builder singleton instance to get a family
+// 	 */
+// 	public readonly all(componentClasses: Array<Klass<any>>): Builder {
+// 		this.allBits = ComponentType.getBitsFor(componentClasses)
+// 		return this
+// 	}
+
+// 	/**
+// 	 * @param componentTypes entities will have to contain at least one of the specified components.
+// 	 * @return A Builder singleton instance to get a family
+// 	 */
+// 	public readonly one(componentClasses: Array<Klass<any>>): Builder {
+// 		this.one = ComponentType.getBitsFor(componentClasses)
+// 		return this
+// 	}
+
+// 	/**
+// 	 * @param componentTypes entities cannot contain any of the specified components.
+// 	 * @return A Builder singleton instance to get a family
+// 	 */
+// 	public readonly exclude(componentClasses: Array<Klass<any>>): Builder {
+// 		this.exclude = ComponentType.getBitsFor(componentClasses)
+// 		return this
+// 	}
+
+// 	/** @return A family for the configured component types */
+// 	// public get(): Family {
+// 	// 	String hash = getFamilyHash(allBits, one, exclude);
+// 	// 	Family family = families.get(hash, null);
+// 	// 	if (family == null) {
+// 	// 		family = new Family(allBits, one, exclude);
+// 	// 		families.put(hash, family);
+// 	// 	}
+// 	// 	return family;
+// 	// }
+// }

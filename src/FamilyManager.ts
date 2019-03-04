@@ -1,3 +1,4 @@
+import Bits from './Bits'
 import Component from './Component'
 import Family from './Family'
 import Entity from './Entity'
@@ -6,15 +7,12 @@ import EntityListener from './EntityListener'
 interface Klass<T> { new(): T }
 
 export default class FamilyManager {
-  // Family -> Entity[]
-  familyToEntitesMap = new WeakMap
-  // Component[] => Family
-  componentsToFamilyMap = new WeakMap
-  // Entity -> Family
-  entityToFamilyMap = new WeakMap
-
-  families: Family[] = []
   entities: Entity[]
+  familyToEntitesMap: WeakMap<Family, Entity[]> = new WeakMap<Family, Entity[]>()
+  entityListenerMasks: Map<Family, Bits> = new Map<Family, Bits>()
+  // componentsToFamilyMap: WeakMap<Component[], Family>= new WeakMap<Component[], Family>()
+  // entityToFamilyMap: WeakMap<Entity, Family> = new WeakMap<Entity, Family>()
+  families: Family[] = []
   entityListeners: EntityListenerData[] = []
 
   constructor(entities: Entity[]){
@@ -25,31 +23,41 @@ export default class FamilyManager {
 		return this.registerFamily(family)
   }
 
-  public getOrCreateFamily(components: string[]): Family {
-    let family = this.componentsToFamilyMap.get(components)
-    if(family){
-      return family
-    } else {
-      family = new Family(components)
-      this.componentsToFamilyMap.set(components, family)
-      this.families.push(family)
-      return family
+  public addEntityListener(listener: EntityListener, priority: number = 0, family?: Family): void {
+    if(family) this.registerFamily(family)
+		let insertionIndex: number = 0
+		while(insertionIndex < this.entityListeners.length) {
+			if(this.entityListeners[insertionIndex].priority <= priority) {
+				insertionIndex++
+			} else {
+				break
+			}
+		}
+
+    // TODO, Bits.length might not work
+		// Shift up bitmasks by one step
+    for(let mask of this.entityListenerMasks.values()) {
+		  for(let k: number = mask.length(); k > insertionIndex; k--) {
+		  	if (mask.get(k - 1)) {
+		  		mask.set(k)
+		  	} else {
+		  		mask.clear(k)
+		  	}
+		  	}
+		  mask.clear(insertionIndex)
     }
-  }
 
-  public addEntityListener(listener: EntityListener, priority: number, family?: Family): void {
-		family ? this.registerFamily(family) : void(0)
+		if(family){
+      let mask: Bits | undefined = this.entityListenerMasks.get(family)
+      if(mask) mask.set(insertionIndex)
+    }
 
-		let insertionIndex = 0
-    this.entityListeners.forEach((e: EntityListenerData) => {
-      e.priority <= priority ? insertionIndex++ : void(0)
-    })
-
-		let entityListenerData: EntityListenerData = new EntityListenerData()
-    entityListenerData.listener = listener
+		const entityListenerData: EntityListenerData = new EntityListenerData()
+		entityListenerData.listener = listener
 		entityListenerData.priority = priority
 		this.entityListeners.splice(insertionIndex, 0, entityListenerData)
-	}
+  }
+
 
 	public removeEntityListener(listener: EntityListener): void {
 		// for (int i = 0; i < entityListeners.size; i++) {
@@ -72,62 +80,19 @@ export default class FamilyManager {
   }
 
   public updateFamilyMembership(entity: Entity): void {
-    const components = entity.getComponents().map((c: Component) => c.constructor)
-    if(entity.getComponents().length){
 
-      let currentFamily: Family = this.componentsToFamilyMap.get(components)
-      let previousFamily = this.entityToFamilyMap.get(entity)
-
-      // Entity changed Family
-      if(previousFamily && currentFamily && previousFamily != currentFamily){
-        this.entityListeners.forEach((listenerData: EntityListenerData) => {
-          listenerData.listener.entityRemoved(entity)
-        })
-        this.entityListeners.forEach((listenerData: EntityListenerData) => {
-          listenerData.listener.entityAdded(entity)
-        })
-      }
-
-      // Entity doesn't have a Family yet
-      if(!currentFamily){
-        currentFamily = this.getOrCreateFamily(components.map(c => c.name))
-        this.entityListeners.forEach((listenerData: EntityListenerData) => {
-          listenerData.listener.entityAdded(entity)
-        })
-      }
-
-      // console.log("currentFamily: ", currentFamily)
-      // console.log("previousFamily: ", previousFamily)
-    }
-
-	  // try {
-	  // 	for (int i = removeListenerBits.nextSetBit(0); i >= 0; i = removeListenerBits.nextSetBit(i + 1)) {
-	  // 		((EntityListenerData)items[i]).listener.entityRemoved(entity);
-	  // 	}
-
-	  // 	for (int i = addListenerBits.nextSetBit(0); i >= 0; i = addListenerBits.nextSetBit(i + 1)) {
-	  // 		((EntityListenerData)items[i]).listener.entityAdded(entity);
-	  // 	}
-	  // }
-	  // finally {
-	  // 	addListenerBits.clear();
-	  // 	removeListenerBits.clear();
-	  // 	bitsPool.free(addListenerBits);
-	  // 	bitsPool.free(removeListenerBits);
-	  // 	entityListeners.end();
-	  // 	notifying = false;
-	  // }
   }
 
   private registerFamily(family: Family): Entity[] {
-		const entitiesInFamily: Entity[] = this.familyToEntitesMap.get(family)
+		const entitiesInFamily: Entity[] | undefined = this.familyToEntitesMap.get(family)
 	  if(entitiesInFamily) {
 	    return entitiesInFamily
 	  } else {
       this.entities.forEach((entity: Entity) => {
 	  	  this.updateFamilyMembership(entity)
       })
-      return this.familyToEntitesMap.get(family)
+      const entities = this.familyToEntitesMap.get(family)
+      return entities ? entities : []
     }
 	}
 }

@@ -138,10 +138,6 @@ export default class Engine {
   	return this.familyManager.getEntitiesFor(family)
   }
 
-  public getFamilyFor(components: string[]): Family {
-  	return this.familyManager.getOrCreateFamily(components)
-  }
-
 
   /**
    * Adds an [[EntityListener]] for a specific [[Family]]. The listener will be notified every time an entity is
