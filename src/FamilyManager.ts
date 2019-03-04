@@ -59,41 +59,88 @@ export default class FamilyManager {
   }
 
 
-	public removeEntityListener(listener: EntityListener): void {
-		// for (int i = 0; i < entityListeners.size; i++) {
-		// 	EntityListenerData entityListenerData = entityListeners.get(i);
-		// 	if (entityListenerData.listener == listener) {
-		// 		// Shift down bitmasks by one step
-		// 		for (Bits mask : entityListenerMasks.values()) {
-		// 			for (int k = i, n = mask.length(); k < n; k++) {
-		// 				if (mask.get(k + 1)) {
-		// 					mask.set(k);
-		// 				} else {
-		// 					mask.clear(k);
-		// 				}
-		// 			}
-		// 		}
-
-		// 		entityListeners.removeIndex(i--);
-		// 	}
-		// }
+  public removeEntityListener(listener: EntityListener): void {
+		for (let i=0; i < this.entityListeners.length; i++) {
+			let entityListenerData: EntityListenerData = this.entityListeners[i]
+			if (entityListenerData.listener == listener) {
+				// Shift down bitmasks by one step
+        for(let mask of this.entityListenerMasks.values()) {
+				  for(let k = i, n = mask.length(); k < n; k++) {
+						if (mask.get(k + 1)) {
+							mask.set(k);
+						} else {
+							mask.clear(k)
+						}
+					}
+				}
+				this.entityListeners.splice(this.entityListeners.indexOf(entityListenerData), 1)
+			}
+		}
   }
 
+  // TODO
   public updateFamilyMembership(entity: Entity): void {
+    // // Find families that the entity was added to/removed from, and fill
+		// // the bitmasks with corresponding listener bits.
+		// Bits addListenerBits = bitsPool.obtain();
+		// Bits removeListenerBits = bitsPool.obtain();
 
+		// for (Family family : entityListenerMasks.keys()) {
+		// 	final int familyIndex = family.getIndex();
+		// 	final Bits entityFamilyBits = entity.getFamilyBits();
+
+		// 	boolean belongsToFamily = entityFamilyBits.get(familyIndex);
+		// 	boolean matches = family.matches(entity) && !entity.removing;
+
+		// 	if (belongsToFamily != matches) {
+		// 		final Bits listenersMask = entityListenerMasks.get(family);
+		// 		final Array<Entity> familyEntities = families.get(family);
+		// 		if (matches) {
+		// 			addListenerBits.or(listenersMask);
+		// 			familyEntities.add(entity);
+		// 			entityFamilyBits.set(familyIndex);
+		// 		} else {
+		// 			removeListenerBits.or(listenersMask);
+		// 			familyEntities.removeValue(entity, true);
+		// 			entityFamilyBits.clear(familyIndex);
+		// 		}
+		// 	}
+		// }
+
+		// // Notify listeners; set bits match indices of listeners
+		// notifying = true;
+		// Object[] items = entityListeners.begin();
+
+		// try {
+		// 	for (int i = removeListenerBits.nextSetBit(0); i >= 0; i = removeListenerBits.nextSetBit(i + 1)) {
+		// 		((EntityListenerData)items[i]).listener.entityRemoved(entity);
+		// 	}
+
+		// 	for (int i = addListenerBits.nextSetBit(0); i >= 0; i = addListenerBits.nextSetBit(i + 1)) {
+		// 		((EntityListenerData)items[i]).listener.entityAdded(entity);
+		// 	}
+		// }
+		// finally {
+		// 	addListenerBits.clear();
+		// 	removeListenerBits.clear();
+		// 	bitsPool.free(addListenerBits);
+		// 	bitsPool.free(removeListenerBits);
+		// 	entityListeners.end();
+		// 	notifying = false;
+    // }
   }
 
   private registerFamily(family: Family): Entity[] {
 		const entitiesInFamily: Entity[] | undefined = this.familyToEntitesMap.get(family)
-	  if(entitiesInFamily) {
-	    return entitiesInFamily
-	  } else {
+	  if(!entitiesInFamily) {
+	    this.familyToEntitesMap.set(family, [])
+	    this.entityListenerMasks.set(family, new Bits())
+      const entities = this.familyToEntitesMap.get(family)
       this.entities.forEach((entity: Entity) => {
 	  	  this.updateFamilyMembership(entity)
       })
-      const entities = this.familyToEntitesMap.get(family)
-      return entities ? entities : []
-    }
+	  }
+    return entitiesInFamily ? entitiesInFamily : []
 	}
 }
 
