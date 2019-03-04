@@ -51,8 +51,6 @@ export default class Engine {
 
   constructor(){}
 
-
-
   /**
    * Creates a new Entity object.
    * @return [[Entity]]
@@ -78,19 +76,15 @@ export default class Engine {
   }
 
   /**
-   * Removes all [[Entity]]s registered with this Engine.
-   */
-  public removeAllEntities(): void {
-  	this.entityManager.removeAllEntities()
-  }
-
-  /**
    * Removes all [[Entity]]s of the given [[Family]]
    */
-  // TODO
-  // public removeAllEntities(family: Family): void {
-  // 	this.entityManager.removeAllEntities(getEntitiesFor(family))
-  // }
+  public removeAllEntities(family?: Family): void {
+    if(family){
+  	  this.entityManager.removeAllEntities(this.getEntitiesFor(family))
+    } else {
+  	  this.entityManager.removeAllEntities()
+    }
+  }
 
 
   /**
@@ -140,7 +134,7 @@ export default class Engine {
   /**
    * Returns collection of entities for the specified [[Family]].
    */
-  public getEntitiesFor(family: Family): Entity[]{
+  public getEntitiesFor(family: Family): Entity[] {
   	return this.familyManager.getEntitiesFor(family)
   }
 

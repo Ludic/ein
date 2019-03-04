@@ -53,8 +53,6 @@ export default class ComponentType {
 	 * @return Bits representing the collection of components for quick comparison and matching. See
 	 *         {@link Family#getFor(Bits, Bits, Bits)}.
 	 */
-
-  // TODO Bits()
 	public static getBitsFor<T extends Component>(componentClasses: Array<Klass<T>>): Bits {
 	  let bits: Bits = new Bits()
 

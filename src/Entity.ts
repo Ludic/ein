@@ -1,3 +1,4 @@
+import Bits from './Bits'
 import Signal from './Signal'
 import Listener from './Listener'
 import Component from './Component'
@@ -9,16 +10,24 @@ interface Klass<T> { new(): T }
  * Simple containers of [[Component]]s that give them "data". The component's data is then processed by the [[System]]s.
  */
 export default class Entity {
+  // A flag that can be used to bit mask this entity. Up to the user to manage.
+  public flags: number
 	// Will dispatch an event when a component is added.
-	componentAdded: Signal<Entity>
+	public componentAdded: Signal<Entity>
 	// Will dispatch an event when a component is removed.
-  componentRemoved: Signal<Entity>
+  public componentRemoved: Signal<Entity>
 
   // ComponentType.index  -> Component
   private componentMap = new Map()
   private components: Component[] = []
 
+  private componentBits: Bits
+  private familyBits: Bits
   constructor(){
+    this.componentBits = new Bits()
+		this.familyBits = new Bits()
+    this.flags = 0
+
     this.componentAdded = new Signal<Entity>()
     this.componentRemoved = new Signal<Entity>()
   }
@@ -93,7 +102,20 @@ export default class Entity {
 
   // @return Whether or not the Entity has a {@link Component} for the specified class.
   public hasComponent(componentType: ComponentType): boolean {
-    return this.componentMap.has(componentType.getIndex())
+    return this.componentBits.get(componentType.getIndex())
+    // return this.componentMap.has(componentType.getIndex())
+  }
+
+  /**
+	 * @return This Entity's component bits, describing all the {@link Component}s it contains.
+	 */
+	getComponentBits(): Bits {
+		return this.componentBits
+	}
+
+	/** @return This Entity's {@link Family} bits, describing all the {@link EntitySystem}s it currently is being processed by. */
+	getFamilyBits(): Bits {
+		return this.familyBits
   }
 
   notifyComponentAdded(): void {
@@ -124,9 +146,7 @@ export default class Entity {
 	  const componentTypeIndex: number = ComponentType.getIndexFor(componentClass)
 	  this.componentMap.set(componentTypeIndex, component)
 	  this.components.push(component)
-
-    // TODO
-	  // componentBits.set(componentTypeIndex);
+	  this.componentBits.set(componentTypeIndex)
 
 	  return true
   }
@@ -147,9 +167,7 @@ export default class Entity {
 
       // TODO -> Is the componentTypeIndex the same here?
 		  this.components.splice(this.components.indexOf(removeComponent), 1)
-
-      // TODO
-		  // componentBits.clear(componentTypeIndex);
+		  this.componentBits.clear(componentTypeIndex)
 
 		  return removeComponent
 	  }

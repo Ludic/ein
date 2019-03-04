@@ -1,5 +1,5 @@
-import EntityListener from './EntityListener'
 import Entity from './Entity'
+import EntityListener from './EntityListener'
 import { IllegalStateException } from './exceptions'
 
 // Manages the addition / removal of entity
@@ -27,8 +27,17 @@ export default class EntityManager {
     }
 	}
 
-	public removeAllEntities(): void {
-    this.entities = []
+	public removeAllEntities(entities?: Entity[]): void {
+    if(entities){
+      while(entities.length){
+        this.removeEntity(entities[0])
+        entities.splice(0, 1)
+      }
+    } else {
+      while(this.entities.length){
+        this.removeEntity(this.entities[0])
+      }
+    }
 	}
 
   public getEntities(): Entity[] {

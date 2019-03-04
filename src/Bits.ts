@@ -11,13 +11,21 @@ export default class Bits {
     }
   }
 
+  /** @param index the index of the bit
+	 * @return whether the bit is set
+	 * @throws ArrayIndexOutOfBoundsException if index < 0 */
+	public get(index: number): boolean {
+		const word: number = index >>> 6
+		if (word >= this.bits.length) return false
+		return (this.bits[word] & (1 << (index & 0x3F))) != 0
+  }
 
   /** @param index the index of the bit to set
 	 * @throws ArrayIndexOutOfBoundsException if index < 0 */
 	public set(index: number): void {
 		const word: number = index >>> 6
 		this.checkCapacity(word)
-		// this.bits[word] |= 1L << (index & 0x3F)
+		this.bits[word] |= 1 << (index & 0x3F)
 	}
 
   private checkCapacity(len: number): void {
@@ -27,5 +35,14 @@ export default class Bits {
 			this.bits = newBits
 		}
 	}
+
+  /** @param index the index of the bit to clear
+	 * @throws ArrayIndexOutOfBoundsException if index < 0 */
+	public clear(index: number): void {
+		const word: number = index >>> 6
+		if (word >= this.bits.length) return
+		this.bits[word] &= ~(1 << (index & 0x3F))
+	}
+
 
 }
