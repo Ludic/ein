@@ -24,6 +24,10 @@ export default class ComponentType {
 		return this.index
 	}
 
+	public static reset(): void {
+		this.typeIndex = 0
+	}
+
 	/**
 	 * @param componentType The {@link Component} class
 	 * @return A ComponentType matching the Component Class

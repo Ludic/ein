@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+import Bits from '@lib/Bits'
 import Listener from '@lib/Listener'
 import Signal from '@lib/Signal'
 import Component from '@lib/Component'
@@ -43,8 +44,7 @@ describe('Entity', () => {
   it('should check for no Components', async () => {
     const entity: Entity = new Entity()
 
-    // TODO
-    // assert.isTrue(entity.getComponentBits().isEmpty())
+    assert.isTrue(entity.getComponentBits().isEmpty())
     assert.equal(0, entity.getComponents().length)
     assert.isNull(am.get(entity))
     assert.isNull(bm.get(entity))
@@ -58,14 +58,11 @@ describe('Entity', () => {
 
     assert.equal(1, entity.getComponents().length)
 
-    // TODO
-    // Bits componentBits = entity.getComponentBits()
-    // const componentAIndex: number = ComponentType.getIndexFor(ComponentA)
-
-    // TODO
-    // for (int i = 0; i < componentBits.length(); ++i) {
-    // 	assert.equal(i == componentAIndex, componentBits.get(i));
-    // }
+    let componentBits: Bits = entity.getComponentBits()
+    const componentAIndex: number = ComponentType.getIndexFor(ComponentA)
+    for(let i=0; i < componentBits.length(); ++i) {
+      assert.equal(i == componentAIndex, componentBits.get(i))
+    }
 
     assert.isNotNull(am.get(entity))
     assert.isNull(bm.get(entity))
@@ -75,10 +72,9 @@ describe('Entity', () => {
     entity.remove(ComponentA.prototype as Klass<ComponentA>)
     assert.equal(0, entity.getComponents().length)
 
-    // TODO
-    // for (int i = 0; i < componentBits.length(); ++i) {
-    // 	assertFalse(componentBits.get(i));
-    // }
+    for(let i=0; i < componentBits.length(); ++i) {
+    	assert.isFalse(componentBits.get(i))
+    }
 
     assert.isNull(am.get(entity))
     assert.isNull(bm.get(entity))
@@ -96,11 +92,10 @@ describe('Entity', () => {
     const componentAIndex: number = ComponentType.getIndexFor(ComponentA.prototype as Klass<ComponentA>)
     const componentBIndex: number = ComponentType.getIndexFor(ComponentB.prototype as Klass<ComponentB>)
 
-    // TODO
-    // Bits componentBits = entity.getComponentBits();
-    // for (int i = 0; i < componentBits.length(); ++i) {
-    // 	assert.equal(i == componentAIndex || i == componentBIndex, componentBits.get(i));
-    // }
+    let componentBits: Bits = entity.getComponentBits()
+    for (let i=0; i < componentBits.length(); ++i) {
+    	assert.equal(i == componentAIndex || i == componentBIndex, componentBits.get(i))
+    }
 
     assert.isNotNull(am.get(entity))
     assert.isNotNull(bm.get(entity))
@@ -111,10 +106,9 @@ describe('Entity', () => {
 
     assert.equal(0, entity.getComponents().length)
 
-    // TODO
-    // for (int i = 0; i < componentBits.length(); ++i) {
-    // 	assert.isFalse(componentBits.get(i));
-    // }
+    for(let i=0; i < componentBits.length(); ++i) {
+    	assert.isFalse(componentBits.get(i))
+    }
 
     assert.isNull(am.get(entity))
     assert.isNull(bm.get(entity))

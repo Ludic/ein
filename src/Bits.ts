@@ -1,13 +1,14 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array
+// https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/utils/Bits.java
 
 export default class Bits {
-  bits: Float64Array
+  bits: Uint8Array
 
   constructor(length?: number){
     if(length){
-      this.bits = new Float64Array(length)
+      this.bits = new Uint8Array(length)
     } else {
-      this.bits = new Float64Array()
+      this.bits = new Uint8Array()
     }
   }
 
@@ -30,7 +31,7 @@ export default class Bits {
 
   private checkCapacity(len: number): void {
 		if (len >= this.bits.length) {
-			const newBits: Float64Array = new Float64Array(len + 1)
+			const newBits: Uint8Array = new Uint8Array(len + 1)
 			newBits.set(this.bits)
 			this.bits = newBits
 		}
@@ -49,18 +50,73 @@ export default class Bits {
 	 *
 	 * @return the logical size of this bitset */
 	public length(): number {
-		let bits: Float64Array = this.bits
-	  for(let word: number = bits.length - 1; word >= 0; --word) {
-		  let bitsAtWord = bits[word]
-		  if (bitsAtWord != 0) {
-			  for (let bit = 63; bit >= 0; --bit) {
-				  if ((bitsAtWord & (1 << (bit & 0x3F))) != 0) {
-					  return (word << 6) + bit + 1
-				  }
-			  }
+    return this.bits.length
+
+    // TODO
+		// let bits: Uint8Array = this.bits
+	  // for(let word: number = bits.length - 1; word >= 0; --word) {
+		//   let bitsAtWord = bits[word]
+		//   if (bitsAtWord != 0) {
+		// 	  for (let bit = 63; bit >= 0; --bit) {
+		// 		  if ((bitsAtWord & (1 << (bit & 0x3F))) != 0) {
+		// 			  return (word << 6) + bit + 1
+		// 		  }
+		// 	  }
+		//   }
+	  // }
+	  // return 0
+  }
+
+
+  /** @return true if this bitset contains no bits that are set to true */
+	public isEmpty(): boolean{
+		let bits = this.bits
+		const length: number = bits.length
+		for(let i=0; i<length; i++) {
+			if (bits[i] != 0) {
+				return false
+			}
+		}
+		return true
+  }
+
+  /** Returns true if this bit set is a super set of the specified set, i.e. it has all bits set to true that are also set to true
+	 * in the specified BitSet.
+	 *
+	 * @param other a bit set
+	 * @return boolean indicating whether this bit set is a super set of the specified set */
+	public containsAll(other: Bits): boolean {
+		const bits = this.bits
+		const otherBits = other.bits
+	  const otherBitsLength: number = otherBits.length
+	  const bitsLength: number = bits.length
+
+	  for (let i=bitsLength; i<otherBitsLength; i++) {
+		  if(otherBits[i] != 0){
+			  return false
 		  }
 	  }
-	  return 0
+	  for (let i=Math.min(bitsLength, otherBitsLength) - 1; i>=0; i--) {
+		  if ((bits[i] & otherBits[i]) != otherBits[i]) {
+			  return false
+		  }
+	  }
+	  return true
+  }
+
+  /** Returns true if the specified BitSet has any bits set to true that are also set to true in this BitSet.
+	 *
+	 * @param other a bit set
+	 * @return boolean indicating whether this bit set intersects the specified bit set */
+	public intersects(other: Bits): boolean {
+		let bits = this.bits
+	  let otherBits = other.bits
+	  for (let i=Math.min(bits.length, otherBits.length) - 1; i >= 0; i--) {
+		  if ((bits[i] & otherBits[i]) != 0) {
+			  return true
+		  }
+	  }
+	  return false
   }
 
 }
