@@ -12,6 +12,7 @@ interface Klass<T> { new(): T }
 export default class Entity {
   // A flag that can be used to bit mask this entity. Up to the user to manage.
   public flags: number
+  public removing: boolean = false
 	// Will dispatch an event when a component is added.
 	public componentAdded: Signal<Entity>
 	// Will dispatch an event when a component is removed.

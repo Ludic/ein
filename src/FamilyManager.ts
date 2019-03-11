@@ -14,6 +14,7 @@ export default class FamilyManager {
   // entityToFamilyMap: WeakMap<Entity, Family> = new WeakMap<Entity, Family>()
   families: Family[] = []
   entityListeners: EntityListenerData[] = []
+  notifying: boolean = false
 
   constructor(entities: Entity[]){
     this.entities = entities
@@ -43,7 +44,7 @@ export default class FamilyManager {
 		  	} else {
 		  		mask.clear(k)
 		  	}
-		  	}
+		  }
 		  mask.clear(insertionIndex)
     }
 
@@ -80,54 +81,50 @@ export default class FamilyManager {
 
   // TODO
   public updateFamilyMembership(entity: Entity): void {
-    // // Find families that the entity was added to/removed from, and fill
-		// // the bitmasks with corresponding listener bits.
-		// Bits addListenerBits = bitsPool.obtain();
-		// Bits removeListenerBits = bitsPool.obtain();
+    // Find families that the entity was added to/removed from, and fill
+		// the bitmasks with corresponding listener bits.
+		let addListenerBits: Bits =  new Bits()
+		let removeListenerBits: Bits = new Bits()
 
-		// for (Family family : entityListenerMasks.keys()) {
-		// 	final int familyIndex = family.getIndex();
-		// 	final Bits entityFamilyBits = entity.getFamilyBits();
+    this.entityListenerMasks.forEach((bits: Bits, family: Family, map) => {
+			const familyIndex: number = family.getIndex()
+			const entityFamilyBits: Bits = entity.getFamilyBits()
 
-		// 	boolean belongsToFamily = entityFamilyBits.get(familyIndex);
-		// 	boolean matches = family.matches(entity) && !entity.removing;
+			let belongsToFamily: boolean = entityFamilyBits.get(familyIndex)
+			let matches: boolean = family.matches(entity) && !entity.removing
 
-		// 	if (belongsToFamily != matches) {
-		// 		final Bits listenersMask = entityListenerMasks.get(family);
-		// 		final Array<Entity> familyEntities = families.get(family);
-		// 		if (matches) {
-		// 			addListenerBits.or(listenersMask);
-		// 			familyEntities.add(entity);
-		// 			entityFamilyBits.set(familyIndex);
-		// 		} else {
-		// 			removeListenerBits.or(listenersMask);
-		// 			familyEntities.removeValue(entity, true);
-		// 			entityFamilyBits.clear(familyIndex);
-		// 		}
-		// 	}
-		// }
+			if (belongsToFamily != matches) {
+				const listenersMask = this.entityListenerMasks.get(family)
+				const familyEntities = this.familyToEntitesMap.get(family)
+				if(matches) {
+          if(listenersMask) addListenerBits.or(listenersMask)
+          if(familyEntities) familyEntities.push(entity)
+					entityFamilyBits.set(familyIndex)
+				} else {
+          if(listenersMask) removeListenerBits.or(listenersMask)
+					if(familyEntities){
+            familyEntities.splice(familyEntities.indexOf(entity), 1)
+            // TODO do i need this^
+            this.familyToEntitesMap.set(family, familyEntities)
+          }
+					entityFamilyBits.clear(familyIndex)
+				}
+			}
+    })
 
-		// // Notify listeners; set bits match indices of listeners
-		// notifying = true;
-		// Object[] items = entityListeners.begin();
+    this.notifying = true
+		try {
+			for (let i = removeListenerBits.nextSetBit(0); i >= 0; i = removeListenerBits.nextSetBit(i + 1)) {
+				this.entityListeners[i].listener.entityRemoved(entity)
+			}
 
-		// try {
-		// 	for (int i = removeListenerBits.nextSetBit(0); i >= 0; i = removeListenerBits.nextSetBit(i + 1)) {
-		// 		((EntityListenerData)items[i]).listener.entityRemoved(entity);
-		// 	}
-
-		// 	for (int i = addListenerBits.nextSetBit(0); i >= 0; i = addListenerBits.nextSetBit(i + 1)) {
-		// 		((EntityListenerData)items[i]).listener.entityAdded(entity);
-		// 	}
-		// }
-		// finally {
-		// 	addListenerBits.clear();
-		// 	removeListenerBits.clear();
-		// 	bitsPool.free(addListenerBits);
-		// 	bitsPool.free(removeListenerBits);
-		// 	entityListeners.end();
-		// 	notifying = false;
-    // }
+			for (let i = addListenerBits.nextSetBit(0); i >= 0; i = addListenerBits.nextSetBit(i + 1)) {
+        this.entityListeners[i].listener.entityAdded(entity)
+			}
+		}
+    finally {
+      this.notifying = false
+    }
   }
 
   private registerFamily(family: Family): Entity[] {
@@ -139,7 +136,9 @@ export default class FamilyManager {
       this.entities.forEach((entity: Entity) => {
 	  	  this.updateFamilyMembership(entity)
       })
+      this.families.push(family)
 	  }
+
     return entitiesInFamily ? entitiesInFamily : []
 	}
 }
