@@ -1,6 +1,6 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array
 // https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/utils/Bits.java
-
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#%3E%3E%3E_(Zero-fill_right_shift)
 export default class Bits {
   bits: Uint8Array
 
@@ -16,17 +16,20 @@ export default class Bits {
 	 * @return whether the bit is set
 	 * @throws ArrayIndexOutOfBoundsException if index < 0 */
 	public get(index: number): boolean {
-		const word: number = index >>> 6
-		if (word >= this.bits.length) return false
-		return (this.bits[word] & (1 << (index & 0x3F))) != 0
+		// const word: number = index >>> 6
+		// if (word >= this.bits.length) return false
+		// return (this.bits[word] & (1 << (index & 0x3F))) != 0
+    return !!this.bits[index]
   }
 
   /** @param index the index of the bit to set
 	 * @throws ArrayIndexOutOfBoundsException if index < 0 */
 	public set(index: number): void {
-		const word: number = index >>> 6
-		this.checkCapacity(word)
-		this.bits[word] |= 1 << (index & 0x3F)
+		// const word: number = index >>> 6
+		this.checkCapacity(index)
+		// this.bits[word] |= 1 << (index & 0x3F)
+    // TODO not being set, because length is 0
+    this.bits[index] = 1
 	}
 
   private checkCapacity(len: number): void {
@@ -40,9 +43,10 @@ export default class Bits {
   /** @param index the index of the bit to clear
 	 * @throws ArrayIndexOutOfBoundsException if index < 0 */
 	public clear(index: number): void {
-		const word: number = index >>> 6
-		if (word >= this.bits.length) return
-		this.bits[word] &= ~(1 << (index & 0x3F))
+		if(index >= this.bits.length) return
+		this.bits[index] = 0
+    let last = this.bits.lastIndexOf(1)
+    this.bits = this.bits.slice(0, last + 1)
 	}
 
   /** Returns the "logical size" of this bitset: the index of the highest set bit in the bitset plus one. Returns zero if the
@@ -51,7 +55,6 @@ export default class Bits {
 	 * @return the logical size of this bitset */
 	public length(): number {
     return this.bits.length
-
     // TODO
 		// let bits: Uint8Array = this.bits
 	  // for(let word: number = bits.length - 1; word >= 0; --word) {
