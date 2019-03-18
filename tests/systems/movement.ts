@@ -3,7 +3,7 @@ import Family from '@lib/Family'
 import Entity from '@lib/Entity'
 import EntityListener from '@lib/EntityListener'
 import System from '@lib/System'
-import { Engine } from '@lib/Engine'
+import Engine from '@lib/Engine'
 
 import PositionComponent from '@tests/components/position'
 import MovementComponent from '@tests/components/movement'
@@ -28,8 +28,8 @@ export default class MovementSystem extends System {
 	public update(deltaTime: number): void {
     this.entities.forEach((e: Entity) => {
 
-			const p: PositionComponent = e.getComponentByClass(PositionComponent)
-			const m: MovementComponent = e.getComponentByClass(MovementComponent)
+			const p: PositionComponent = e.getComponentForClass(PositionComponent)
+			const m: MovementComponent = e.getComponentForClass(MovementComponent)
 
 			p.x += m.velocityX * deltaTime
 			p.y += m.velocityY * deltaTime

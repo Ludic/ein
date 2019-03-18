@@ -1,8 +1,9 @@
 // import { assert } from 'chai'
 
-// import { Engine } from '@lib/engine'
-// import { System } from '@lib/system'
-// import { Entity, EntityListener } from '@lib/entity'
+// import Engine from '@lib/Engine'
+// import System from '@lib/System'
+// import Entity from '@lib/Entity'
+// import EntityListener from '@lib/EntityListener'
 
 // import PositionComponent from '@tests/components/position'
 // import MovementComponent from '@tests/components/movement'

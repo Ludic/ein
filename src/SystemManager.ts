@@ -30,11 +30,9 @@ export default class SystemManager {
   }
 
   public removeAllSystems(): void {
-    // TODO for pooling operations -> not implemented
-    // this.systems.forEach((system: System) => {
-    //   this.removeSystem(entity)
-    // })
-    this.systems = []
+    while(this.systems.length){
+      this.removeSystem(this.systems[0])
+    }
   }
 
   public getSystem<T extends System>(systemClass: Klass<T>): T {

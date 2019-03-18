@@ -32,15 +32,39 @@ interface Klass<T> {
 const am: ComponentMapper<ComponentA> = ComponentMapper.getFor(ComponentA.prototype as Klass<ComponentA>)
 const bm: ComponentMapper<ComponentB> = ComponentMapper.getFor(ComponentB.prototype as Klass<ComponentB>)
 
-// TODO entityRemoved not calling
+
 describe('EntityListener', () => {
 
-  it('add an EntityListener, and then remove a Family()', async () => {
+  // TODO entityRemoved not calling
+  it('add an EntityListener, and then remove a Family', async () => {
     const engine: Engine = new Engine()
 
 		const e: Entity = new Entity()
 		e.add(new PositionComponent(0, 0))
 		engine.addEntity(e)
+
+		const family: Family = Family.all(PositionComponent.constructor.prototype).get()
+
+    const listener: EntityListener = {
+      entityAdded(entity: Entity): void {},
+			entityRemoved(entity: Entity): void {
+        // TODO
+        console.log("\n\nentityRemoved\n")
+				engine.addEntity(new Entity())
+			}
+		}
+
+		engine.addEntityListener(listener,  0, family)
+    engine.removeEntity(e)
+
+    assert.equal(engine.getEntities().length, 0)
+  })
+
+  it('add an EntityListener, and then add a Family', async () => {
+    const engine: Engine = new Engine()
+
+		const e: Entity = new Entity()
+		e.add(new PositionComponent(0, 0))
 
 		const family: Family = Family.all(PositionComponent.constructor.prototype).get()
 
@@ -53,11 +77,8 @@ describe('EntityListener', () => {
 		}
 
 		engine.addEntityListener(listener,  0, family)
-    engine.removeEntity(e)
-
-    assert.equal(engine.getEntities().length, 0)
+    engine.addEntity(e)
   })
-
 
 
 })

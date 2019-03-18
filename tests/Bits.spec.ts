@@ -63,7 +63,6 @@ describe('Bits', () => {
     assert.isTrue(b2.get(1024))
   })
 
-
   it('and()', async () => {
     let b1: Bits = new Bits()
 		let b2: Bits = new Bits()
