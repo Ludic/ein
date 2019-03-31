@@ -73,10 +73,9 @@ export default class Bits {
 
   /** @return true if this bitset contains no bits that are set to true */
 	public isEmpty(): boolean{
-		let bits = this.bits
-		const length: number = bits.length
+		const length: number = this.bits.length
 		for(let i=0; i<length; i++) {
-			if (bits[i] != 0) {
+			if (this.bits[i] != 0) {
 				return false
 			}
 		}
@@ -86,32 +85,8 @@ export default class Bits {
 
   /** Returns the index of the first bit that is set to true that occurs on or after the specified starting index. If no such bit
 	 * exists then -1 is returned. */
-	public nextSetBit(fromIndex: number): number {
-		let bits = this.bits;
-		let word = fromIndex >>> 6
-		let bitsLength = bits.length
-		if (word >= bitsLength) return -1
-		let bitsAtWord = bits[word]
-		if (bitsAtWord != 0) {
-			for (let i = fromIndex & 0x3f; i < 64; i++) {
-				if ((bitsAtWord & (1 << (i & 0x3F))) != 0) {
-					return (word << 6) + i;
-				}
-			}
-		}
-		for (word++; word < bitsLength; word++) {
-			if (word != 0) {
-				bitsAtWord = bits[word];
-				if (bitsAtWord != 0) {
-					for (let i = 0; i < 64; i++) {
-						if ((bitsAtWord & (1 << (i & 0x3F))) != 0) {
-							return (word << 6) + i;
-						}
-					}
-				}
-			}
-		}
-		return -1;
+	public nextSetBit(fromIndex: number = 0): number {
+    return this.bits.indexOf(1, fromIndex)
   }
 
   /** Performs a logical <b>AND</b> of this target bit set with the argument bit set. This bit set is modified so that each bit in

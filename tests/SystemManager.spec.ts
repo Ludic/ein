@@ -1,24 +1,8 @@
 import { assert } from 'chai'
-import Listener from '@lib/Listener'
-import Signal from '@lib/Signal'
-import Component from '@lib/Component'
-import ComponentType from '@lib/ComponentType'
-import ComponentManager from '@lib/ComponentManager'
-import ComponentMapper from '@lib/ComponentMapper'
-import Entity from '@lib/Entity'
-import EntityListener from '@lib/EntityListener'
 import SystemManager from '@lib/SystemManager'
 import System from '@lib/System'
 import SystemListener from '@lib/SystemListener'
-import { IllegalStateException } from '@lib/exceptions'
-import Family from '@lib/Family'
 import Engine from '@lib/Engine'
-
-class ComponentA implements Component {}
-class ComponentB implements Component {}
-
-import PositionComponent from '@tests/components/position'
-import MovementComponent from '@tests/components/movement'
 
 class SystemListenerSpy implements SystemListener {
   public addedCount: number = 0
@@ -110,9 +94,7 @@ describe('SystemManager', () => {
 		assert.isUndefined(manager.getSystem(SystemMockB));
 		assert.equal(2, systemA.removedCalls);
     assert.equal(2, systemB.removedCalls);
-
   })
-
 
   it('getSystems()', async () => {
     let systemA: SystemMockA = new SystemMockA()
@@ -135,10 +117,8 @@ describe('SystemManager', () => {
 		assert.equal(0, manager.getSystems().length);
 		assert.equal(2, systemSpy.addedCount);
     assert.equal(2, systemSpy.removedCount);
-
   })
 
-  // TODO, SystemManager does not replace
   it('add two systems of the same Class', async () => {
     let system1: SystemMockA = new SystemMockA()
     let system2: SystemMockA = new SystemMockA()
@@ -146,22 +126,39 @@ describe('SystemManager', () => {
 		let systemSpy: SystemListenerSpy = new SystemListenerSpy()
 		let manager: SystemManager = new SystemManager(systemSpy)
 
-    assert.equal(0, manager.getSystems().length);
+    assert.equal(0, manager.getSystems().length)
 
 		manager.addSystem(system1)
 
-		assert.equal(1, manager.getSystems().length);
-		assert.equal(system1, manager.getSystem(SystemMockA));
-		assert.equal(1, systemSpy.addedCount);
+		assert.equal(1, manager.getSystems().length)
+		assert.equal(system1, manager.getSystem(SystemMockA))
+		assert.equal(1, systemSpy.addedCount)
 
-		manager.addSystem(system2);
+		manager.addSystem(system2)
 
-		assert.equal(1, manager.getSystems().length);
-		assert.equal(system2, manager.getSystem(SystemMockA));
-		assert.equal(2, systemSpy.addedCount);
-    assert.equal(1, systemSpy.removedCount);
-
+		assert.equal(1, manager.getSystems().length)
+		assert.equal(system2, manager.getSystem(SystemMockA))
+		assert.equal(2, systemSpy.addedCount)
+    assert.equal(1, systemSpy.removedCount)
   })
 
+  it('should update systems in order', async() => {
+    let updates: number[] = []
+
+		let systemSpy:SystemListenerSpy = new SystemListenerSpy()
+		let manager: SystemManager = new SystemManager(systemSpy)
+		let system1: SystemMockA = new SystemMockA(updates)
+		let system2: SystemMockB = new SystemMockB(updates)
+
+		system1.priority = 2
+		system2.priority = 1
+
+		manager.addSystem(system1)
+		manager.addSystem(system2)
+
+		let systems: System[] = manager.getSystems()
+		assert.equal(system2, systems[0])
+    assert.equal(system1, systems[1])
+  })
 
 })

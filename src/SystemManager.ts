@@ -13,7 +13,9 @@ export default class SystemManager {
   }
 
   public addSystem(system: System): void{
-    // TODO check if system already exists, if so replace it
+    if(this.systemMap.get(system.constructor)){
+      this.removeSystem(system)
+    }
     this.systemMap.set(system.constructor, system)
 	  this.systems.push(system)
 	  this.systems.sort(this.systemComparator)
@@ -21,9 +23,11 @@ export default class SystemManager {
   }
 
   public removeSystem(system: System): void {
-    const i = this.systems.indexOf(system)
-    if(i > -1){
-		  this.systems.splice(i, 1)
+    for(let i=0; i < this.systems.length; i++){
+      let s: System = this.systems[i]
+      if(s.constructor.prototype == system.constructor.prototype){
+        this.systems.splice(i, 1)
+      }
     }
     this.systemMap.delete(system.constructor)
 	  this.listener.systemRemoved(system)

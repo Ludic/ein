@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "tsc -w",
     "build": "rimraf lib && tsc",
-    "test": "npm run build && nyc mocha --require ts-node/register -r tsconfig-paths/register -r source-map-support/register --recursive \"./tests/**/SystemManager.spec.ts\"",
+    "test": "npm run build && nyc mocha --require ts-node/register -r tsconfig-paths/register -r source-map-support/register --recursive \"./tests/**/Bits.spec.ts\"",
     "test:all": "npm run build && nyc mocha --require ts-node/register -r tsconfig-paths/register -r source-map-support/register --recursive \"./tests/**/*.spec.ts\""
   },
   "repository": {

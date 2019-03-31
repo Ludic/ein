@@ -79,4 +79,19 @@ describe('Bits', () => {
     assert.isFalse(b1.get(400))
   })
 
+  it('nextSetBit()', async () => {
+    let b1: Bits = new Bits()
+
+	  b1.set(20)
+
+	  assert.isTrue(b1.get(20))
+    assert.equal(20, b1.nextSetBit())
+
+    b1.set(10)
+
+    assert.equal(10, b1.nextSetBit())
+    assert.equal(20, b1.nextSetBit(15))
+
+  })
+
 })
