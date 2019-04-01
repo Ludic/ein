@@ -13,11 +13,11 @@ export default class PositionSystem extends System {
     this.entities = []
 
 		// this.entities = engine.getEntitiesFor(Family.all(PositionComponent.class).get())
-		console.log("PositionSystem added to engine.")
+		// console.log("PositionSystem added to engine.")
 	}
 
 	public removedFromEngine(engine: Engine): void {
-		console.log("PositionSystem removed from engine.")
-    this.entities = []
+		// console.log("PositionSystem removed from engine.")
+    // this.entities = []
 	}
 }

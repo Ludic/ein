@@ -10,7 +10,7 @@ export default abstract class System {
 	public priority: number
 
 	private processing: boolean
-	private engine: Engine | null
+	public engine: Engine | null
 
 	/**
 	 * Initialises the System with the priority specified.

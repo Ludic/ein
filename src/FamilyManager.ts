@@ -81,6 +81,7 @@ export default class FamilyManager {
 
   // TODO
   public updateFamilyMembership(entity: Entity): void {
+    console.log("updateFamilyMembership")
     // Find families that the entity was added to/removed from, and fill
 		// the bitmasks with corresponding listener bits.
 		let addListenerBits: Bits =  new Bits()
@@ -128,6 +129,7 @@ export default class FamilyManager {
   }
 
   private registerFamily(family: Family): Entity[] {
+    console.log("registerFamily", this.families.length)
 		const entitiesInFamily: Entity[] | undefined = this.familyToEntitesMap.get(family)
 	  if(!entitiesInFamily) {
 	    this.familyToEntitesMap.set(family, [])
