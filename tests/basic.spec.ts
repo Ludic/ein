@@ -34,14 +34,14 @@ describe('Basic', () => {
 	    engine.addEntity(entity)
     }
 
-    // console.log(engine.familyManager.families)
-    // console.log("MovementSystem has: " + movementSystem.entities.length + " entities.");
-    // console.log("PositionSystem has: " + positionSystem.entities.length + " entities.");
-
-    for(let i=0; i<10; i++){
+    for(let i=0; i<1; i++){
 	    engine.update(0.25)
-	    if (i > 5) engine.removeSystem(movementSystem);
+	    // if (i > 5) engine.removeSystem(movementSystem)
     }
+
+    assert.equal(positionSystem.entities.length, 10)
+    assert.equal(movementSystem.entities.length, 4)
+
 
     engine.removeEntityListener(listener)
 

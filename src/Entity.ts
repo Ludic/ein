@@ -37,7 +37,7 @@ export default class Entity {
 	 * Adds a [[Component]] to this Entity.
 	 * @return The Entity for easy chaining
 	 */
-	public add<T extends Component>(component: Component): Entity {
+	public add<Component>(component: Component): Entity {
     if(this.addInternal(component)){
       this.notifyComponentAdded()
 		}
@@ -134,17 +134,17 @@ export default class Entity {
    */
   addInternal(component: Component): boolean {
 	  const componentClass = component.constructor.prototype
-	  const oldComponent: Component | null = this.getComponentForClass(componentClass)
+	  const oldComponent: Component | null = this.getComponentForClass(componentClass.constructor)
 
 	  if(component == oldComponent){
 		  return false
 	  }
 
 	  if(oldComponent != null){
-	  	this.removeInternal(componentClass)
+	  	this.removeInternal(componentClass.constructor)
 	  }
 
-	  const componentTypeIndex: number = ComponentType.getIndexFor(componentClass)
+	  const componentTypeIndex: number = ComponentType.getIndexFor(componentClass.constructor)
 	  this.componentMap.set(componentTypeIndex, component)
 	  this.components.push(component)
 	  this.componentBits.set(componentTypeIndex)

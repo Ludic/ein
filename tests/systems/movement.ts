@@ -19,24 +19,19 @@ export default class MovementSystem extends System {
   constructor(){
     super()
     this.family = Family.all([PositionComponent, MovementComponent]).get()
-    // console.log("this.family: ", this.family)
   }
 
   public addedToEngine(engine: Engine): void {
-    // console.log(this.family)
     this.entities = engine.getEntitiesFor(this.family)
     this.engine = engine
-	  console.log("MovementSystem added to engine.", this.entities)
   }
 
   public removedFromEngine(engine: Engine): void {
     this.entities = []
-	  // console.log("MovementSystem removed from engine.")
   }
 
   public update(deltaTime: number): void {
     if(this.engine)  this.entities = this.engine.getEntitiesFor(this.family)
-    console.log("update: ", this.entities)
 
     this.entities.forEach((entity: Entity) => {
 
@@ -48,7 +43,5 @@ export default class MovementSystem extends System {
 		    p.y += m.velocityY * deltaTime
       }
     })
-
-	  console.log(this.entities.length + " Entities updated in MovementSystem.")
   }
 }

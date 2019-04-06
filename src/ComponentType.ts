@@ -34,7 +34,6 @@ export default class ComponentType {
 	 */
 	public static getFor<T>(componentClass: Klass<T>): ComponentType {
 		let componentType: ComponentType | undefined = ComponentType.classMap.get(componentClass)
-
 		if(!componentType){
 			componentType = new ComponentType()
       ComponentType.classMap.set(componentClass, componentType)
