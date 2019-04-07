@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 
 import Engine from '@lib/Engine'
-import System from '@lib/System'
 import Entity from '@lib/Entity'
 import EntityListener from '@lib/EntityListener'
 

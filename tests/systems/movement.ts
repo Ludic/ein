@@ -1,4 +1,3 @@
-import Component from '@lib/Component'
 import ComponentMapper from '@lib/ComponentMapper'
 import Family from '@lib/Family'
 import Entity from '@lib/Entity'
