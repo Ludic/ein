@@ -3,9 +3,9 @@
   "version": "1.0.1",
   "description": "Entity Component System",
   "format": "es6",
-  "main": "lib/main.js",
-  "module": "lib/main.js",
-  "types": "lib/main.d.ts",
+  "main": "lib/Ein.js",
+  "module": "lib/Ein.js",
+  "types": "lib/Ein.d.ts",
   "scripts": {
     "dev": "tsc -w",
     "build": "rimraf lib && tsc",
