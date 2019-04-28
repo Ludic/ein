@@ -1,13 +1,12 @@
-import * as Component from './Component'
-import * as ComponentType from './ComponentType'
-import * as ComponentMapper from './ComponentMapper'
-import * as Family from './Family'
-import * as Entity from './Entity'
-import * as EntityListener from './EntityListener'
-import * as System from './System'
-import * as SystemListener from './SystemListener'
-import * as Engine from './Engine'
-
+import Component from './Component'
+import ComponentType from './ComponentType'
+import ComponentMapper from './ComponentMapper'
+import Family from './Family'
+import Entity from './Entity'
+import EntityListener from './EntityListener'
+import System from './System'
+import SystemListener from './SystemListener'
+import Engine from './Engine'
 
 export {Component}
 export {ComponentType}
@@ -18,15 +17,3 @@ export {EntityListener}
 export {System}
 export {SystemListener}
 export {Engine}
-
-export default {
-  Component,
-  ComponentType,
-  ComponentMapper,
-  Family,
-  Entity,
-  EntityListener,
-  System,
-  SystemListener,
-  Engine
-}
