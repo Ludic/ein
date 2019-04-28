@@ -4,6 +4,7 @@
   "description": "Entity Component System",
   "format": "es6",
   "main": "lib/main.js",
+  "module": "lib/main.js",
   "types": "lib/main.d.ts",
   "scripts": {
     "dev": "tsc -w",
