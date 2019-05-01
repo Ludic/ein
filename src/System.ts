@@ -1,7 +1,5 @@
 import Engine from './Engine'
 
-type Klass<T> = { new (...args: any[]): T }
-
 /**
  * Abstract class for processing sets of [[Entity]] objects.
  */

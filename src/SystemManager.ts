@@ -1,7 +1,6 @@
 import System from './System'
 import SystemListener from './SystemListener'
-
-type Klass<T> = { new (...args: any[]): T }
+import { Klass } from './Klass'
 
 export default class SystemManager {
 	private systems: System[] = []

@@ -1,7 +1,6 @@
 import Component from './Component'
 import Bits from './Bits'
-
-interface Klass<T> { new(): T }
+import Klass from './Klass'
 
 /**
  * Uniquely identifies a {@link Component} sub-class. It assigns them an index which is used internally for fast comparison and

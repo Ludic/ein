@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { IllegalStateException } from '@lib/exceptions'
+import { IllegalStateException } from '../src/exceptions'
 
 describe('Exceptions', () => {
   it('should throw a custom exception', async () => {

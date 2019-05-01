@@ -4,8 +4,7 @@ import Bits from './Bits'
 import Component from './Component'
 import ComponentType from './ComponentType'
 import Entity from './Entity'
-
-type Klass<T> = { new (...args: any[]): T }
+import Klass from './Klass'
 
 /**
  * Represents a group of [[Component]]s. It is used to describe what [[Entity]] objects a [[System]] should

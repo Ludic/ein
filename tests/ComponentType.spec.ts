@@ -1,11 +1,11 @@
 import { assert } from 'chai'
-import Component from '@lib/Component'
-import ComponentType from '@lib/ComponentType'
+import Component from '../src/Component'
+import ComponentType from '../src/ComponentType'
 
-import MovementComponent from '@tests/components/movement'
+import MovementComponent from './components/movement'
 
-class ComponentA implements Component {}
-class ComponentB implements Component {}
+class ComponentA extends Component {}
+class ComponentB extends Component {}
 
 describe('ComponentType', () => {
 

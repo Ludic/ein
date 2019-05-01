@@ -1,20 +1,21 @@
 import { assert } from 'chai'
-import Listener from '@lib/Listener'
-import Signal from '@lib/Signal'
-import Component from '@lib/Component'
-import ComponentType from '@lib/ComponentType'
-import ComponentManager from '@lib/ComponentManager'
-import ComponentMapper from '@lib/ComponentMapper'
-import Entity from '@lib/Entity'
-import EntityListener from '@lib/EntityListener'
-import Family from '@lib/Family'
-import Engine from '@lib/Engine'
+import Listener from '../src/Listener'
+import Signal from '../src/Signal'
+import Component from '../src/Component'
+import ComponentType from '../src/ComponentType'
+import ComponentManager from '../src/ComponentManager'
+import ComponentMapper from '../src/ComponentMapper'
+import Entity from '../src/Entity'
+import EntityListener from '../src/EntityListener'
+import Family from '../src/Family'
+import Engine from '../src/Engine'
 
-class ComponentA implements Component {}
-class ComponentB implements Component {}
+import PositionComponent from './components/position'
+import MovementComponent from './components/movement'
 
-import PositionComponent from '@tests/components/position'
-import MovementComponent from '@tests/components/movement'
+class ComponentA extends Component {}
+class ComponentB extends Component {}
+
 
 class EntityListenerMock implements Listener<Entity> {
 	public counter: number = 0
@@ -25,12 +26,8 @@ class EntityListenerMock implements Listener<Entity> {
 	}
 }
 
-interface Klass<T> {
-  new(): T
-}
-
-const am: ComponentMapper<ComponentA> = ComponentMapper.getFor(ComponentA.prototype as Klass<ComponentA>)
-const bm: ComponentMapper<ComponentB> = ComponentMapper.getFor(ComponentB.prototype as Klass<ComponentB>)
+const am: ComponentMapper<ComponentA> = ComponentMapper.getFor(ComponentA)
+const bm: ComponentMapper<ComponentB> = ComponentMapper.getFor(ComponentB)
 
 
 describe('EntityListener', () => {

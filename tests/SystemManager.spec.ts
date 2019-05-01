@@ -1,8 +1,8 @@
 import { assert } from 'chai'
-import SystemManager from '@lib/SystemManager'
-import System from '@lib/System'
-import SystemListener from '@lib/SystemListener'
-import Engine from '@lib/Engine'
+import SystemManager from '../src/SystemManager'
+import System from '../src/System'
+import SystemListener from '../src/SystemListener'
+import Engine from '../src/Engine'
 
 class SystemListenerSpy implements SystemListener {
   public addedCount: number = 0

@@ -1,19 +1,15 @@
-import Component from '@lib/Component'
-import ComponentType from '@lib/ComponentType'
-import ComponentMapper from '@lib/ComponentMapper'
-import Family from '@lib/Family'
-import Entity from '@lib/Entity'
-import System from '@lib/System'
-import Engine from '@lib/Engine'
+import Component from '../../src/Component'
+import ComponentType from '../../src/ComponentType'
+import ComponentMapper from '../../src/ComponentMapper'
+import Family from '../../src/Family'
+import Entity from '../../src/Entity'
+import System from '../../src/System'
+import Engine from '../../src/Engine'
 
-import PositionComponent from '@tests/components/position'
-
-interface Klass<T> {
-  new(): T
-}
+import PositionComponent from '../components/position'
 
 export default class PositionSystem extends System {
-  private pm: ComponentMapper<PositionComponent> = ComponentMapper.getFor(PositionComponent as Klass<PositionComponent>)
+  private pm: ComponentMapper<PositionComponent> = ComponentMapper.getFor(PositionComponent)
 
   public entities: Entity[]
   public components = [PositionComponent]
@@ -40,8 +36,8 @@ export default class PositionSystem extends System {
     if(this.engine)  this.entities = this.engine.getEntitiesFor(this.family)
     this.entities.forEach((entity: Entity) => {
 
-		  const p: PositionComponent | null = this.pm.get(entity)
-
+		  const p = this.pm.get(entity)
+      
       if(p){
 		    // p.x += m.velocityX * deltaTime
 		    // p.y += m.velocityY * deltaTime

@@ -4,8 +4,6 @@ import Family from './Family'
 import Entity from './Entity'
 import EntityListener from './EntityListener'
 
-interface Klass<T> { new(): T }
-
 export default class FamilyManager {
   entities: Entity[]
   familyToEntitesMap: WeakMap<Family, Entity[]> = new WeakMap<Family, Entity[]>()

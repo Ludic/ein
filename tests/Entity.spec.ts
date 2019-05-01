@@ -1,16 +1,16 @@
 import { assert } from 'chai'
-import Bits from '@lib/Bits'
-import Listener from '@lib/Listener'
-import Signal from '@lib/Signal'
-import Component from '@lib/Component'
-import ComponentType from '@lib/ComponentType'
-import ComponentManager from '@lib/ComponentManager'
-import ComponentMapper from '@lib/ComponentMapper'
-import Entity from '@lib/Entity'
-import EntityListener from '@lib/EntityListener'
+import Bits from '../src/Bits'
+import Listener from '../src/Listener'
+import Signal from '../src/Signal'
+import Component from '../src/Component'
+import ComponentType from '../src/ComponentType'
+import ComponentManager from '../src/ComponentManager'
+import ComponentMapper from '../src/ComponentMapper'
+import Entity from '../src/Entity'
+import EntityListener from '../src/EntityListener'
 
-class ComponentA implements Component {}
-class ComponentB implements Component {}
+class ComponentA extends Component {}
+class ComponentB extends Component {}
 
 class EntityListenerMock implements Listener<Entity> {
 	public counter: number = 0
@@ -21,12 +21,8 @@ class EntityListenerMock implements Listener<Entity> {
 	}
 }
 
-interface Klass<T> {
-  new(): T
-}
-
-const am: ComponentMapper<ComponentA> = ComponentMapper.getFor(ComponentA.prototype as Klass<ComponentA>)
-const bm: ComponentMapper<ComponentB> = ComponentMapper.getFor(ComponentB.prototype as Klass<ComponentB>)
+const am: ComponentMapper<ComponentA> = ComponentMapper.getFor(ComponentA)
+const bm: ComponentMapper<ComponentB> = ComponentMapper.getFor(ComponentB)
 
 describe('Entity', () => {
 
@@ -69,7 +65,7 @@ describe('Entity', () => {
     assert.isTrue(am.has(entity))
     assert.isFalse(bm.has(entity))
 
-    entity.remove(ComponentA.prototype as Klass<ComponentA>)
+    entity.remove(ComponentA)
     assert.equal(0, entity.getComponents().length)
 
     for(let i=0; i < componentBits.length(); ++i) {
@@ -89,8 +85,8 @@ describe('Entity', () => {
 
     assert.equal(2, entity.getComponents().length)
 
-    const componentAIndex: number = ComponentType.getIndexFor(ComponentA.prototype as Klass<ComponentA>)
-    const componentBIndex: number = ComponentType.getIndexFor(ComponentB.prototype as Klass<ComponentB>)
+    const componentAIndex: number = ComponentType.getIndexFor(ComponentA)
+    const componentBIndex: number = ComponentType.getIndexFor(ComponentB)
 
     let componentBits: Bits = entity.getComponentBits()
     for (let i=0; i < componentBits.length(); ++i) {
@@ -147,14 +143,14 @@ describe('Entity', () => {
     assert.equal(1, addedListener.counter)
     assert.equal(0, removedListener.counter)
 
-    entity.remove(ComponentA.prototype as Klass<ComponentA>)
+    entity.remove(ComponentA)
     assert.equal(1, addedListener.counter)
     assert.equal(1, removedListener.counter)
 
     entity.add(new ComponentB())
     assert.equal(2, addedListener.counter)
 
-    entity.remove(ComponentB.prototype as Klass<ComponentB>)
+    entity.remove(ComponentB)
     assert.equal(2, removedListener.counter)
   })
 
@@ -165,8 +161,8 @@ describe('Entity', () => {
     const entity: Entity = new Entity()
     entity.add(compA).add(compB)
 
-    const retA: ComponentA | null = entity.getComponentForClass(ComponentA.prototype as Klass<ComponentA>)
-    const retB: ComponentB | null = entity.getComponentForClass(ComponentB.prototype as Klass<ComponentB>)
+    const retA = entity.getComponent(ComponentA)
+    const retB = entity.getComponent(ComponentB)
 
     assert.isNotNull(retA)
     assert.isNotNull(retB)

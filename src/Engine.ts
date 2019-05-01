@@ -15,8 +15,8 @@ import System from './System'
 import SystemListener from './SystemListener'
 import SystemManager from './SystemManager'
 
-type Klass<T> = { new (...args: any[]): T }
 import { IllegalStateException } from './exceptions'
+import Klass from './Klass'
 
 /**
  * [[System]]s have no state and [[Component]]s have no behavior!!!!!
@@ -42,7 +42,7 @@ export default class Engine {
   private componentAdded: Listener<Entity>  = new ComponentListener(this)
   private componentRemoved:  Listener<Entity>  = new ComponentListener(this)
 
-  private systemManager: SystemManager = new SystemManager(new EngineSystemListener(this))
+  private systemManager = new SystemManager(new EngineSystemListener(this))
   private entityManager: EntityManager = new EntityManager(new EngineEntityListener(this))
   public familyManager: FamilyManager = new FamilyManager(this.entityManager.getEntities())
   private componentManager: ComponentManager = new ComponentManager()
@@ -99,14 +99,14 @@ export default class Engine {
    * If the Engine already had a system of the same class,
    * the new one will replace the old one.
    */
-  public addSystem(system: System): void {
+  public addSystem<T extends System>(system: T): void {
   	this.systemManager.addSystem(system)
   }
 
   /**
    * Removes a [[System]] from the Engine.
    */
-  public removeSystem(system: System): void {
+  public removeSystem<T extends System>(system: T): void {
   	this.systemManager.removeSystem(system)
   }
 

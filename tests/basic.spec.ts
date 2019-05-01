@@ -1,21 +1,21 @@
 import { assert } from 'chai'
 
-import Engine from '@lib/Engine'
-import Entity from '@lib/Entity'
-import EntityListener from '@lib/EntityListener'
+import Engine from '../src/Engine'
+import Entity from '../src/Entity'
+import EntityListener from '../src/EntityListener'
 
-import PositionComponent from '@tests/components/position'
-import MovementComponent from '@tests/components/movement'
+import PositionComponent from './components/position'
+import MovementComponent from './components/movement'
 
-import PositionSystem from '@tests/systems/position'
-import MovementSystem from '@tests/systems/movement'
+import PositionSystem from './systems/position'
+import MovementSystem from './systems/movement'
 
 describe('Basic', () => {
   it('should basically work', async () => {
 
     const engine = new Engine()
 
-    const movementSystem: MovementSystem = new MovementSystem()
+    const movementSystem = new MovementSystem()
     const positionSystem: PositionSystem = new PositionSystem()
 
     engine.addSystem(movementSystem)

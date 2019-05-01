@@ -3,4 +3,7 @@
  * [[System]]. But do as you wish.
  * [[System]]s have no state and [[Component]]s have no behavior!!!!!
  */
-export default interface Component {}
+export const ComponentSymbol = Symbol.for('Component')
+export default abstract class Component {
+  protected [ComponentSymbol] = true
+}

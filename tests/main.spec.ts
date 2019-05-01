@@ -1,12 +1,12 @@
-import Bits from '@lib/Bits'
-import Listener from '@lib/Listener'
-import Signal from '@lib/Signal'
-import Component from '@lib/Component'
-import ComponentType from '@lib/ComponentType'
-import ComponentManager from '@lib/ComponentManager'
-import ComponentMapper from '@lib/ComponentMapper'
-import Entity from '@lib/Entity'
-import EntityListener from '@lib/EntityListener'
+import Bits from '../src/Bits'
+import Listener from '../src/Listener'
+import Signal from '../src/Signal'
+import Component from '../src/Component'
+import ComponentType from '../src/ComponentType'
+import ComponentManager from '../src/ComponentManager'
+import ComponentMapper from '../src/ComponentMapper'
+import Entity from '../src/Entity'
+import EntityListener from '../src/EntityListener'
 
 beforeEach(()=> {
   ComponentType.reset()

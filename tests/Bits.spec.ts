@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import Bits from '@lib/Bits'
+import Bits from '../src/Bits'
 
 describe('Bits', () => {
 

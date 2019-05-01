@@ -1,19 +1,11 @@
-import Component from './Component'
-import ComponentType from './ComponentType'
-import ComponentMapper from './ComponentMapper'
-import Family from './Family'
-import Entity from './Entity'
-import EntityListener from './EntityListener'
-import System from './System'
-import SystemListener from './SystemListener'
-import Engine from './Engine'
+export {default as Component} from './Component'
+export {default as ComponentType} from './ComponentType'
+export {default as ComponentMapper} from './ComponentMapper'
+export {default as Family} from './Family'
+export {default as Entity} from './Entity'
+export {default as EntityListener} from './EntityListener'
+export {default as System} from './System'
+export {default as SystemListener} from './SystemListener'
+export {default as Engine} from './Engine'
+export {default as Klass} from './Klass'
 
-export {Component}
-export {ComponentType}
-export {ComponentMapper}
-export {Family}
-export {Entity}
-export {EntityListener}
-export {System}
-export {SystemListener}
-export {Engine}

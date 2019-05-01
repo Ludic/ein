@@ -6,7 +6,6 @@
     "sourceMap": true,
     "baseUrl": ".",
     "declaration": true,
-    "declarationDir": "lib/",
     "outDir": "lib/",
     "allowJs": false,
     "alwaysStrict": true,
@@ -29,6 +28,6 @@
     }
   },
   "include": [
-    "src",
+    "src"
   ]
 }

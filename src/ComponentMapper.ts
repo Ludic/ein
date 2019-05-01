@@ -1,8 +1,7 @@
 import Component from './Component'
 import ComponentType from './ComponentType'
 import Entity from './Entity'
-
-interface Klass<T> { new(): T }
+import Klass from './Klass'
 
 /**
  * Provides super fast {@link Component} retrieval from {@Link Entity} objects.
@@ -25,7 +24,7 @@ export default class ComponentMapper<T extends Component> {
 	}
 
 	/** @return The {@link Component} of the specified class belonging to entity. */
-	public get<T extends Component>(entity: Entity): T | null {
+	public get(entity: Entity): T | undefined {
 		return entity.getComponent<T>(this.componentType)
 	}
 

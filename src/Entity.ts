@@ -3,8 +3,7 @@ import Signal from './Signal'
 import Listener from './Listener'
 import Component from './Component'
 import ComponentType from './ComponentType'
-
-interface Klass<T> { new(): T }
+import Klass from './Klass'
 
 /**
  * Simple containers of [[Component]]s that give them "data". The component's data is then processed by the [[System]]s.
@@ -19,7 +18,7 @@ export default class Entity {
   public componentRemoved: Signal<Entity>
 
   // ComponentType.index  -> Component
-  private componentMap = new Map()
+  private componentMap = new Map<ComponentType['index'], Component>()
   private components: Component[] = []
 
   private componentBits: Bits
@@ -37,7 +36,7 @@ export default class Entity {
 	 * Adds a [[Component]] to this Entity.
 	 * @return The Entity for easy chaining
 	 */
-	public add<Component>(component: Component): Entity {
+	public add<T extends Component>(component: T): Entity {
     if(this.addInternal(component)){
       this.notifyComponentAdded()
 		}
@@ -48,7 +47,7 @@ export default class Entity {
 	 * Adds a {@link Component} to this Entity. If a {@link Component} of the same type already exists, it'll be replaced.
 	 * @return The Component for direct component manipulation (e.g. PooledComponent)
 	 */
-	public addAndReturn(component: Component): Component {
+	public addAndReturn<T extends Component>(component: T): T {
 	  this.add(component)
 		return component
   }
@@ -58,10 +57,10 @@ export default class Entity {
 	 * instance reference.
 	 * @return The removed [[Component]], or null if the Entity did no contain such a component.
 	 */
-  public remove<T extends Component>(componentClass: Klass<T>): Component | null {
+  public remove<T extends Component>(componentClass: Klass<T>): T | undefined {
 		const componentType: ComponentType = ComponentType.getFor(componentClass)
 		const componentTypeIndex: number = componentType.getIndex()
-		const removeComponent: Component = this.componentMap.get(componentTypeIndex)
+		const removeComponent = this.componentMap.get(componentTypeIndex) as T | undefined
 
 		if(removeComponent != null && this.removeInternal(componentClass) != null) {
 			this.notifyComponentRemoved()
@@ -84,17 +83,12 @@ export default class Entity {
    * @return the instance of the specified {@link Component} attached to this {@link Entity}, or null if no such
    *         {@link Component} exists.
    */
-  public getComponentForClass<T extends Component>(componentClass: Klass<T>): T | null {
-	  return this.getComponent(ComponentType.getFor(componentClass))
-  }
-
-  public getComponent<T extends Component>(componentType: ComponentType): T | null {
-	  const componentTypeIndex: number = componentType.getIndex()
-	  if (componentTypeIndex < this.components.length) {
-		  return this.componentMap.get(componentType.getIndex())
-	  } else {
-		  return null
-	  }
+  public getComponent<T extends Component>(componentClassOrType: ComponentType | Klass<T>): T | undefined {
+    if(componentClassOrType instanceof ComponentType){
+      return this.componentMap.get(componentClassOrType.getIndex()) as T | undefined
+    } else {
+      return this.getComponent(ComponentType.getFor(componentClassOrType))
+    }
   }
 
   public getComponents(): Component[] {
@@ -132,9 +126,9 @@ export default class Entity {
    * @param component
    * @return whether or not the component was added.
    */
-  addInternal(component: Component): boolean {
+  addInternal<T>(component: Component): boolean {
 	  const componentClass = component.constructor.prototype
-	  const oldComponent: Component | null = this.getComponentForClass(componentClass.constructor)
+	  const oldComponent = this.getComponent(componentClass.constructor)
 
 	  if(component == oldComponent){
 		  return false
@@ -156,10 +150,10 @@ export default class Entity {
    * @param componentClass
    * @return the component if the specified class was found and removed. Otherwise, null
    */
-  removeInternal<T>(componentClass: Klass<T>): Component | null {
+  removeInternal<T>(componentClass: Klass<T>): Component | undefined {
 	  const componentType: ComponentType = ComponentType.getFor(componentClass)
 	  const componentTypeIndex: number = componentType.getIndex();
-	  const removeComponent: Component = this.componentMap.get(componentTypeIndex)
+	  const removeComponent = this.componentMap.get(componentTypeIndex)
 
 	  if(removeComponent != null){
 
@@ -173,6 +167,6 @@ export default class Entity {
 		  return removeComponent
 	  }
 
-	  return null
+	  return undefined
   }
 }
