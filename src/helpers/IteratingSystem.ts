@@ -28,9 +28,9 @@ export default abstract class IteratingSystem extends System {
   public update(deltaTime: number): void {
     if(this.engine)  this.entities = this.engine.getEntitiesFor(this.family)
     this.entities.forEach((entity: Entity) => {
-      this.proccessEntity(entity, deltaTime)
+      this.processEntity(entity, deltaTime)
     })
   }
 
-  protected abstract proccessEntity(entity: Entity, deltaTime: number): void
+  protected abstract processEntity(entity: Entity, deltaTime: number): void
 }

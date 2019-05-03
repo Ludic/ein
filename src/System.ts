@@ -7,8 +7,11 @@ export default abstract class System {
 	// Use this to set the priority of the system. Lower means it'll get executed first.
 	public priority: number
 
-	private processing: boolean
-	public engine: Engine | null
+  private processing: boolean
+  private sleeping: boolean
+  private sleepTime: number = 0
+  public engine: Engine | null
+  
 
 	/**
 	 * Initialises the System with the priority specified.
@@ -38,14 +41,47 @@ export default abstract class System {
 	public update(deltaTime: number): void {}
 
 	/** @return Whether or not the system should be processed. */
-	public checkProcessing(): boolean {
-		return this.processing
+	public checkProcessing(deltaTime: number): boolean {
+    return this.processing || this.dream(deltaTime)
 	}
 
 	/** Sets whether or not the system should be processed by the [[Engine]]. */
 	public setProcessing(processing: boolean): void {
-		this.processing = processing
-	}
+    this.processing = processing
+    // reset the sleep time if manually re-enabled
+    if(this.processing){
+      this.wake()
+    }
+  }
+  
+  /**
+   * Sets this system to not processing for a set time
+   * @param ms milliseconds to sleep
+   */
+  public sleep(ms: number): void {
+    this.sleeping = true
+    this.sleepTime = ms
+    this.processing = false
+  }
+  /**
+   * Wakes this system, resetting all variables.
+   */
+  public wake(): void {
+    this.sleepTime = 0
+    this.sleeping = false
+    this.processing = true
+  }
+  /**
+   * Reduce the sleep time by a delta time
+   * @param deltaTime amount of time to dream
+   */
+  private dream(deltaTime: number): boolean {
+    this.sleepTime -= deltaTime
+    if(this.sleepTime <= 0){
+      this.wake()
+    }
+    return false
+  }
 
 	public getEngine(): Engine | null {
 		return this.engine

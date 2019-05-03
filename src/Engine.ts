@@ -169,7 +169,7 @@ export default class Engine {
 
   	try {
       systems.forEach((system: System) => {
-  			if(system.checkProcessing()) {
+  			if(system.checkProcessing(deltaTime)) {
   				system.update(deltaTime)
   			}
       })

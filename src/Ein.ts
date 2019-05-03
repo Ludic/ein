@@ -8,4 +8,7 @@ export {default as System} from './System'
 export {default as SystemListener} from './SystemListener'
 export {default as Engine} from './Engine'
 export {default as Klass} from './Klass'
+export {default as IteratingSystem} from './helpers/IteratingSystem'
+export {default as IntervalSystem} from './helpers/IntervalSystem'
+export {default as SortedIteratingSystem} from './helpers/SortedIteratingSystem'
 
