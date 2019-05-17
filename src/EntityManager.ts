@@ -5,10 +5,11 @@ import { IllegalStateException } from './exceptions'
 // Manages the addition / removal of entity
 export default class EntityManager {
 	private listener: EntityListener
-	private entities: Entity[] = []
+  private entities: Entity[] = []
+  private singletonEntity: Entity
 
 	constructor(listener: EntityListener) {
-		this.listener = listener
+    this.listener = listener
 	}
 
 	public addEntity(entity: Entity): void {
@@ -25,7 +26,15 @@ export default class EntityManager {
 		  this.entities.splice(i, 1)
       this.listener.entityRemoved(entity)
     }
-	}
+  }
+  
+  public getSingleton(): Entity {
+    if(this.singletonEntity == null){
+      this.singletonEntity = new Entity()
+      this.addEntity(this.singletonEntity)
+    }
+    return this.singletonEntity
+  }
 
 	public removeAllEntities(entities?: Entity[]): void {
     if(entities){

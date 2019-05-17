@@ -17,6 +17,8 @@ import SystemManager from './SystemManager'
 
 import { IllegalStateException } from './exceptions'
 import Klass from './Klass'
+import ComponentType from './ComponentType';
+import ComponentMapper from './ComponentMapper';
 
 /**
  * [[System]]s have no state and [[Component]]s have no behavior!!!!!
@@ -66,6 +68,22 @@ export default class Engine {
    */
   public addEntity(entity: Entity): void {
   	this.entityManager.addEntity(entity)
+  }
+
+  public getSingleton(): Entity {
+    return this.entityManager.getSingleton()
+  }
+
+  public addSingletonComponent<T extends Component>(component: T): T {
+    return this.getSingleton().addAndReturn(component)
+  }
+
+  public getSingletonComponent<T extends Component>(arg: ComponentType | Klass<T> | ComponentMapper<T>): T | undefined {
+    if(arg instanceof ComponentMapper){
+      return arg.get(this.getSingleton())
+    } else {
+      return this.getSingleton().getComponent(arg)
+    }
   }
 
   /**
