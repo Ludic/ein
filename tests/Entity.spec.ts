@@ -42,8 +42,8 @@ describe('Entity', () => {
 
     assert.isTrue(entity.getComponentBits().isEmpty())
     assert.equal(0, entity.getComponents().length)
-    assert.isNull(am.get(entity))
-    assert.isNull(bm.get(entity))
+    assert.isUndefined(am.get(entity))
+    assert.isUndefined(bm.get(entity))
     assert.isFalse(am.has(entity))
     assert.isFalse(bm.has(entity))
   })
@@ -61,7 +61,7 @@ describe('Entity', () => {
     }
 
     assert.isNotNull(am.get(entity))
-    assert.isNull(bm.get(entity))
+    assert.isUndefined(bm.get(entity))
     assert.isTrue(am.has(entity))
     assert.isFalse(bm.has(entity))
 
@@ -72,8 +72,8 @@ describe('Entity', () => {
     	assert.isFalse(componentBits.get(i))
     }
 
-    assert.isNull(am.get(entity))
-    assert.isNull(bm.get(entity))
+    assert.isUndefined(am.get(entity))
+    assert.isUndefined(bm.get(entity))
     assert.isFalse(am.has(entity))
     assert.isFalse(bm.has(entity))
   })
@@ -106,8 +106,8 @@ describe('Entity', () => {
     	assert.isFalse(componentBits.get(i))
     }
 
-    assert.isNull(am.get(entity))
-    assert.isNull(bm.get(entity))
+    assert.isUndefined(am.get(entity))
+    assert.isUndefined(bm.get(entity))
     assert.isFalse(am.has(entity))
     assert.isFalse(bm.has(entity))
 
