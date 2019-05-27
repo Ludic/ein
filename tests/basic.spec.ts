@@ -35,15 +35,22 @@ describe('Basic', () => {
 
     for(let i=0; i<1; i++){
 	    engine.update(0.25)
-	    // if (i > 5) engine.removeSystem(movementSystem)
+	    if (i > 5) engine.removeSystem(movementSystem)
     }
 
     assert.equal(positionSystem.entities.length, 10)
     assert.equal(movementSystem.entities.length, 4)
 
 
-    engine.removeEntityListener(listener)
+    // Remove an entity
+    positionSystem.entities[0].removing = true
+    engine.removeEntity(positionSystem.entities[0])
+    engine.update(0.25)
+    assert.equal(positionSystem.entities.length, 9)
 
+
+    // Remove the listener
+    engine.removeEntityListener(listener)
   })
 })
 

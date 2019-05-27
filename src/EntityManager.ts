@@ -27,7 +27,7 @@ export default class EntityManager {
       this.listener.entityRemoved(entity)
     }
   }
-  
+
   public getSingleton(): Entity {
     if(this.singletonEntity == null){
       this.singletonEntity = new Entity()

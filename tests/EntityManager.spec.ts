@@ -22,7 +22,7 @@ class EntityListenerMock implements EntityListener {
 
 describe('EntityManager', () => {
 
-  it('addEntity() and removeEntity()', async () => {
+  it('addEntity() and removeAllEntity()', async () => {
     const listener: EntityListenerMock = new EntityListenerMock()
 		const manager: EntityManager = new EntityManager(listener)
 
@@ -93,6 +93,25 @@ describe('EntityManager', () => {
     } catch(e){
       assert.isTrue(e instanceof IllegalStateException)
     }
+  })
+
+  it('removeEntity()', async () => {
+    const listener: EntityListenerMock = new EntityListenerMock()
+		const manager: EntityManager = new EntityManager(listener)
+
+		const entity1: Entity = new Entity()
+		manager.addEntity(entity1)
+
+		assert.equal(1, listener.addedCount)
+		const entity2: Entity = new Entity()
+		manager.addEntity(entity2)
+
+		assert.equal(2, listener.addedCount)
+
+    manager.removeEntity(entity1)
+    manager.removeEntity(entity2)
+
+    assert.equal(2, listener.removedCount)
   })
 
 })
