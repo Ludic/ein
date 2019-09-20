@@ -1,4 +1,4 @@
-import Component from '../../src/Component'
+import { Component } from '../../dist/cjs/Ein'
 
 export default class MovementComponent extends Component {
 	public velocityX: number

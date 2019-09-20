@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "lib": ["es2017"],
-    "module": "commonjs",
+    "module": "ESNext",
     "sourceMap": true,
     "baseUrl": ".",
     "declaration": true,

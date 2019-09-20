@@ -1,11 +1,4 @@
-import Component from '../../src/Component'
-import ComponentType from '../../src/ComponentType'
-import ComponentMapper from '../../src/ComponentMapper'
-import Family from '../../src/Family'
-import Entity from '../../src/Entity'
-import System from '../../src/System'
-import Engine from '../../src/Engine'
-
+import { ComponentMapper, Family, Entity, System, Engine } from '../../dist/cjs/Ein'
 import PositionComponent from '../components/position'
 
 export default class PositionSystem extends System {
@@ -37,7 +30,7 @@ export default class PositionSystem extends System {
     this.entities.forEach((entity: Entity) => {
 
 		  const p = this.pm.get(entity)
-      
+
       if(p){
 		    // p.x += m.velocityX * deltaTime
 		    // p.y += m.velocityY * deltaTime

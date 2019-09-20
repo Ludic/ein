@@ -3,12 +3,13 @@
   "version": "1.0.1",
   "description": "Entity Component System",
   "format": "es6",
-  "main": "lib/Ein.js",
-  "module": "lib/Ein.js",
-  "types": "lib/Ein.d.ts",
+  "main": "dist/cjs/Ein.js",
+  "module": "dist/iife/Ein.js",
+  "types": "dist/Ein.d.ts",
   "scripts": {
     "dev": "tsc -w",
-    "build": "rimraf lib && tsc",
+    "clean": "rimraf ./build && rimraf ./dist",
+    "build": "npm run clean && rollup -c",
     "test": "npm run build && nyc mocha --require ts-node/register -r tsconfig-paths/register -r source-map-support/register --recursive \"./tests/**/basic.spec.ts\"",
     "test:all": "npm run build && nyc mocha --require ts-node/register -r tsconfig-paths/register -r source-map-support/register --recursive \"./tests/**/*.spec.ts\""
   },
@@ -25,10 +26,13 @@
     "mocha": "^5.2.0",
     "nyc": "^12.0.2",
     "rimraf": "^2.6.3",
+    "rollup": "^1.21.4",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-typescript2": "^0.24.2",
     "sinon": "^6.1.4",
     "source-map-support": "^0.5.6",
     "ts-node": "^7.0.0",
     "tsconfig-paths": "^3.5.0",
-    "typescript": "^3.2.2"
+    "typescript": "^3.6.3"
   }
 }

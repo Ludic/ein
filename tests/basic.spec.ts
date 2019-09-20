@@ -1,8 +1,6 @@
 import { assert } from 'chai'
 
-import Engine from '../src/Engine'
-import Entity from '../src/Entity'
-import EntityListener from '../src/EntityListener'
+import { Engine, Entity, EntityListener } from '../dist/cjs/Ein'
 
 import PositionComponent from './components/position'
 import MovementComponent from './components/movement'

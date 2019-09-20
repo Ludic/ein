@@ -1,4 +1,4 @@
-import Component from '../../src/Component'
+import { Component } from '../../dist/cjs/Ein'
 
 export default class PositionComponent extends Component {
 	public x: number

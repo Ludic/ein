@@ -1,8 +1,4 @@
-import ComponentMapper from '../../src/ComponentMapper'
-import Family from '../../src/Family'
-import Entity from '../../src/Entity'
-import System from '../../src/System'
-import Engine from '../../src/Engine'
+import { ComponentMapper, Family, Entity, System, Engine } from '../../dist/cjs/Ein'
 
 import PositionComponent from '../components/position'
 import MovementComponent from '../components/movement'
