@@ -1,6 +1,5 @@
 import { assert } from 'chai'
-import Component from '../src/Component'
-import ComponentType from '../src/ComponentType'
+import { Component, ComponentType } from '../dist/cjs/Ein'
 
 import MovementComponent from './components/movement'
 

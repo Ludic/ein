@@ -1,14 +1,15 @@
 import { assert } from 'chai'
-import Listener from '../src/Listener'
-import Signal from '../src/Signal'
-import Component from '../src/Component'
-import ComponentType from '../src/ComponentType'
-import ComponentManager from '../src/ComponentManager'
-import ComponentMapper from '../src/ComponentMapper'
-import Entity from '../src/Entity'
-import EntityListener from '../src/EntityListener'
-import Family from '../src/Family'
-import Engine from '../src/Engine'
+import { Listener,
+         Signal,
+         Component,
+         ComponentMapper,
+         ComponentType,
+         ComponentManager,
+         Entity,
+         EntityListener,
+         Family,
+         Engine
+       } from '../dist/cjs/Ein'
 
 import PositionComponent from './components/position'
 import MovementComponent from './components/movement'

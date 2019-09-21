@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import Bits from '../src/Bits'
+import { Bits } from '../dist/cjs/Ein'
 
 describe('Bits', () => {
 

@@ -11,7 +11,7 @@ export default abstract class System {
   private sleeping: boolean
   private sleepTime: number = 0
   public engine: Engine | null
-  
+
 
 	/**
 	 * Initialises the System with the priority specified.
@@ -53,7 +53,7 @@ export default abstract class System {
       this.wake()
     }
   }
-  
+
   /**
    * Sets this system to not processing for a set time
    * @param ms milliseconds to sleep

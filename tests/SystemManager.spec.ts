@@ -1,8 +1,5 @@
 import { assert } from 'chai'
-import SystemManager from '../src/SystemManager'
-import System from '../src/System'
-import SystemListener from '../src/SystemListener'
-import Engine from '../src/Engine'
+import { System, SystemManager, SystemListener, Engine } from '../dist/cjs/Ein'
 
 class SystemListenerSpy implements SystemListener {
   public addedCount: number = 0

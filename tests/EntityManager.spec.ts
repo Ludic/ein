@@ -1,9 +1,5 @@
 import { assert } from 'chai'
-import Entity from '../src/Entity'
-import EntityManager from '../src/EntityManager'
-import EntityListener from '../src/EntityListener'
-import { IllegalStateException } from '../src/exceptions'
-import Engine from '../src/Engine'
+import { Entity, EntityManager, EntityListener, Engine, IllegalStateException } from '../dist/cjs/Ein'
 
 class EntityListenerMock implements EntityListener {
   public addedCount: number = 0
