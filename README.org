@@ -1,0 +1,427 @@
+* Ein
+
+  Local Variables:
+  eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle)) nil t)
+  End:
+  https://media0.giphy.com/media/mUiRhlQ2iMSOI/source.gif
+
+
+** Engine
+   #+begin_src typescript :comments link :tangle src/Engine.ts
+    // import { Klass } from './Klass'
+    // import { Component } from './Component'
+    // import { Entity } from './Entity'
+    // import { System } from './System'
+    import { SystemManager } from "./SystemManager"
+    import { EntityManager } from "./EntityManager"
+    import { ComponentManager } from "./ComponentManager"
+
+
+    export class Engine {
+      systemManager: SystemManager
+      entityManager: EntityManager
+      componentsManager: ComponentManager
+
+      enabled: boolean
+
+      constructor(){
+        this.systemManager = new SystemManager(this)
+        this.entityManager = new EntityManager(this)
+        this.componentsManager = new ComponentManager(this)
+
+        this.enabled = true
+      }
+
+      createEntity(){
+        return this.entityManager.createEntity()
+      }
+    }
+   #+end_src
+
+
+** SystemManager
+   #+begin_src typescript :comments link :tangle src/SystemManager.ts
+     import { Engine } from './Engine'
+     import { System } from './System'
+     import { Klass } from './Klass'
+
+     export class SystemManager {
+       engine: Engine
+       systems: System[]
+       executeSystems: System[]
+
+       constructor(engine: Engine){
+         this.systems = []
+         this.executeSystems = [] // Systems that have `execute` method
+         this.engine = engine
+       }
+
+       addSystem(system: System){
+         system.engine = this.engine
+         system.order = this.systems.length
+         system.initQueries()
+
+         this.systems.push(system)
+
+         if(system.execute) this.executeSystems.push(system)
+         this.sortSystems()
+         return this
+       }
+
+       sortSystems(){
+         this.executeSystems.sort((a: System, b: System) => {
+           return a.priority - b.priority || a.order - b.order
+         })
+       }
+
+       getSystem(klass: Klass<System>): System | undefined {
+         return this.systems.find((s: System) => s instanceof klass)
+       }
+
+       getSystems() {
+         return this.systems
+       }
+
+       removeSystem(system: System) {
+         let index = this.systems.indexOf(system)
+         if (!~index) return
+
+         this.systems.splice(index, 1)
+       }
+
+       async execute(delta: number, time: number) {
+         for(let i=0; i<this.executeSystems.length; i++){
+           const system: System = this.executeSystems[i]
+           if (system.enabled && system.initialized) {
+             if (system.canExecute()) {
+               // @ts-ignore
+               let startTime = performance.now()
+
+               // @ts-ignore
+               await system.execute(delta, time)
+
+               // @ts-ignore
+               system.executeTime = performance.now() - startTime
+             }
+             system.clearEvents()
+           }
+         }
+
+         // this.executeSystems.forEach((system: System) => {
+         //   if (system.enabled && system.initialized) {
+         //     if (system.canExecute()) {
+         //       // @ts-ignore
+         //       let startTime = performance.now()
+         //       // @ts-ignore
+         //       system.execute(delta, time)
+         //       // @ts-ignore
+         //       system.executeTime = performance.now() - startTime
+         //     }
+         //     system.clearEvents()
+         //   }
+         // })
+       }
+
+       stats() {
+         let stats = {
+           numSystems: this.systems.length,
+           systems: {}
+         }
+
+         for (let i = 0; i < this.systems.length; i++) {
+           let system = this.systems[i]
+           // @ts-ignore
+           let systemStats = (stats.systems[system.constructor.name] = {
+             queries: {}
+           })
+         }
+
+         return stats
+       }
+     }
+   #+end_src
+
+
+** System
+   #+begin_src typescript :comments link :tangle src/System.ts
+     import { Klass } from './Klass'
+     import { Component } from './Component'
+     import { Entity } from './Entity'
+     import { Engine } from './Engine'
+     import { Query } from "./Query"
+
+     export class System {
+       engine: Engine
+       enabled: boolean
+       _queries: {[key: string]: Query}
+       queries: any
+       priority: number
+       executeTime: number
+       mandatoryQueries: any[]
+       initialized: boolean
+       order: any
+       todo_queries: any
+
+       constructor(todo_queries: any, priority: number = 0) {
+         this.enabled = true
+
+         // @todo Better naming :)
+         this._queries = {}
+         this.queries = {}
+         this.todo_queries = todo_queries
+
+         // Used for stats
+         this.executeTime = 0
+
+         this.priority = priority
+
+         this.mandatoryQueries = []
+
+         this.initialized = true
+       }
+
+       initQueries(){
+         // @ts-ignore
+         if(this.todo_queries) {
+           // @ts-ignore
+           for(let queryName in this.todo_queries) {
+             // @ts-ignore
+             let queryConfig = this.todo_queries[queryName]
+             let Components = queryConfig.components
+             if (!Components || Components.length === 0) {
+               throw new Error("'components' attribute can't be empty in a query")
+             }
+
+             let query = this.engine.entityManager.queryComponents(Components)
+
+             this._queries[queryName] = query
+             if (queryConfig.mandatory === true) {
+               this.mandatoryQueries.push(query)
+             }
+
+             this.queries[queryName] = {
+               results: query.entities
+             }
+
+             // Reactive configuration added/removed/changed
+             let validEvents = ["added", "removed", "changed"]
+
+             const eventMapping = {
+               // @ts-ignore
+               added: Query.prototype.ENTITY_ADDED,
+               // @ts-ignore
+               removed: Query.prototype.ENTITY_REMOVED,
+               // @ts-ignore
+               changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
+             }
+
+             if (queryConfig.listen) {
+               validEvents.forEach(eventName => {
+                 // Is the event enabled on this system's query?
+                 if (queryConfig.listen[eventName]) {
+                   let event = queryConfig.listen[eventName]
+
+                   if (eventName === "changed") {
+                     query.reactive = true
+                     if (event === true) {
+                       // Any change on the entity from the components in the query
+                       let eventList = (this.queries[queryName][eventName] = [])
+                       query.eventDispatcher.addEventListener(
+                         // @ts-ignore
+                         Query.prototype.COMPONENT_CHANGED,
+                         (entity: Entity) => {
+                           // Avoid duplicates
+                           // @ts-ignore
+                           if (eventList.indexOf(entity) === -1) {
+                             // @ts-ignore
+                             eventList.push(entity)
+                           }
+                         }
+                       )
+                     } else if (Array.isArray(event)) {
+                       let eventList = (this.queries[queryName][eventName] = [])
+                       query.eventDispatcher.addEventListener(
+                         // @ts-ignore
+                         Query.prototype.COMPONENT_CHANGED,
+                         // @ts-ignore
+                         (entity, changedComponent) => {
+                           // Avoid duplicates
+                           if (
+                             event.indexOf(changedComponent.constructor) !== -1 &&
+                               // @ts-ignore
+                               eventList.indexOf(entity) === -1
+                           ) {
+                             // @ts-ignore
+                             eventList.push(entity)
+                           }
+                         }
+                       )
+                     } else {
+                       /*
+                       // Checking just specific components
+                       let changedList = (this.queries[queryName][eventName] = {})
+                       event.forEach(component => {
+                       let eventList = (changedList[
+                       componentPropertyName(component)
+                       ] = [])
+                       query.eventDispatcher.addEventListener(
+                       Query.prototype.COMPONENT_CHANGED,
+                       (entity, changedComponent) => {
+                       if (
+                       changedComponent.constructor === component &&
+                       eventList.indexOf(entity) === -1
+                       ) {
+                       eventList.push(entity)
+                       }
+                       }
+                       )
+                       })
+                       ,*/
+                     }
+                   } else {
+                     let eventList = (this.queries[queryName][eventName] = [])
+
+                     query.eventDispatcher.addEventListener(
+                       // @ts-ignore
+                       eventMapping[eventName],
+                       // @ts-ignore
+                       entity => {
+                         // @fixme overhead?
+                         // @ts-ignore
+                         if (eventList.indexOf(entity) === -1)
+                           // @ts-ignore
+                           eventList.push(entity)
+                       }
+                     )
+                   }
+                 }
+               })
+             }
+           }
+         }
+       }
+
+       stop() {
+         this.enabled = false
+       }
+
+       play() {
+         this.enabled = true
+       }
+
+       // @question rename to clear queues?
+       clearEvents() {
+         for (let queryName in this.queries) {
+           let query = this.queries[queryName]
+           if (query.added) query.added.length = 0
+           if (query.removed) query.removed.length = 0
+           if (query.changed) {
+             if (Array.isArray(query.changed)) {
+               query.changed.length = 0
+             } else {
+               for (let name in query.changed) {
+                 query.changed[name].length = 0
+               }
+             }
+           }
+         }
+       }
+
+       canExecute() {
+         if(this.mandatoryQueries.length === 0) return true
+
+         for(let i=0; i < this.mandatoryQueries.length; i++) {
+           let query = this.mandatoryQueries[i]
+           if (query.entities.length === 0) {
+             return false
+           }
+         }
+
+         return true
+       }
+       async execute(delta: number, time: number){}
+     }
+
+     export function Not(klass: Klass<Component>) {
+       return {
+         operator: "not",
+         Component: klass
+       }
+     }
+   #+end_src
+
+
+** ComponentManager
+   #+begin_src typescript :comments link :tangle src/ComponentMangaer.ts
+     import { Klass } from './Klass'
+     import { Component } from './Component'
+     import { ObjectPool } from "./ObjectPool"
+     import { DummyObjectPool } from "./DummyObjectPool"
+     import { componentPropertyName } from "./Utils"
+
+     export class ComponentManager {
+       klasses: {[key: string]: Klass<Component>}
+       componentPool: {[key: string]: ObjectPool | DummyObjectPool}
+       numComponents: {[key: string]: number}
+
+       constructor() {
+         this.klasses = {}
+         this.componentPool = {}
+         this.numComponents = {}
+       }
+
+       registerComponent(klass: Klass<Component>): void {
+         if(this.klasses[klass.name]) {
+           console.warn(`Component type: '${Component.name}' already registered.`)
+           return
+         }
+
+         this.klasses[klass.name] = klass
+         this.numComponents[klass.name] = 0
+       }
+
+       componentAddedToEntity(klass: Klass<Component>): void {
+         if(!this.numComponents[klass.name]) this.numComponents[klass.name] = 1
+         else this.numComponents[klass.name]++
+       }
+
+       componentRemovedFromEntity(klass: Klass<Component>): void {
+         this.numComponents[klass.name]--
+       }
+
+       getComponentsPool(klass: Klass<Component>): ObjectPool | DummyObjectPool {
+         const componentName = componentPropertyName(klass)
+         if(!this.componentPool[componentName]) {
+           if(klass.prototype.reset) {
+             this.componentPool[componentName] = new ObjectPool(klass)
+           } else {
+             console.warn(`Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemeneted.`)
+             this.componentPool[componentName] = new DummyObjectPool(klass)
+           }
+         }
+         return this.componentPool[componentName]
+       }
+     }
+   #+end_src
+
+** Component
+   #+begin_src typescript :comments link :tangle src/Component.ts
+     export class Component {
+       _data: any
+       modified: boolean
+
+       constructor(data: any){
+         this.data = data
+         this.modified = false
+       }
+
+       get data(){
+         return this._data
+       }
+
+       set data(data){
+         this._data = data
+         this.modified = true
+       }
+     }
+   #+end_src
