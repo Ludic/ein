@@ -1,0 +1,27 @@
+{
+  "name": "@ludic/ein",
+  "version": "1.0.0",
+  "description": "Entity Component System",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ludic/ein.git"
+  },
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "dev": "parcel watch --no-autoinstall ./src/index.ts",
+    "clean": "rimraf ./dist",
+    "build": "parcel build --no-autoinstall ./src/index.ts --no-cache",
+    "bnt": "npm run build && npm run test",
+    "example": "parcel ./example/index.html --no-autoinstall --no-cache -p 8080",
+    "test": "nyc mocha --require ts-node/register --recursive \"./tests/**/*.spec.ts\"  --timeout 30000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^1.12.4"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": [
+      "es6",
+      "webworker",
+      "dom"
+    ],
+    "module": "commonjs",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "outDir": "build/",
+    "allowJs": false,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true
+  },
+  "include": [
+    "src"
+  ]
+}
