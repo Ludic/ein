@@ -2,7 +2,6 @@
   "name": "@ludic/ein",
   "version": "1.0.0",
   "description": "Entity Component System",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ludic/ein.git"
@@ -22,6 +21,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "parcel": "^1.12.4"
+    "parcel": "^1.12.4",
+    "typescript": "^3.7.5"
   }
 }
