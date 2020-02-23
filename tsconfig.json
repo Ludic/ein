@@ -20,6 +20,12 @@
     "strictNullChecks": true,
     "experimentalDecorators": true
   },
+  "types": [
+    "node",
+    "mocha",
+    "chai",
+    "sinon"
+  ],
   "include": [
     "src"
   ]

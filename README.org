@@ -406,18 +406,13 @@
 
 ** Component
    #+begin_src typescript :comments link :tangle src/Component.ts
-     const encoder = new TextEncoder()
-     const decoder = new TextDecoder()
      export class Component {
        _data: any
-       _transferable_data: any
        modified: boolean
-       isTransferable: boolean
 
-       constructor(data?: any, isTransferable: boolean = false){
+       constructor(data?: any){
          this.data = data
          this.modified = false
-         this.isTransferable = isTransferable
        }
 
        get data(){
@@ -428,16 +423,72 @@
          this._data = data
          this.modified = true
        }
+     }
+   #+end_src
+
+** TransferableComponent
+   #+begin_src typescript :comments link :tangle src/Component.ts
+     const encoder = new TextEncoder()
+     const decoder = new TextDecoder()
+     export class TransferableComponent extends Component {
+       _data: any
+       _transferable_data: any
+       modified: boolean
+       isTransferable: boolean
+       lastModified: string | null
+
+       constructor(data?: any, isTransferable: boolean = false){
+         this.data = data
+         this.modified = false
+         this.isTransferable = isTransferable
+       }
+
+       get data(){
+         if(this.lastModified == "transferable"){
+           this._data = this.fromTransferable(this._transferable_data)
+           this.lastModified = null
+         }
+         return this._data
+       }
+
+       set data(data){
+         this._data = data
+         this.modified = true
+       }
 
        get transferable_data(){
-         const view = encoder.encode('taco')
-         console.log(view); // Uint8Array(3)
+         if(this.lastModified == "data"){
+           this._data = this.toTransferable(this.data)
+           this.lastModified = null
+         }
+
          return this._transferable
+         // const view = encoder.encode('taco')
+         // console.log(view); // Uint8Array(3)
+         // return this._transferable
        }
 
        set transferable_data(data){
-         this._data = data
+         this._transferable_data = this.toTransferable(data)
          this.modified = true
+       }
+
+       toTransferable(data: any){
+         return encoder.encode(JSON.stringify(data))
+         // let transferable_data: any = {}
+         // for(let [key, value] in data){
+         //   if(typeof(value) == 'string'){
+         //     transferable_data[key] = encoder.encode(value)
+         //   }
+         //   if(typeof(value) == 'number'){
+         //     transferable_data[key] = encoder.encode(value.toString())
+         //   }
+         // }
+         // return transferable_data
+       }
+
+       fromTransferable(data: any){
+         return JSON.parse(decoder.defoce(data))
        }
      }
    #+end_src

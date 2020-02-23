@@ -15,13 +15,20 @@
     "build": "parcel build --no-autoinstall ./src/index.ts --no-cache",
     "bnt": "npm run build && npm run test",
     "example": "parcel ./example/index.html --no-autoinstall --no-cache -p 8080",
-    "test": "nyc mocha --require ts-node/register --recursive \"./tests/**/*.spec.ts\"  --timeout 30000"
+    "test": "ts-mocha tests/**/*.spec.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/chai": "^4.2.9",
+    "@types/mocha": "^7.0.1",
+    "mocha": "^7.0.1",
     "parcel": "^1.12.4",
+    "ts-mocha": "^6.0.0",
     "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "chai": "^4.2.0"
   }
 }
