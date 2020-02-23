@@ -1,17 +1,6 @@
 import { Component } from "../src/Component"
+import { TransferableComponent } from "../src/TransferableComponent"
 
-let data: any = {
-  x: 0,
-  y: 0
-}
-
-let t = new Component(data)
-
-console.log(t)
-
-t.data = {
-  x: 2,
-  y: 3
-}
+let t = new TransferableComponent(5)
 
 console.log(t)

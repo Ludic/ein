@@ -1,55 +1,29 @@
-import { Klass } from './Klass'
 import { Component } from './Component'
+import { EntityManager } from './EntityManager'
 import { Engine } from './Engine'
 
-import { Query } from "./Query"
-import { wrapImmutableComponent } from "./WrapImmutableComponent"
-
-let nextId = 0
+let next_id: number = 0
 
 export class Entity {
-  engine: any
   id: number
-  componentKlasses: Klass<Component>[]
+  class: string
+  entity_manager: EntityManager
+  component_classes: string[]
   components: {[key: string]: Component}
-  componentsToRemove: {[key: string]: Component}
-  queries: Query[]
-  componentKlassesToRemove: Klass<Component>[]
+  components_to_remove: {[key: string]: Component}
   alive: boolean
 
-  constructor(engine: Engine) {
-    this.engine = engine
-
-    // Unique ID for this entity
-    this.id = nextId++
-
-    // List of components types the entity has
-    this.componentKlasses = []
-
-    // Instance of the components
+  constructor(entity_manager: EntityManager) {
+    this.id = next_id++
+    this.entity_manager = entity_manager
+    this.component_classes = []
     this.components = {}
-
-    this.componentsToRemove = {}
-
-    // Queries where the entity is added
-    this.queries = []
-
-    // Used for deferred removal
-    this.componentKlassesToRemove = []
-
+    this.components_to_remove = {}
     this.alive = false
   }
 
-  // COMPONENTS
-  getComponent(klass: Klass<Component>, includeRemoved: boolean = false): Component {
-    let component: Component = this.components[klass.name]
-    if(!component && includeRemoved === true) component = this.componentsToRemove[klass.name]
-
-    return DEBUG ? wrapImmutableComponent(klass, component) : component
-  }
-
-  getRemovedComponent(klass: Klass<Component>): Component {
-    return this.componentsToRemove[klass.name]
+  getComponent(class_name: string): Component {
+    return this.components[class_name]
   }
 
   getComponents(): {[key: string]: Component} {
@@ -57,82 +31,71 @@ export class Entity {
   }
 
   getComponentsToRemove(): {[key: string]: Component} {
-    return this.componentsToRemove
+    return this.components_to_remove
   }
 
-  getComponentTypes(): Klass<Component>[] {
-    return this.componentKlasses
+  getComponentClasses(): string[] {
+    return this.component_classes
   }
 
-  getComponentKlassByName(name: string): Klass<Component> | undefined {
-    return this.componentKlasses.find((klass: Klass<Component>)=>{
-      return klass.name == name
-    })
-  }
+  // getMutableComponent(klass: Klass<Component>): Component {
+  //   let component = this.components[klass.name]
+  //   for(let i = 0; i < this.queries.length; i++){
+  //     let query: any = this.queries[i]
+  //     // @todo accelerate this check. Maybe having query.components as an object
+  //     if(query.reactive && query.Components.indexOf(klass) !== -1){
+  //       query.eventDispatcher.dispatchEvent(
+  //         // @ts-ignore
+  //         Query.prototype.COMPONENT_CHANGED,
+  //         this,
+  //         component
+  //       )
+  //     }
+  //   }
+  //   return component
+  // }
 
-  getMutableComponent(klass: Klass<Component>): Component {
-    let component = this.components[klass.name]
-    for(let i = 0; i < this.queries.length; i++){
-      let query: any = this.queries[i]
-      // @todo accelerate this check. Maybe having query.components as an object
-      if(query.reactive && query.Components.indexOf(klass) !== -1){
-        query.eventDispatcher.dispatchEvent(
-          // @ts-ignore
-          Query.prototype.COMPONENT_CHANGED,
-          this,
-          component
-        )
-      }
-    }
-    return component
-  }
-
-  addComponent(klass: Klass<Component>, values: any): Entity {
-    this.engine.entityAddComponent(this, klass, values)
+  addComponent(component_class: string, data: any): Entity {
+    this.entity_manager.entityAddComponent(this, component_class, data)
     return this
   }
 
-  removeComponent(klass: Klass<Component>, forceRemove: any): Entity {
-    this.engine.entityRemoveComponent(this, klass, forceRemove)
+  removeComponent(component_class: string, forceRemove: boolean = false): Entity {
+    this.entity_manager.entityRemoveComponent(this, component_class, forceRemove)
     return this
   }
 
-  hasComponent(klass: Klass<Component>, includeRemoved: boolean = false): boolean {
-    return (
-      !!~this.componentKlasses.indexOf(klass) ||
-      (includeRemoved === true && this.hasRemovedComponent(klass))
-    )
+  hasComponent(component_class: string): boolean {
+    return this.component_classes.includes(component_class)
   }
 
-  hasRemovedComponent(klass: Klass<Component>): boolean {
-    return !!~this.componentKlassesToRemove.indexOf(klass)
-  }
+  // hasRemovedComponent(component_class: string): boolean {
+  //   return this.components_to_remove.includes(component_class)
+  // }
 
-  hasAllComponents(klasses: Klass<Component>[]): boolean {
-    for(let i = 0; i < klasses.length; i++) {
-      if(!this.hasComponent(klasses[i])) return false
+  hasAllComponents(component_classes: string[]): boolean {
+    for(let i = 0; i < component_classes.length; i++) {
+      if(!this.hasComponent(component_classes[i])) return false
     }
     return true
   }
 
-  hasAnyComponents(klasses: Klass<Component>[]): boolean {
-    for (let i = 0; i < klasses.length; i++) {
-      if (this.hasComponent(klasses[i])) return true
+  hasAnyComponents(component_classes: string[]): boolean {
+    for (let i = 0; i < component_classes.length; i++) {
+      if (this.hasComponent(component_classes[i])) return true
     }
     return false
   }
 
-  removeAllComponents(forceRemove: boolean) {
-    return this.engine.entityRemoveAllComponents(this, forceRemove)
+  removeAllComponents(forceRemove: boolean = true) {
+    return this.entity_manager.entityRemoveAllComponents(this, forceRemove)
   }
 
-  // EXTRAS
   // Initialize the entity. To be used when returning an entity to the pool
   reset(): void {
-    this.id = nextId++
-    this.engine = null
-    this.componentKlasses.length = 0
-    this.queries.length = 0
+    this.id = next_id++
+    // delete this.entity_manager
+    this.component_classes.length = 0
     this.components = {}
   }
 
@@ -143,46 +106,46 @@ export class Entity {
     }
   }
 
-  syncComponents(components: any, reactive: boolean = true): void {
-    for(let [klassName, component] of Object.entries(components)){
-      let current: any = this.components[klassName]
-      for(let [key, value] of Object.entries(component)){
-        if(current[key] != value){
-          if(reactive){
-            const klass: Klass<Component> | undefined = this.getComponentKlassByName(klassName)
-            if(klass){
-              let componentToUpdate: any = this.getMutableComponent(klass)
-              componentToUpdate[key] = value
-            }
-          } else {
-            current[key] = value
-          }
-        }
-      }
-    }
-  }
+  // syncComponents(components: any, reactive: boolean = true): void {
+  //   for(let [klassName, component] of Object.entries(components)){
+  //     let current: any = this.components[klassName]
+  //     for(let [key, value] of Object.entries(component)){
+  //       if(current[key] != value){
+  //         if(reactive){
+  //           const klass: Klass<Component> | undefined = this.getComponentKlassByName(klassName)
+  //           if(klass){
+  //             let componentToUpdate: any = this.getMutableComponent(klass)
+  //             componentToUpdate[key] = value
+  //           }
+  //         } else {
+  //           current[key] = value
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
-  canBeCloned(val: any): boolean {
-    if(Object(val) !== val) // Primitive value
-      return true;
-    switch({}.toString.call(val).slice(8,-1)) { // Class
-      case 'Boolean':     case 'Number':      case 'String':      case 'Date':
-      case 'RegExp':      case 'Blob':        case 'FileList':
-      case 'ImageData':   case 'ImageBitmap': case 'ArrayBuffer':
-        return true;
-      case 'Array':       case 'Object':
-        return Object.keys(val).every(prop => this.canBeCloned(val[prop]))
-      case 'Map':
-        return [...val.keys()].every(this.canBeCloned)
-          && [...val.values()].every(this.canBeCloned)
-      case 'Set':
-        return [...val.keys()].every(this.canBeCloned)
-      default:
-        return false;
-    }
-  }
+  // canBeCloned(val: any): boolean {
+  //   if(Object(val) !== val) // Primitive value
+  //     return true;
+  //   switch({}.toString.call(val).slice(8,-1)) { // Class
+  //     case 'Boolean':     case 'Number':      case 'String':      case 'Date':
+  //     case 'RegExp':      case 'Blob':        case 'FileList':
+  //     case 'ImageData':   case 'ImageBitmap': case 'ArrayBuffer':
+  //       return true;
+  //     case 'Array':       case 'Object':
+  //       return Object.keys(val).every(prop => this.canBeCloned(val[prop]))
+  //     case 'Map':
+  //       return [...val.keys()].every(this.canBeCloned)
+  //         && [...val.values()].every(this.canBeCloned)
+  //     case 'Set':
+  //       return [...val.keys()].every(this.canBeCloned)
+  //     default:
+  //       return false;
+  //   }
+  // }
 
-  remove(forceRemove?: boolean) {
-    return this.engine.removeEntity(this, forceRemove)
+  remove(forceRemove: boolean = false) {
+    return this.entity_manager.removeEntity(this, forceRemove)
   }
 }
