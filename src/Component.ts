@@ -4,7 +4,6 @@ export class Component {
   modified: boolean
 
   constructor(data?: any){
-    console.log("this", this)
     this.class_name = this.constructor.name
     this.data = data
     this.modified = false

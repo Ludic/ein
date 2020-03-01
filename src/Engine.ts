@@ -26,11 +26,12 @@ export class Engine {
     }
   }
 
+  addSystem(system: System): System {
+    return this.system_manager.addSystem(system)
+  }
+
   createEntity(): Entity {
     return this.entity_manager.createEntity()
   }
 
-  addSystem(system: System): System {
-    return this.system_manager.addSystem(system)
-  }
 }
