@@ -1,9 +1,7 @@
-// [[file:~/repos/mine/README.org::*ComponentManager][ComponentManager:1]]
 import { Klass } from './Klass'
 import { Component } from './Component'
 import { ObjectPool } from "./ObjectPool"
 import { DummyObjectPool } from "./DummyObjectPool"
-import { componentPropertyName } from "./Utils"
 
 export class ComponentManager {
   klasses: {[key: string]: Klass<Component>}
@@ -26,9 +24,12 @@ export class ComponentManager {
     this.numComponents[klass.name] = 0
   }
 
-  componentAddedToEntity(klass: Klass<Component>): void {
-    if(!this.numComponents[klass.name]) this.numComponents[klass.name] = 1
-    else this.numComponents[klass.name]++
+  componentAddedToEntity(klass: Klass<Component>) {
+    if (!this.klasses[Component.name]) {
+      this.registerComponent(Component);
+    }
+
+    this.numComponents[Component.name]++;
   }
 
   componentRemovedFromEntity(klass: Klass<Component>): void {
@@ -48,4 +49,3 @@ export class ComponentManager {
     return this.componentPool[componentName]
   }
 }
-// ComponentManager:1 ends here

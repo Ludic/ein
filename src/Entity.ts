@@ -6,20 +6,23 @@ let next_id: number = 0
 
 export class Entity {
   id: number
-  class: string
-  entity_manager: EntityManager
+  alive: boolean
+  class_name: string
+
   component_classes: string[]
   components: {[key: string]: Component}
   components_to_remove: {[key: string]: Component}
-  alive: boolean
+  entity_manager: EntityManager
 
   constructor(entity_manager: EntityManager) {
     this.id = next_id++
-    this.entity_manager = entity_manager
+    this.alive = false
+    this.class_name = this.constructor.name
+
     this.component_classes = []
     this.components = {}
     this.components_to_remove = {}
-    this.alive = false
+    this.entity_manager = entity_manager
   }
 
   getComponent(class_name: string): Component {
@@ -37,23 +40,6 @@ export class Entity {
   getComponentClasses(): string[] {
     return this.component_classes
   }
-
-  // getMutableComponent(klass: Klass<Component>): Component {
-  //   let component = this.components[klass.name]
-  //   for(let i = 0; i < this.queries.length; i++){
-  //     let query: any = this.queries[i]
-  //     // @todo accelerate this check. Maybe having query.components as an object
-  //     if(query.reactive && query.Components.indexOf(klass) !== -1){
-  //       query.eventDispatcher.dispatchEvent(
-  //         // @ts-ignore
-  //         Query.prototype.COMPONENT_CHANGED,
-  //         this,
-  //         component
-  //       )
-  //     }
-  //   }
-  //   return component
-  // }
 
   addComponent(component_class: string, data: any): Entity {
     this.entity_manager.entityAddComponent(this, component_class, data)
@@ -98,52 +84,6 @@ export class Entity {
     this.component_classes.length = 0
     this.components = {}
   }
-
-  serialize(): any {
-    return {
-      id: this.id,
-      components: this.getComponents()
-    }
-  }
-
-  // syncComponents(components: any, reactive: boolean = true): void {
-  //   for(let [klassName, component] of Object.entries(components)){
-  //     let current: any = this.components[klassName]
-  //     for(let [key, value] of Object.entries(component)){
-  //       if(current[key] != value){
-  //         if(reactive){
-  //           const klass: Klass<Component> | undefined = this.getComponentKlassByName(klassName)
-  //           if(klass){
-  //             let componentToUpdate: any = this.getMutableComponent(klass)
-  //             componentToUpdate[key] = value
-  //           }
-  //         } else {
-  //           current[key] = value
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-
-  // canBeCloned(val: any): boolean {
-  //   if(Object(val) !== val) // Primitive value
-  //     return true;
-  //   switch({}.toString.call(val).slice(8,-1)) { // Class
-  //     case 'Boolean':     case 'Number':      case 'String':      case 'Date':
-  //     case 'RegExp':      case 'Blob':        case 'FileList':
-  //     case 'ImageData':   case 'ImageBitmap': case 'ArrayBuffer':
-  //       return true;
-  //     case 'Array':       case 'Object':
-  //       return Object.keys(val).every(prop => this.canBeCloned(val[prop]))
-  //     case 'Map':
-  //       return [...val.keys()].every(this.canBeCloned)
-  //         && [...val.values()].every(this.canBeCloned)
-  //     case 'Set':
-  //       return [...val.keys()].every(this.canBeCloned)
-  //     default:
-  //       return false;
-  //   }
-  // }
 
   remove(forceRemove: boolean = false) {
     return this.entity_manager.removeEntity(this, forceRemove)

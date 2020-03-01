@@ -1,100 +1,43 @@
-// [[file:~/repos/mine/README.org::*SystemManager][SystemManager:1]]
 import { Engine } from './Engine'
 import { System } from './System'
-import { Klass } from './Klass'
 
 export class SystemManager {
   engine: Engine
   systems: System[]
-  executeSystems: System[]
 
   constructor(engine: Engine){
-    this.systems = []
-    this.executeSystems = [] // Systems that have `execute` method
     this.engine = engine
+    this.systems = []
   }
 
-  addSystem(system: System){
+  addSystem(system: System): System {
     system.engine = this.engine
     system.order = this.systems.length
-    system.initQueries()
 
     this.systems.push(system)
-
-    if(system.execute) this.executeSystems.push(system)
     this.sortSystems()
-    return this
+
+    return system
   }
 
   sortSystems(){
-    this.executeSystems.sort((a: System, b: System) => {
+    this.systems.sort((a: System, b: System) => {
       return a.priority - b.priority || a.order - b.order
     })
   }
 
-  getSystem(klass: Klass<System>): System | undefined {
-    return this.systems.find((s: System) => s instanceof klass)
-  }
-
-  getSystems() {
-    return this.systems
-  }
-
   removeSystem(system: System) {
-    let index = this.systems.indexOf(system)
-    if (!~index) return
-
+    let index: number = this.systems.indexOf(system)
+    if(index == -1) return
     this.systems.splice(index, 1)
   }
 
-  async execute(delta: number, time: number) {
-    for(let i=0; i<this.executeSystems.length; i++){
-      const system: System = this.executeSystems[i]
-      if (system.enabled && system.initialized) {
-        if (system.canExecute()) {
-          // @ts-ignore
-          let startTime = performance.now()
-
-          // @ts-ignore
-          await system.execute(delta, time)
-
-          // @ts-ignore
-          system.executeTime = performance.now() - startTime
-        }
-        system.clearEvents()
+  execute(delta: number, time: number) {
+    for(let i=0; i<this.systems.length; i++){
+      const system: System = this.systems[i]
+      if(system.enabled){
+        system.execute(delta, time)
       }
     }
-
-    // this.executeSystems.forEach((system: System) => {
-    //   if (system.enabled && system.initialized) {
-    //     if (system.canExecute()) {
-    //       // @ts-ignore
-    //       let startTime = performance.now()
-    //       // @ts-ignore
-    //       system.execute(delta, time)
-    //       // @ts-ignore
-    //       system.executeTime = performance.now() - startTime
-    //     }
-    //     system.clearEvents()
-    //   }
-    // })
-  }
-
-  stats() {
-    let stats = {
-      numSystems: this.systems.length,
-      systems: {}
-    }
-
-    for (let i = 0; i < this.systems.length; i++) {
-      let system = this.systems[i]
-      // @ts-ignore
-      let systemStats = (stats.systems[system.constructor.name] = {
-        queries: {}
-      })
-    }
-
-    return stats
   }
 }
-// SystemManager:1 ends here

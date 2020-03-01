@@ -1,15 +1,20 @@
 import { Component } from "./Component"
 import { ComponentManager } from './ComponentManager'
 import { Entity } from "./Entity"
+
+import { EventDispatcher } from "./EventDispatcher"
+
 import { Engine } from "./Engine"
 
 
 export class EntityManager {
+  entities: Entity[]
+  entitiesToRemove: Entity[]
+  entitiesWithComponentsToRemove: Entity[]
+
   engine: Engine
   componentManager: ComponentManager
-  entities: Entity[]
-  entitiesWithComponentsToRemove: Entity[]
-  entitiesToRemove: Entity[]
+
   entityPool: ObjectPool
   queryManager: QueryManager
   eventDispatcher: EventDispatcher
