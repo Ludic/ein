@@ -6,22 +6,18 @@ let next_id: number = 0
 
 export class Entity {
   id: number
-  alive: boolean
-  class_name: string
+  active: boolean
+  name: string
 
-  component_classes: string[]
   components: {[key: string]: Component}
-  components_to_remove: {[key: string]: Component}
   entity_manager: EntityManager
 
-  constructor(entity_manager: EntityManager) {
+  constructor(entity_manager: EntityManager, name: string = "") {
     this.id = next_id++
-    this.alive = false
-    this.class_name = this.constructor.name
+    this.name = name
+    this.active = true
 
-    this.component_classes = []
     this.components = {}
-    this.components_to_remove = {}
     this.entity_manager = entity_manager
   }
 
@@ -29,16 +25,8 @@ export class Entity {
     return this.components[class_name]
   }
 
-  getComponents(): {[key: string]: Component} {
-    return this.components
-  }
-
-  getComponentsToRemove(): {[key: string]: Component} {
-    return this.components_to_remove
-  }
-
   getComponentClasses(): string[] {
-    return this.component_classes
+    return Object.keys(this.components)
   }
 
   addComponent(component_class: string, data: any): Entity {
@@ -46,46 +34,34 @@ export class Entity {
     return this
   }
 
-  removeComponent(component_class: string, forceRemove: boolean = false): Entity {
-    this.entity_manager.entityRemoveComponent(this, component_class, forceRemove)
+  removeComponent(component_class: string): Entity {
+    this.entity_manager.entityRemoveComponent(this, component_class)
     return this
   }
 
   hasComponent(component_class: string): boolean {
-    return this.component_classes.includes(component_class)
+    return this.getComponentClasses().includes(component_class)
   }
 
-  // hasRemovedComponent(component_class: string): boolean {
-  //   return this.components_to_remove.includes(component_class)
-  // }
-
   hasAllComponents(component_classes: string[]): boolean {
-    for(let i = 0; i < component_classes.length; i++) {
+    for(let i = 0; i < component_classes.length; i++){
       if(!this.hasComponent(component_classes[i])) return false
     }
     return true
   }
 
   hasAnyComponents(component_classes: string[]): boolean {
-    for (let i = 0; i < component_classes.length; i++) {
-      if (this.hasComponent(component_classes[i])) return true
+    for(let i = 0; i < component_classes.length; i++){
+      if(this.hasComponent(component_classes[i])) return true
     }
     return false
   }
 
-  removeAllComponents(forceRemove: boolean = true) {
-    return this.entity_manager.entityRemoveAllComponents(this, forceRemove)
+  removeAllComponents(){
+    return this.entity_manager.entityRemoveAllComponents(this)
   }
 
-  // Initialize the entity. To be used when returning an entity to the pool
-  reset(): void {
-    this.id = next_id++
-    // delete this.entity_manager
-    this.component_classes.length = 0
-    this.components = {}
-  }
-
-  remove(forceRemove: boolean = false) {
-    return this.entity_manager.removeEntity(this, forceRemove)
+  remove(): void {
+    return this.entity_manager.removeEntity(this)
   }
 }

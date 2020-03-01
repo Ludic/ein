@@ -1,3 +1,5 @@
+import { ComponentManager } from "./ComponentManager"
+
 import { Entity } from "./Entity"
 import { EntityManager } from "./EntityManager"
 
@@ -5,28 +7,30 @@ import { System } from "./System"
 import { SystemManager } from "./SystemManager"
 
 export class Engine {
-  entityManager: EntityManager
-  systemManager: SystemManager
+  component_manager: ComponentManager
+  entity_manager: EntityManager
+  system_manager: SystemManager
 
   enabled: boolean
 
   constructor(){
-    this.entityManager = new EntityManager(this)
-    this.systemManager = new SystemManager(this)
+    this.component_manager = new ComponentManager()
+    this.entity_manager = new EntityManager(this.component_manager)
+    this.system_manager = new SystemManager(this)
     this.enabled = true
   }
 
   execute(delta: number, time: number) {
     if(this.enabled){
-      this.systemManager.execute(delta, time)
+      this.system_manager.execute(delta, time)
     }
   }
 
   createEntity(): Entity {
-    return this.entityManager.createEntity()
+    return this.entity_manager.createEntity()
   }
 
   addSystem(system: System): System {
-    return this.systemManager.addSystem(system)
+    return this.system_manager.addSystem(system)
   }
 }

@@ -20,19 +20,20 @@ export class SystemManager {
     return system
   }
 
-  sortSystems(){
+  sortSystems(): void {
     this.systems.sort((a: System, b: System) => {
       return a.priority - b.priority || a.order - b.order
     })
   }
 
-  removeSystem(system: System) {
+  removeSystem(system: System): boolean {
     let index: number = this.systems.indexOf(system)
-    if(index == -1) return
+    if(index == -1) return false
     this.systems.splice(index, 1)
+    return true
   }
 
-  execute(delta: number, time: number) {
+  execute(delta: number, time: number): void {
     for(let i=0; i<this.systems.length; i++){
       const system: System = this.systems[i]
       if(system.enabled){
