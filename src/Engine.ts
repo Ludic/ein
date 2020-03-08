@@ -1,22 +1,26 @@
-import { ComponentManager } from "./ComponentManager"
-
-import { Entity } from "./Entity"
-import { EntityManager } from "./EntityManager"
-
-import { System } from "./System"
-import { SystemManager } from "./SystemManager"
+import {
+  ComponentManager,
+  Entity,
+  EntityManager,
+  System,
+  SystemManager,
+  Family,
+  FamilyManager
+} from "./"
 
 export class Engine {
   component_manager: ComponentManager
   entity_manager: EntityManager
   system_manager: SystemManager
+  family_manager: FamilyManager
 
   enabled: boolean
 
   constructor(){
-    this.component_manager = new ComponentManager()
-    this.entity_manager = new EntityManager(this.component_manager)
+    this.component_manager = new ComponentManager(this)
+    this.entity_manager = new EntityManager(this)
     this.system_manager = new SystemManager(this)
+    this.family_manager = new FamilyManager(this)
     this.enabled = true
   }
 
@@ -33,5 +37,6 @@ export class Engine {
   createEntity(): Entity {
     return this.entity_manager.createEntity()
   }
+
 
 }

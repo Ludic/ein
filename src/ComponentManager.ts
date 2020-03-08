@@ -1,9 +1,12 @@
 import { Component } from './Component'
+import { Engine } from './Engine'
 
 export class ComponentManager {
   component_classes: string[]
+  engine: Engine
 
-  constructor(){
+  constructor(engine: Engine){
+    this.engine = engine
     this.component_classes = []
   }
 

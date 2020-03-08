@@ -1,4 +1,3 @@
-import { Klass } from './Klass'
 import { Component } from './Component'
 import { Entity } from './Entity'
 import { Engine } from './Engine'
@@ -16,4 +15,13 @@ export class System {
   }
 
   execute(delta: number, time: number): void {}
+
+  shouldExecute(): boolean {
+    return this.enabled
+  }
+
+  // Listeners
+  onAdded(engine: Engine): void {}
+  onRemoved(): void {}
+
 }

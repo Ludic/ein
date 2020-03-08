@@ -9,13 +9,14 @@ import { Engine } from "./Engine"
 
 export class EntityManager {
   entities: Entity[]
-
   component_manager: ComponentManager
   event_dispatcher: EventDispatcher
+  engine: Engine
 
-  constructor(component_manager: ComponentManager){
+  constructor(engine: Engine){
     this.entities = []
-    this.component_manager = component_manager
+    this.component_manager = engine.component_manager
+    this.engine = engine
     this.event_dispatcher = new EventDispatcher()
   }
 

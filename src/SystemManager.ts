@@ -11,8 +11,8 @@ export class SystemManager {
   }
 
   addSystem(system: System): System {
-    system.engine = this.engine
     system.order = this.systems.length
+    system.onAdded(this.engine)
 
     this.systems.push(system)
     this.sortSystems()
@@ -36,7 +36,7 @@ export class SystemManager {
   execute(delta: number, time: number): void {
     for(let i=0; i<this.systems.length; i++){
       const system: System = this.systems[i]
-      if(system.enabled){
+      if(system.shouldExecute()){
         system.execute(delta, time)
       }
     }
