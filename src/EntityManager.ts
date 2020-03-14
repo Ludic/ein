@@ -9,12 +9,16 @@ import { Engine } from "./Engine"
 
 export class EntityManager {
   entities: Entity[]
+  name_to_entities: {[key: string]: Entity[]}
+
   component_manager: ComponentManager
   event_dispatcher: EventDispatcher
   engine: Engine
 
   constructor(engine: Engine){
     this.entities = []
+    this.name_to_entities = {}
+
     this.component_manager = engine.component_manager
     this.engine = engine
     this.event_dispatcher = new EventDispatcher()
@@ -23,15 +27,20 @@ export class EntityManager {
   createEntity(name: string = ""): Entity {
     // TODO Object pool
     let entity: Entity = new Entity(this, name)
-    this.entities.push(entity)
 
-    this.event_dispatcher.dispatchEvent(ENTITY_CREATED, entity)
+    this.entities.push(entity)
+    this.name_to_entities[entity.name] ? this.name_to_entities[entity.name].push(entity) : this.name_to_entities[entity.name] = [entity]
+
+    // TODO, just call other managers directly? or use pub/sub?
+    // this.event_dispatcher.dispatchEvent(ENTITY_CREATED, entity)
+
     return entity
   }
 
-  entityAddComponent(entity: Entity, component_class: string, data: any, is_transferable: boolean = false): Entity {
+  addComponent(entity: Entity, component_class: string, data: any, is_transferable: boolean = false): Entity {
     if(!entity.getComponentClasses().includes(component_class)) return entity
 
+    // TODO don't like this
     let component: Component
     if(is_transferable){
       component = new TransferableComponent(data)
@@ -39,8 +48,7 @@ export class EntityManager {
       component = new Component(data)
     }
 
-    entity.components[component_class] = component
-
+    entity.class_to_component[component_class] = component
 
     // this.queryManager.onEntityComponentAdded(entity, klass)
     this.component_manager.componentAddedToEntity(component_class)
@@ -49,19 +57,19 @@ export class EntityManager {
     return entity
   }
 
-  entityRemoveComponent(entity: Entity, component_class: string): Entity {
-    let component: Component = entity.components[component_class]
+  removeComponent(entity: Entity, component_class: string): Entity {
+    let component: Component = entity.class_to_component[component_class]
     if(!component) return entity
 
     this.event_dispatcher.dispatchEvent(COMPONENT_REMOVE, entity, component)
-    delete entity.components[component_class]
+    delete entity.class_to_component[component_class]
 
     return entity
   }
 
-  entityRemoveAllComponents(entity: Entity): Entity {
+  removeAllComponents(entity: Entity): Entity {
     entity.getComponentClasses().forEach((component_class: string)=>{
-      this.entityRemoveComponent(entity, component_class)
+      this.removeComponent(entity, component_class)
     })
 
     return entity

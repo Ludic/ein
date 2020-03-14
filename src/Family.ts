@@ -21,8 +21,8 @@ export class Family {
 }
 
 
-// TODO
-export interface FamilyQuery {
-  component_class: string
-  type: string
-}
+// // TODO
+// export interface Query {
+//   component_class: string
+//   type: string
+// }

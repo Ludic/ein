@@ -34,8 +34,8 @@ export class Engine {
     return this.system_manager.addSystem(system)
   }
 
-  createEntity(): Entity {
-    return this.entity_manager.createEntity()
+  createEntity(name?: string): Entity {
+    return this.entity_manager.createEntity(name)
   }
 
 

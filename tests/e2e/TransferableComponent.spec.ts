@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { TransferableComponent } from '../src/TransferableComponent'
+import { TransferableComponent } from '../../src/TransferableComponent'
 
 class TestComponent extends TransferableComponent {
   constructor(value: number){

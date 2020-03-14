@@ -9,7 +9,7 @@ export class Entity {
   active: boolean
   name: string
 
-  components: {[key: string]: Component}
+  class_to_component: {[key: string]: Component}
   entity_manager: EntityManager
 
   constructor(entity_manager: EntityManager, name: string = "") {
@@ -17,25 +17,25 @@ export class Entity {
     this.name = name
     this.active = true
 
-    this.components = {}
+    this.class_to_component = {}
     this.entity_manager = entity_manager
   }
 
-  getComponent(class_name: string): Component {
-    return this.components[class_name]
-  }
-
-  getComponentClasses(): string[] {
-    return Object.keys(this.components)
-  }
-
   addComponent(component_class: string, data: any): Entity {
-    this.entity_manager.entityAddComponent(this, component_class, data)
+    this.entity_manager.addComponent(this, component_class, data)
     return this
   }
 
+  getComponent(class_name: string): Component {
+    return this.class_to_component[class_name]
+  }
+
+  getComponentClasses(): string[] {
+    return Object.keys(this.class_to_component)
+  }
+
   removeComponent(component_class: string): Entity {
-    this.entity_manager.entityRemoveComponent(this, component_class)
+    this.entity_manager.removeComponent(this, component_class)
     return this
   }
 
@@ -58,7 +58,7 @@ export class Entity {
   }
 
   removeAllComponents(){
-    return this.entity_manager.entityRemoveAllComponents(this)
+    return this.entity_manager.removeAllComponents(this)
   }
 
   remove(): void {

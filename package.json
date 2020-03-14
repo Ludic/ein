@@ -15,7 +15,9 @@
     "build": "parcel build --no-autoinstall ./src/index.ts --no-cache",
     "bnt": "npm run build && npm run test",
     "example": "parcel ./example/index.html --no-autoinstall --no-cache -p 8080",
-    "test": "ts-mocha tests/**/*.spec.ts"
+    "test": "ts-mocha tests/**/*.spec.ts",
+    "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
+    "test:performance": "ts-mocha tests/performance/**/*.spec.ts"
   },
   "keywords": [],
   "author": "",
