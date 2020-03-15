@@ -1,5 +1,4 @@
-import { Engine } from './Engine'
-import { System } from './System'
+import { Klass, System, Engine } from './'
 
 export class SystemManager {
   engine: Engine
@@ -10,7 +9,8 @@ export class SystemManager {
     this.systems = []
   }
 
-  addSystem(system: System): System {
+  addSystem(system_klass: Klass<System>): System {
+    let system: System = new system_klass()
     system.order = this.systems.length
     system.onAdded(this.engine)
 

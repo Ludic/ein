@@ -22,19 +22,15 @@ describe('Engine', ()=>{
   })
 
   it('addSystem()', async()=>{
-    const system: System = new TestSystem()
-
-    engine.addSystem(system)
+    engine.addSystem(TestSystem)
     assert.equal(engine.system_manager.systems.length, 1)
   })
 
 
   it('execute()', async()=>{
-    const system: System = new TestSystem()
     assert.equal(engine.system_manager.systems.length, 1)
-
-    engine.execute(test_executions, 1)
-
+    engine.execute(0, 1)
+    assert.equal(test_executions, 1)
   })
 
 })

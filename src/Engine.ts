@@ -5,7 +5,8 @@ import {
   System,
   SystemManager,
   Family,
-  FamilyManager
+  FamilyManager,
+  Klass
 } from "./"
 
 export class Engine {
@@ -30,8 +31,8 @@ export class Engine {
     }
   }
 
-  addSystem(system: System): System {
-    return this.system_manager.addSystem(system)
+  addSystem(system_klass: Klass<System>): System {
+    return this.system_manager.addSystem(system_klass)
   }
 
   createEntity(name?: string): Entity {
