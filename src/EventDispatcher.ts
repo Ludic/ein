@@ -3,14 +3,9 @@ import { Entity } from "./Entity"
 
 export class EventDispatcher {
   listeners: {[key:string]: any[]}
-  stats: any
 
   constructor() {
     this.listeners = {}
-    this.stats = {
-      fired: 0,
-      handled: 0
-    }
   }
 
   /**
@@ -62,7 +57,6 @@ export class EventDispatcher {
    * @param {Component} component
    */
   dispatchEvent(eventName: string, entity?: Entity, component?: Component) {
-    this.stats.fired++
     let listeners = this.listeners[eventName]
     if(listeners !== undefined){
       var array = listeners.slice(0)

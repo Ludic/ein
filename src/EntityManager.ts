@@ -1,11 +1,4 @@
-import { Component } from "./Component"
-import { TransferableComponent } from "./TransferableComponent"
-import { ComponentManager } from './ComponentManager'
-
-import { Entity } from "./Entity"
-
-import { EventDispatcher } from "./EventDispatcher"
-import { Engine } from "./Engine"
+import { Klass, Component, TransferableComponent, ComponentManager, Entity, EventDispatcher, Engine } from "./"
 
 export class EntityManager {
   entities: Entity[]
@@ -37,8 +30,13 @@ export class EntityManager {
     return entity
   }
 
-  addComponent(entity: Entity, component_class: string, data: any, is_transferable: boolean = false): Entity {
-    if(!entity.getComponentClasses().includes(component_class)) return entity
+  entitiesByName(name: string): Entity[]{
+    return this.name_to_entities[name]
+  }
+
+  addComponent(entity: Entity, component_class: Klass<Component>, data: any, is_transferable: boolean = false): Entity {
+    // If the Entity already has this Component, return
+    if(entity.class_to_component.has(component_class)) return entity
 
     // TODO don't like this
     let component: Component
@@ -48,27 +46,31 @@ export class EntityManager {
       component = new Component(data)
     }
 
-    entity.class_to_component[component_class] = component
+    entity.class_to_component.set(component_class, component)
 
-    // this.queryManager.onEntityComponentAdded(entity, klass)
-    this.component_manager.componentAddedToEntity(component_class)
-    this.event_dispatcher.dispatchEvent(COMPONENT_ADDED, entity, component)
+    // this.component_manager.componentAddedToEntity(component_class)
+    // TODO do we want pub/sub, or just direct call?
+    // this.event_dispatcher.dispatchEvent(COMPONENT_ADDED, entity, component)
 
     return entity
   }
 
-  removeComponent(entity: Entity, component_class: string): Entity {
-    let component: Component = entity.class_to_component[component_class]
+  removeComponent(entity: Entity, component_class: Klass<Component>): Entity {
+    let component: Component | undefined = entity.class_to_component.get(component_class)
+
+    // If the Entity doesn't have this Component, return
     if(!component) return entity
 
-    this.event_dispatcher.dispatchEvent(COMPONENT_REMOVE, entity, component)
-    delete entity.class_to_component[component_class]
+    // TODO do we want pub/sub, or just direct call?
+    // this.event_dispatcher.dispatchEvent(COMPONENT_REMOVE, entity, component)
+    entity.class_to_component.delete(component_class)
 
     return entity
   }
 
   removeAllComponents(entity: Entity): Entity {
-    entity.getComponentClasses().forEach((component_class: string)=>{
+    // TODO, just use entity.component_to_class map Iterator here
+    entity.getComponentClasses().forEach((component_class: Klass<Component>)=>{
       this.removeComponent(entity, component_class)
     })
 
@@ -80,7 +82,8 @@ export class EntityManager {
     if(index === -1) throw new Error("Tried to remove entity not in list")
     entity.active = false
 
-    this.event_dispatcher.dispatchEvent(ENTITY_REMOVED, entity)
+    // TODO
+    // this.event_dispatcher.dispatchEvent(ENTITY_REMOVED, entity)
     this.entities.splice(index, 1)
   }
 
@@ -91,7 +94,8 @@ export class EntityManager {
   }
 }
 
-const ENTITY_CREATED: string = "EntityManager#ENTITY_CREATE"
-const ENTITY_REMOVED: string = "EntityManager#ENTITY_REMOVED"
-const COMPONENT_ADDED: string = "EntityManager#COMPONENT_ADDED"
-const COMPONENT_REMOVE: string = "EntityManager#COMPONENT_REMOVE"
+// See TODO ^
+// const ENTITY_CREATED: string = "EntityManager#ENTITY_CREATE"
+// const ENTITY_REMOVED: string = "EntityManager#ENTITY_REMOVED"
+// const COMPONENT_ADDED: string = "EntityManager#COMPONENT_ADDED"
+// const COMPONENT_REMOVE: string = "EntityManager#COMPONENT_REMOVE"

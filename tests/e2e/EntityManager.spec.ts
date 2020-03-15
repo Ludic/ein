@@ -13,19 +13,15 @@ describe('EntityManager', ()=>{
     assert.equal(Object.keys(player.class_to_component).length, 0)
   })
 
-  it('addComponent()', async()=>{
-    const engine: Engine = new Engine()
-    const player: Entity = engine.createEntity("player")
+  // it('addComponent()', async()=>{
+  //   const engine: Engine = new Engine()
+  //   const player: Entity = engine.createEntity("player")
 
-    const position: Component = new Component()
-    player.addComponent("position", {x: 5, y: 1})
+  //   const position: Component = new Component()
+  //   player.addComponent("position", {x: 5, y: 1})
 
-    // const player: Entity = em.createEntity("player")
-    // assert.equal(player.name, "player")
-    // assert.equal(player.id, 0)
-    // assert.equal(player.active, true)
-    // assert.equal(Object.keys(player.class_to_component).length, 0)
-  })
+  //   // assert.equal(!!player.class_to_component["position"], true)
+  // })
 
 
 })

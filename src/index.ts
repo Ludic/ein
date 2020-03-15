@@ -1,5 +1,3 @@
-export { Klass } from './Klass'
-
 export { Component } from './Component'
 export { TransferableComponent } from './TransferableComponent'
 export { ComponentManager } from './ComponentManager'
@@ -14,3 +12,6 @@ export { Family } from './Family'
 export { FamilyManager } from './FamilyManager'
 
 export { Engine } from './Engine'
+
+export { Klass } from './Klass'
+export { EventDispatcher } from './EventDispatcher'
