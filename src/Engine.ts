@@ -6,7 +6,9 @@ import {
   SystemManager,
   Family,
   FamilyManager,
-  Klass
+  Query,
+  QueryManager,
+  Klass,
 } from "./"
 
 export class Engine {
@@ -14,6 +16,7 @@ export class Engine {
   entity_manager: EntityManager
   system_manager: SystemManager
   family_manager: FamilyManager
+  query_manager: QueryManager
 
   enabled: boolean
 
@@ -22,10 +25,11 @@ export class Engine {
     this.entity_manager = new EntityManager(this)
     this.system_manager = new SystemManager(this)
     this.family_manager = new FamilyManager(this)
+    this.query_manager = new QueryManager(this)
     this.enabled = true
   }
 
-  execute(delta: number, time: number) {
+  execute(delta: number, time: number): void {
     if(this.enabled){
       this.system_manager.execute(delta, time)
     }
@@ -39,5 +43,9 @@ export class Engine {
     return this.entity_manager.createEntity(name)
   }
 
+  // TODO
+  entitiesForQuery(query: Query): Entity[] {
+    return this.query_manager.entitiesForQuery(query)
+  }
 
 }

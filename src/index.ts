@@ -1,3 +1,6 @@
+export { Klass } from './Klass'
+export { EventDispatcher } from './EventDispatcher'
+
 export { Component } from './Component'
 export { TransferableComponent } from './TransferableComponent'
 export { ComponentManager } from './ComponentManager'
@@ -11,7 +14,7 @@ export { SystemManager } from './SystemManager'
 export { Family } from './Family'
 export { FamilyManager } from './FamilyManager'
 
-export { Engine } from './Engine'
+export { Query } from './Query'
+export { QueryManager } from './QueryManager'
 
-export { Klass } from './Klass'
-export { EventDispatcher } from './EventDispatcher'
+export { Engine } from './Engine'

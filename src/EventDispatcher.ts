@@ -65,11 +65,4 @@ export class EventDispatcher {
       }
     }
   }
-
-  /**
-   * Reset stats counters
-   */
-  resetCounters(){
-    this.stats.fired = this.stats.handled = 0
-  }
 }

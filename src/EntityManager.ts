@@ -10,6 +10,7 @@ export class EntityManager {
 
   constructor(engine: Engine){
     this.entities = []
+    // TODO object.freeze?
     this.name_to_entities = {}
 
     this.component_manager = engine.component_manager
@@ -30,7 +31,7 @@ export class EntityManager {
     return entity
   }
 
-  entitiesByName(name: string): Entity[]{
+  entitiesByName(name: string): Entity[] {
     return this.name_to_entities[name]
   }
 
