@@ -29,9 +29,15 @@ export class QueryManager {
       return this.query_to_entities.get(query)!
     }
     if(query.entity_name){
-      let entities: Entity[] = this.engine.entity_manager.entitiesByName(query.entity_name)
-      this.query_to_entities.set(query, entities)
-      return entities
+      let entities: Entity[] | undefined = this.engine.entity_manager.name_to_entities.get(query.entity_name)
+      if(!!entities){
+        this.query_to_entities.set(query, entities)
+      } else {
+        this.engine.entity_manager.name_to_entities.set(query.entity_name, [])
+        entities = this.engine.entity_manager.name_to_entities.get(query.entity_name)
+        this.query_to_entities.set(query, entities!)
+      }
+      return entities!
     } else {
       return []
     }

@@ -2,7 +2,7 @@ import { Klass, Component, TransferableComponent, ComponentManager, Entity, Even
 
 export class EntityManager {
   entities: Entity[]
-  name_to_entities: {[key: string]: Entity[]}
+  name_to_entities: Map<string, Entity[]>
 
   component_manager: ComponentManager
   event_dispatcher: EventDispatcher
@@ -11,7 +11,7 @@ export class EntityManager {
   constructor(engine: Engine){
     this.entities = []
     // TODO object.freeze?
-    this.name_to_entities = {}
+    this.name_to_entities = new Map()
 
     this.component_manager = engine.component_manager
     this.engine = engine
@@ -23,16 +23,15 @@ export class EntityManager {
     let entity: Entity = new Entity(this, name)
 
     this.entities.push(entity)
-    this.name_to_entities[entity.name] ? this.name_to_entities[entity.name].push(entity) : this.name_to_entities[entity.name] = [entity]
-
-    // TODO, just call other managers directly? or use pub/sub?
-    // this.event_dispatcher.dispatchEvent(ENTITY_CREATED, entity)
+    let entities: Entity[] | undefined = this.name_to_entities.get(entity.name)
+    if(!!entities){
+      entities.push(entity)
+      this.name_to_entities.set(entity.name, entities)
+    } else {
+      this.name_to_entities.set(entity.name, [entity])
+    }
 
     return entity
-  }
-
-  entitiesByName(name: string): Entity[] {
-    return this.name_to_entities[name]
   }
 
   addComponent(entity: Entity, component_class: Klass<Component>, data: any, is_transferable: boolean = false): Entity {
@@ -82,9 +81,6 @@ export class EntityManager {
     const index: number = this.entities.indexOf(entity)
     if(index === -1) throw new Error("Tried to remove entity not in list")
     entity.active = false
-
-    // TODO
-    // this.event_dispatcher.dispatchEvent(ENTITY_REMOVED, entity)
     this.entities.splice(index, 1)
   }
 
@@ -94,9 +90,3 @@ export class EntityManager {
     }
   }
 }
-
-// See TODO ^
-// const ENTITY_CREATED: string = "EntityManager#ENTITY_CREATE"
-// const ENTITY_REMOVED: string = "EntityManager#ENTITY_REMOVED"
-// const COMPONENT_ADDED: string = "EntityManager#COMPONENT_ADDED"
-// const COMPONENT_REMOVE: string = "EntityManager#COMPONENT_REMOVE"

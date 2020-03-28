@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { Component, TransferableComponent, Entity, EntityManager, System, Engine } from '../../src/'
 
 
-describe('basic performance', ()=>{
+describe('Performance', ()=>{
 
   it('1000x createEntity()', async()=>{
     const engine: Engine = new Engine()
