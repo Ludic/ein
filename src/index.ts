@@ -18,3 +18,6 @@ export { Query } from './Query'
 export { QueryManager } from './QueryManager'
 
 export { Engine } from './Engine'
+
+import * as Utils from './Utils'
+export { Utils }

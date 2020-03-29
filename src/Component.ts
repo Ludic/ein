@@ -1,5 +1,7 @@
+let next: number = 0
 export class Component {
   _data: any
+  id: number
   class_name: string
   modified: boolean
 
@@ -7,6 +9,7 @@ export class Component {
     this.class_name = this.constructor.name
     this.data = data
     this.modified = false
+    this.id = next++
   }
 
   get data(){

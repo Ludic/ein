@@ -1,4 +1,4 @@
-import { Klass, Component, EntityManager, Engine } from './'
+import { Klass, Component, TransferableComponent, EntityManager, Engine } from './'
 
 let next_id: number = 0
 
@@ -19,8 +19,17 @@ export class Entity {
     this.entity_manager = entity_manager
   }
 
-  addComponent(component_class: Klass<Component>, data: any): Entity {
-    this.entity_manager.addComponent(this, component_class, data)
+  get components(): Component[] {
+    return Array.from(this.class_to_component.values())
+  }
+
+  get transferableComponents(): TransferableComponent[] {
+    // @ts-ignore
+    return Array.from(this.class_to_component.values()).filter((component: Component)=>(component instanceof TransferableComponent))
+  }
+
+  addComponent(component_class: Klass<Component>, data: any, is_transferable: boolean = false): Entity {
+    this.entity_manager.addComponent(this, component_class, data, is_transferable)
     return this
   }
 
@@ -66,4 +75,16 @@ export class Entity {
   remove(): void {
     return this.entity_manager.removeEntity(this)
   }
+
+  toTransferable(): any {
+    return JSON.stringify({
+      id: 1,
+      components: this.transferableComponents.map((component: TransferableComponent)=>component.transferable_data)
+    })
+  }
+
+  fromTransferable(data: any): any {
+    JSON.parse(data)
+  }
+
 }

@@ -1,5 +1,4 @@
-import { Component } from './Component'
-import { Engine } from './Engine'
+import { Component, Entity, Klass, Engine } from "./"
 
 export class ComponentManager {
   component_classes: string[]
@@ -10,21 +9,16 @@ export class ComponentManager {
     this.component_classes = []
   }
 
-  registerComponent(component_class: string): void {
-    if(this.component_classes.includes(component_class)){
-      console.warn(`'${component_class}' already registered.`)
-      return
-    }
-    this.component_classes.push(component_class)
+  // get components(): Component[] {
+  //   return Array.from(this.name_to_entities.values()).reduce((a: Entity[], i: Entity[])=>a.concat(i), [])
+  // }
+
+
+  componentAddedToEntity(component_class: Klass<Component>, component: Component, entity: Entity): void {
+
   }
 
-  componentAddedToEntity(component_class: string): void {
-    if(!this.component_classes.includes(component_class)){
-      this.registerComponent(component_class)
-    }
-  }
-
-  componentRemovedFromEntity(component_class: string): void {
+  componentRemovedFromEntity(component_class: Klass<Component>, entity: Entity): void {
 
   }
 }

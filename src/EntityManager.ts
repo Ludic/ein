@@ -1,7 +1,6 @@
 import { Klass, Component, TransferableComponent, ComponentManager, Entity, EventDispatcher, Engine } from "./"
 
 export class EntityManager {
-  entities: Entity[]
   name_to_entities: Map<string, Entity[]>
 
   component_manager: ComponentManager
@@ -9,7 +8,6 @@ export class EntityManager {
   engine: Engine
 
   constructor(engine: Engine){
-    this.entities = []
     // TODO object.freeze?
     this.name_to_entities = new Map()
 
@@ -18,11 +16,13 @@ export class EntityManager {
     this.event_dispatcher = new EventDispatcher()
   }
 
+  get entities(): Entity[] {
+    return Array.from(this.name_to_entities.values()).reduce((a: Entity[], i: Entity[])=>a.concat(i), [])
+  }
+
   createEntity(name: string = ""): Entity {
     // TODO Object pool
     let entity: Entity = new Entity(this, name)
-
-    this.entities.push(entity)
     let entities: Entity[] | undefined = this.name_to_entities.get(entity.name)
     if(!!entities){
       entities.push(entity)
@@ -47,10 +47,7 @@ export class EntityManager {
     }
 
     entity.class_to_component.set(component_class, component)
-
-    // this.component_manager.componentAddedToEntity(component_class)
-    // TODO do we want pub/sub, or just direct call?
-    // this.event_dispatcher.dispatchEvent(COMPONENT_ADDED, entity, component)
+    // this.engine.component_manager.componentAddedToEntity(component_class, component, entity)
 
     return entity
   }
@@ -61,10 +58,7 @@ export class EntityManager {
     // If the Entity doesn't have this Component, return
     if(!component) return entity
 
-    // TODO do we want pub/sub, or just direct call?
-    // this.event_dispatcher.dispatchEvent(COMPONENT_REMOVE, entity, component)
     entity.class_to_component.delete(component_class)
-
     return entity
   }
 
@@ -78,15 +72,10 @@ export class EntityManager {
   }
 
   removeEntity(entity: Entity): void {
-    const index: number = this.entities.indexOf(entity)
-    if(index === -1) throw new Error("Tried to remove entity not in list")
-    entity.active = false
-    this.entities.splice(index, 1)
+    // TODO
   }
 
-  removeAllEntities() {
-    for(let i = this.entities.length - 1; i >= 0; i--){
-      this.removeEntity(this.entities[i])
-    }
+  removeAllEntities(){
+    // TODO
   }
 }

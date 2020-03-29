@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import { Component, TransferableComponent, Entity, EntityManager, System, Engine } from '../../src/'
 
 
-describe('Performance', ()=>{
+describe('Basic Performance', ()=>{
 
   it('1000x createEntity()', async()=>{
     const engine: Engine = new Engine()
@@ -24,7 +24,7 @@ describe('Performance', ()=>{
     const engine: Engine = new Engine()
     const player: Entity = engine.createEntity("player")
     for(let i=0; i<10000; i++){
-      player.addComponent("position", {x: 5, y: 1})
+      player.addComponent(Component, {x: 5, y: 1})
     }
   })
 
