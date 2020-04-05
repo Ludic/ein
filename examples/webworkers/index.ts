@@ -6,22 +6,45 @@ const circle_query: Query = {
   entity_name: "circle"
 }
 
+class PositionComponent extends Component {}
+
 class MovementSystem extends System {
   entities: Entity[]
   entity_query: Query
   angle: number
   data: any
-  worker_execute: any
+  worker_execute: (entities: any[], dt: number)=>Promise<{}>
+
   constructor(priority: number = 0, enabled: boolean = true) {
     super(priority, enabled)
     this.entity_query = circle_query
 
-    this.worker_execute = Utils.greenlet(async(entities: any)=>{
-      console.log("worker: ", entities)
+    this.worker_execute = Utils.greenlet(async(entities: any[], dt: number)=>{
+      // console.log("dt: ", dt)
+      entities.forEach((entity: Entity)=>{
+        let pos: any = entity.components.find((component: Component)=>component.class_name=="PositionComponent")
+
+        pos.data.x = 150 - Math.cos((Math.PI / 180) * pos.data.angle) * 100
+        pos.data.y = 150 + Math.sin((Math.PI / 180) * pos.data.angle) * 100
+        pos.data.angle -= dt/10
+      })
+
+      return entities
     })
+  }
 
-    this.data = new TransferableComponent({x: 5})
+  async execute(dt: number, time: number): Promise<void> {
+    // this.entities.forEach((entity: Entity)=>{
+    //   let pos: any = entity.getComponent(PositionComponent)!
 
+    //   pos.data.x = 150 - Math.cos((Math.PI / 180) * pos.data.angle) * 100
+    //   pos.data.y = 150 + Math.sin((Math.PI / 180) * pos.data.angle) * 100
+    //   pos.data.angle -= dt / 10
+
+    // })
+
+    let res: any = await this.worker_execute(this.entities.map((entity: Entity)=>entity.toCloneable()), dt)
+    console.log("res: ", res)
   }
 
   onAdded(engine: Engine): void {
@@ -29,20 +52,6 @@ class MovementSystem extends System {
     this.entities = this.engine.entitiesForQuery(this.entity_query)
   }
 
-  execute(delta: number, time: number): void {
-    this.entities.forEach((entity: Entity)=>{
-      let pos: any = entity.getComponent(PositionComponent)!
-      pos.data.x = 150 - Math.cos((Math.PI / 180) * pos.data.angle) * 100
-      pos.data.y = 150 + Math.sin((Math.PI / 180) * pos.data.angle) * 100
-      pos.data.angle -= 2
-
-      // console.log(pos.transferable_data)
-    })
-
-    // console.log("1: ", this.data.transferable_data)
-    // this.worker_execute(this.data.transferable_data)
-    // console.log("2: ", this.data)
-  }
 }
 
 class RenderSystem extends System {
@@ -76,24 +85,24 @@ class RenderSystem extends System {
   }
 }
 
-class PositionComponent extends TransferableComponent {}
+
 
 const engine: Engine = new Engine()
 engine.addSystem(MovementSystem)
 engine.addSystem(RenderSystem)
 engine
   .createEntity("circle")
-  .addComponent(PositionComponent, {x: 50, y: 50, angle: 0}, true)
+  .addComponent(PositionComponent, {x: 50, y: 50, angle: 0})
 
 engine
   .createEntity("circle")
-  .addComponent(PositionComponent, {x: 50, y: 50, angle: 180}, true)
+  .addComponent(PositionComponent, {x: 50, y: 50, angle: 180})
 
 
-let start: any = null
+let last: number = 0
 function update(timestamp: number){
-  if(!start) start = timestamp
-  engine.execute(timestamp-start, timestamp)
+  engine.execute(timestamp-last, timestamp)
+  last = timestamp
   requestAnimationFrame(update)
 }
 

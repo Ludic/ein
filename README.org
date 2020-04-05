@@ -13,6 +13,10 @@
    #+RESULTS:
    [[file:frame.png]]
 
+** Ideas
+   Keep Component state in both System and WW, on execute(), diff WW and system state, only transfer diff update to WW
+
+   Have a Job Manager that queues up work, resyncs Entities, resolves System dependency graphs
 
 
 ** Example

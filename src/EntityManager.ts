@@ -1,7 +1,9 @@
 import { Klass, Component, TransferableComponent, ComponentManager, Entity, EventDispatcher, Engine } from "./"
 
 export class EntityManager {
+  entities: Entity[]
   name_to_entities: Map<string, Entity[]>
+  id_to_entity: Map<number, Entity>
 
   component_manager: ComponentManager
   event_dispatcher: EventDispatcher
@@ -10,19 +12,18 @@ export class EntityManager {
   constructor(engine: Engine){
     // TODO object.freeze?
     this.name_to_entities = new Map()
+    this.id_to_entity = new Map()
 
     this.component_manager = engine.component_manager
     this.engine = engine
     this.event_dispatcher = new EventDispatcher()
   }
 
-  get entities(): Entity[] {
-    return Array.from(this.name_to_entities.values()).reduce((a: Entity[], i: Entity[])=>a.concat(i), [])
-  }
-
   createEntity(name: string = ""): Entity {
     // TODO Object pool
     let entity: Entity = new Entity(this, name)
+    this.entities.push(entity)
+    this.id_to_entity.set(entity.id, entity)
     let entities: Entity[] | undefined = this.name_to_entities.get(entity.name)
     if(!!entities){
       entities.push(entity)
@@ -34,23 +35,23 @@ export class EntityManager {
     return entity
   }
 
-  addComponent(entity: Entity, component_class: Klass<Component>, data: any, is_transferable: boolean = false): Entity {
-    // If the Entity already has this Component, return
-    if(entity.class_to_component.has(component_class)) return entity
+  // addComponent(entity: Entity, component_class: Klass<Component>, data: any, is_transferable: boolean = false): Entity {
+  //   // If the Entity already has this Component, return
+  //   if(entity.class_to_component.has(component_class)) return entity
 
-    // TODO don't like this
-    let component: Component
-    if(is_transferable){
-      component = new TransferableComponent(data)
-    } else {
-      component = new Component(data)
-    }
+  //   // TODO don't like this
+  //   let component: Component
+  //   if(is_transferable){
+  //     component = new TransferableComponent(data)
+  //   } else {
+  //     component = new Component(data)
+  //   }
 
-    entity.class_to_component.set(component_class, component)
-    // this.engine.component_manager.componentAddedToEntity(component_class, component, entity)
+  //   entity.class_to_component.set(component_class, component)
+  //   // this.engine.component_manager.componentAddedToEntity(component_class, component, entity)
 
-    return entity
-  }
+  //   return entity
+  // }
 
   removeComponent(entity: Entity, component_class: Klass<Component>): Entity {
     let component: Component | undefined = entity.class_to_component.get(component_class)
@@ -77,5 +78,11 @@ export class EntityManager {
 
   removeAllEntities(){
     // TODO
+  }
+
+  updateEntitiesFromClonable(entities: any[]){
+    entities.forEach((e: any)=>{
+
+    })
   }
 }

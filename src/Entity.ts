@@ -7,6 +7,7 @@ export class Entity {
   active: boolean
   name: string
 
+  components: Component[]
   class_to_component: Map<Klass<Component>, Component>
   entity_manager: EntityManager
 
@@ -15,21 +16,21 @@ export class Entity {
     this.name = name
     this.active = true
 
+    this.components = []
     this.class_to_component = new Map()
     this.entity_manager = entity_manager
   }
 
-  get components(): Component[] {
-    return Array.from(this.class_to_component.values())
-  }
+  addComponent(component_class: Klass<Component>, data: any): Entity {
+    // If the Entity already has this Component, return
+    if(this.class_to_component.has(component_class)) return this
 
-  get transferableComponents(): TransferableComponent[] {
-    // @ts-ignore
-    return Array.from(this.class_to_component.values()).filter((component: Component)=>(component instanceof TransferableComponent))
-  }
+    let component = new component_class(data)
+    this.class_to_component.set(component_class, component)
+    this.components.push(component)
 
-  addComponent(component_class: Klass<Component>, data: any, is_transferable: boolean = false): Entity {
-    this.entity_manager.addComponent(this, component_class, data, is_transferable)
+    // TODO notify a component was added to this entity
+
     return this
   }
 
@@ -76,15 +77,18 @@ export class Entity {
     return this.entity_manager.removeEntity(this)
   }
 
-  toTransferable(): any {
-    return JSON.stringify({
-      id: 1,
-      components: this.transferableComponents.map((component: TransferableComponent)=>component.transferable_data)
-    })
+  toCloneable(): any {
+    return {
+      id: this.id,
+      components: this.components,
+      // class_to_components: this.class_to_component
+
+      // components: this.components.map((component: Component)=>component.toCloneable())
+    }
   }
 
-  fromTransferable(data: any): any {
-    JSON.parse(data)
+  // TODO
+  fromCloneable(components: any[]): any {
+    // components: this.components.map((component: Component)=>component.toCloneable())
   }
-
 }

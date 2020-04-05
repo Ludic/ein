@@ -14,6 +14,10 @@ export class ComponentManager {
   // }
 
 
+  componentForEntityByClass(component_class: Klass<Component>, entity: Entity){
+
+  }
+
   componentAddedToEntity(component_class: Klass<Component>, component: Component, entity: Entity): void {
 
   }
