@@ -17,7 +17,6 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noEmitOnError": true,
     "strictNullChecks": true,
     "experimentalDecorators": true
   },

@@ -3,7 +3,7 @@ import { Klass, Component, TransferableComponent, ComponentManager, Entity, Even
 export class EntityManager {
   entities: Entity[]
   name_to_entities: {[key: string]: Entity[]}
-  id_to_entity: {[key: number]: Entity}
+  id_to_entity: {[key: string]: Entity}
 
   engine: Engine
 
@@ -19,6 +19,11 @@ export class EntityManager {
   createEntity(name: string = ""): Entity {
     // TODO Object pool
     let entity: Entity = new Entity(name)
+    this.addEntity(entity)
+    return entity
+  }
+
+  private addEntity(entity: Entity){
     this.entities.push(entity)
     this.id_to_entity[entity.id] = entity
     if(this.name_to_entities[entity.name]){
@@ -26,8 +31,6 @@ export class EntityManager {
     } else {
       this.name_to_entities[entity.name] = [entity]
     }
-
-    return entity
   }
 
   // addComponent(entity: Entity, component_class: Klass<Component>, data: any, is_transferable: boolean = false): Entity {
@@ -80,9 +83,13 @@ export class EntityManager {
   syncEntities(entities: Entity[]): void {
     entities.forEach((entity: Entity)=>{
       let e: Entity = this.id_to_entity[entity.id]
-      e.components.forEach((c: Component)=>{
-        c.data = entity.class_to_component[c.class_name].data
-      })
+      if(e == null){
+        this.addEntity(entity)
+      } else {
+        e.components.forEach((c: Component)=>{
+          c.data = entity.class_to_component[c.class_name].data
+        })
+      }
     })
   }
 

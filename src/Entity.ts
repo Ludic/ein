@@ -1,9 +1,10 @@
 import { Klass, Component, TransferableComponent, EntityManager, Engine } from './'
+import { v4 as uuid } from 'uuid'
 
 let next_id: number = 0
 
 export class Entity {
-  id: number
+  id: string
   active: boolean
   name: string
 
@@ -13,7 +14,7 @@ export class Entity {
   id_to_component: {[key: number]: Component}
 
   constructor(name: string = "default_name") {
-    this.id = next_id++
+    this.id = uuid()
     this.name = name
     this.active = true
 
