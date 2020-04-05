@@ -6,7 +6,6 @@ export class Component {
   data: any
 
   constructor(data?: any){
-    console.log(this)
     this.id = next++
     this.modified = false
     this.class_name = this.constructor.name

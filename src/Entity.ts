@@ -8,25 +8,28 @@ export class Entity {
   name: string
 
   components: Component[]
-  class_to_component: Map<Klass<Component>, Component>
-  entity_manager: EntityManager
+  component_class_names: string[]
+  class_to_component: {[key: string]: Component}
+  id_to_component: {[key: number]: Component}
 
-  constructor(entity_manager: EntityManager, name: string = "") {
+  constructor(name: string = "default_name") {
     this.id = next_id++
     this.name = name
     this.active = true
 
     this.components = []
-    this.class_to_component = new Map()
-    this.entity_manager = entity_manager
+    this.component_class_names = []
+    this.class_to_component = {}
+    this.id_to_component = {}
   }
 
   addComponent(component_class: Klass<Component>, data: any): Entity {
     // If the Entity already has this Component, return
-    if(this.class_to_component.has(component_class)) return this
+    if(this.class_to_component[component_class.name]) return this
 
     let component = new component_class(data)
-    this.class_to_component.set(component_class, component)
+    this.class_to_component[component_class.name] = component
+    this.id_to_component[component.id] = component
     this.components.push(component)
 
     // TODO notify a component was added to this entity
@@ -34,61 +37,49 @@ export class Entity {
     return this
   }
 
-  getComponent(component_class: Klass<Component>): Component | undefined {
-    return this.class_to_component.get(component_class)
-  }
+  // removeComponent(component_class: Klass<Component>): Entity {
+  //   this.entity_manager.removeComponent(this, component_class)
+  //   return this
+  // }
 
-  getComponentClasses(): Klass<Component>[] {
-    return Array.from(this.class_to_component.keys())
-  }
 
-  getComponents(): Component[] {
-    return Array.from(this.class_to_component.values())
-  }
+  // getComponent(component_class: Klass<Component>): Component | undefined {
+  //   return this.class_to_component.get(component_class)
+  // }
 
-  removeComponent(component_class: Klass<Component>): Entity {
-    this.entity_manager.removeComponent(this, component_class)
-    return this
-  }
+  // getComponentClasses(): Klass<Component>[] {
+  //   this.class_to_component.keys())
+  // }
 
-  hasComponent(component_class: Klass<Component>): boolean {
-    return this.getComponentClasses().includes(component_class)
-  }
+  // getComponents(): Component[] {
+  //   return Array.from(this.class_to_component.values())
+  // }
 
-  hasAllComponents(component_classes: Klass<Component>[]): boolean {
-    for(let i = 0; i < component_classes.length; i++){
-      if(!this.hasComponent(component_classes[i])) return false
-    }
-    return true
-  }
 
-  hasAnyComponents(component_classes: Klass<Component>[]): boolean {
-    for(let i = 0; i < component_classes.length; i++){
-      if(this.hasComponent(component_classes[i])) return true
-    }
-    return false
-  }
+  // hasComponent(component_class: Klass<Component>): boolean {
+  //   return this.getComponentClasses().includes(component_class)
+  // }
 
-  removeAllComponents(){
-    return this.entity_manager.removeAllComponents(this)
-  }
+  // hasAllComponents(component_classes: Klass<Component>[]): boolean {
+  //   for(let i = 0; i < component_classes.length; i++){
+  //     if(!this.hasComponent(component_classes[i])) return false
+  //   }
+  //   return true
+  // }
 
-  remove(): void {
-    return this.entity_manager.removeEntity(this)
-  }
+  // hasAnyComponents(component_classes: Klass<Component>[]): boolean {
+  //   for(let i = 0; i < component_classes.length; i++){
+  //     if(this.hasComponent(component_classes[i])) return true
+  //   }
+  //   return false
+  // }
 
-  toCloneable(): any {
-    return {
-      id: this.id,
-      components: this.components,
-      // class_to_components: this.class_to_component
+  // removeAllComponents(){
+  //   return this.entity_manager.removeAllComponents(this)
+  // }
 
-      // components: this.components.map((component: Component)=>component.toCloneable())
-    }
-  }
+  // remove(): void {
+  //   return this.entity_manager.removeEntity(this)
+  // }
 
-  // TODO
-  fromCloneable(components: any[]): any {
-    // components: this.components.map((component: Component)=>component.toCloneable())
-  }
 }

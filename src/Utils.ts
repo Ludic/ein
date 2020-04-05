@@ -54,7 +54,7 @@ export function greenlet(asyncFunction: any) {
 	};
 
 	// Return a proxy function that forwards calls to the worker & returns a promise for the result.
-	return function (args: any) {
+	return function(args: any): Promise<any> {
 		args = [].slice.call(arguments);
 		return new Promise(function () {
 			// Add the promise controller to the registry

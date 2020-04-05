@@ -1,7 +1,6 @@
 import { Component, TransferableComponent, Entity, System, Query, Engine, Utils } from '../../src/'
 console.log("webworker example")
 
-
 const circle_query: Query = {
   entity_name: "circle"
 }
@@ -13,14 +12,13 @@ class MovementSystem extends System {
   entity_query: Query
   angle: number
   data: any
-  worker_execute: (entities: any[], dt: number)=>Promise<{}>
+  worker_execute: (entities: any[], dt: number)=>Promise<Entity[]>
 
   constructor(priority: number = 0, enabled: boolean = true) {
     super(priority, enabled)
     this.entity_query = circle_query
 
-    this.worker_execute = Utils.greenlet(async(entities: any[], dt: number)=>{
-      // console.log("dt: ", dt)
+    this.worker_execute = Utils.greenlet(async(entities: Entity[], dt: number): Promise<Entity[]> => {
       entities.forEach((entity: Entity)=>{
         let pos: any = entity.components.find((component: Component)=>component.class_name=="PositionComponent")
 
@@ -29,29 +27,25 @@ class MovementSystem extends System {
         pos.data.angle -= dt/10
       })
 
+
       return entities
     })
   }
 
   async execute(dt: number, time: number): Promise<void> {
-    // this.entities.forEach((entity: Entity)=>{
-    //   let pos: any = entity.getComponent(PositionComponent)!
+    // let entities: Entity[] = await this.worker_execute(this.entities, dt)
+    // this.engine.entity_manager.syncEntities(entities)
 
-    //   pos.data.x = 150 - Math.cos((Math.PI / 180) * pos.data.angle) * 100
-    //   pos.data.y = 150 + Math.sin((Math.PI / 180) * pos.data.angle) * 100
-    //   pos.data.angle -= dt / 10
 
-    // })
-
-    let res: any = await this.worker_execute(this.entities.map((entity: Entity)=>entity.toCloneable()), dt)
-    console.log("res: ", res)
+    this.worker_execute(this.entities, dt).then((entities: Entity[])=>{
+      this.engine.entity_manager.syncEntities(entities)
+    })
   }
 
   onAdded(engine: Engine): void {
     this.engine = engine
     this.entities = this.engine.entitiesForQuery(this.entity_query)
   }
-
 }
 
 class RenderSystem extends System {
@@ -75,7 +69,7 @@ class RenderSystem extends System {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.fillStyle = "steelblue"
     this.entities.forEach((entity: Entity)=>{
-      const pos: any = entity.getComponent(PositionComponent)!
+      const pos: any = entity.class_to_component[PositionComponent.name]
       this.ctx.save()
       this.ctx.beginPath();
       this.ctx.arc(pos.data.x, pos.data.y, 10, 0, Math.PI * 2, true)
@@ -84,8 +78,6 @@ class RenderSystem extends System {
     })
   }
 }
-
-
 
 const engine: Engine = new Engine()
 engine.addSystem(MovementSystem)
