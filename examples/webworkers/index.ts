@@ -1,6 +1,12 @@
 import { Component, TransferableComponent, Entity, System, Query, Engine, Utils } from '../../src/'
 console.log("webworker example")
 
+let state: string = "stop"
+
+document.getElementById("start")!.onclick = ()=>{ state = "start"; update(last) }
+document.getElementById("stop")!.onclick = ()=>{ state = "stop" }
+document.getElementById("step")!.onclick = ()=>{ state = "step" }
+
 const circle_query: Query = {
   entity_name: "circle"
 }
@@ -20,18 +26,14 @@ class MovementSystem extends System {
 
     this.worker_execute = Utils.greenlet((entities: Entity[], dt: number): Promise<Entity[]> => {
       return new Promise((resolve)=>{
-        // simulates a long running greenlet task
-        setTimeout(() => {
-          entities.forEach((entity: Entity)=>{
-            let pos: any = entity.components.find((component: Component)=>component.class_name=="PositionComponent")
-    
-            pos.data.x = 150 - Math.cos((Math.PI / 180) * pos.data.angle) * 100
-            pos.data.y = 150 + Math.sin((Math.PI / 180) * pos.data.angle) * 100
-            pos.data.angle -= dt/10
-          })
-    
-          resolve(entities)
-        }, 1000)
+        entities.forEach((entity: Entity)=>{
+          let pos: any = entity.components.find((component: Component)=>component.class_name=="PositionComponent")
+
+          pos.data.x = 150 - Math.cos((Math.PI / 180) * pos.data.angle) * 100
+          pos.data.y = 150 + Math.sin((Math.PI / 180) * pos.data.angle) * 100
+          pos.data.angle -= dt/10
+        })
+        resolve(entities)
       })
     })
   }
@@ -99,7 +101,10 @@ let last: number = 0
 function update(timestamp: number){
   engine.execute(timestamp-last, timestamp)
   last = timestamp
-  requestAnimationFrame(update)
+
+  if(state == "start"){
+    requestAnimationFrame(update)
+  }
 }
 
 requestAnimationFrame(update)
