@@ -79,9 +79,11 @@ engine
   .createEntity("circle")
   .addComponent(PositionComponent, {x: 50, y: 50, angle: 0})
 
-engine
-  .createEntity("circle")
-  .addComponent(PositionComponent, {x: 50, y: 50, angle: 180})
+for(let i=0; i<1000; i++){
+  engine
+    .createEntity("circle")
+    .addComponent(PositionComponent, {x: 50, y: 50, angle: 180})
+}
 
 const worker = new Worker('./worker.ts')
 
