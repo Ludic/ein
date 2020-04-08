@@ -22,23 +22,25 @@ export class MovementSystem extends System {
           pos.data.y = 150 + Math.sin((Math.PI / 180) * pos.data.angle) * 100
           pos.data.angle -= dt/10
         })
-        console.log("movement: ", performance.now() - start)
+        console.log("MovementSystem.worker_execute: ", performance.now() - start)
         return resolve(entities)
       })
     })
   }
 
   async execute(dt: number, time: number): Promise<void> {
+    console.log("MovementSystem.excute() start")
     const start: number = performance.now()
     // let entities: Entity[] = await this.worker_execute(this.entities, dt)
     // this.engine.entity_manager.syncEntities(entities)
 
-
-    this.worker_execute(this.entities, dt).then((entities: Entity[])=>{
-
-      this.engine.entity_manager.syncEntities(entities)
-
-    })
+    const worker_start: number = performance.now()
+    const entities: Entity[] = await this.worker_execute(this.entities, dt)
+    console.log("MovementSystem.worker_execute total: ", performance.now() - worker_start)
+    const sync_start: number = performance.now()
+    this.engine.entity_manager.syncEntities(entities)
+    console.log("MovementSystem.sync: ", performance.now() - sync_start)
+    console.log("MovementSystem.execute() end", performance.now() - start)
   }
 
   onAdded(engine: Engine): void {

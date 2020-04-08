@@ -29,9 +29,9 @@ export class Engine {
     this.enabled = true
   }
 
-  execute(delta: number, time: number): void {
+  async execute(delta: number, time: number): Promise<void> {
     if(this.enabled){
-      this.system_manager.execute(delta, time)
+      await this.system_manager.execute(delta, time)
     }
   }
 

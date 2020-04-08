@@ -27,9 +27,10 @@ let last: number = 0
 let frame_start: number = 0
 let frame_end: number = 0
 
-function update(timestamp: number){
+async function update(timestamp: number){
+  console.log("update() start")
   frame_start = timestamp
-  engine.execute(timestamp-last, timestamp)
+  await engine.execute(timestamp-last, timestamp)
   last = timestamp
 
   frame_end = performance.now()
@@ -38,6 +39,7 @@ function update(timestamp: number){
   // if(frame_end - frame_start > 16){
   //   console.log(frame_end - frame_start)
   // }
+  console.log("update() end")
   if(state == "start"){
     requestAnimationFrame(update)
   }

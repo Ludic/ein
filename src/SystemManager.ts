@@ -33,11 +33,11 @@ export class SystemManager {
     return true
   }
 
-  execute(delta: number, time: number): void {
+  async execute(delta: number, time: number): Promise<void> {
     for(let i=0; i<this.systems.length; i++){
       const system: System = this.systems[i]
       if(system.shouldExecute()){
-        system.execute(delta, time)
+        await system.execute(delta, time)
       }
     }
   }
