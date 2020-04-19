@@ -5,17 +5,37 @@
     <title>Ein</title>
   </head>
   <body>
-    <canvas id="canvas" width="300" height="300"></canvas>
+    <div id="buttons">
+      <button id="start">START</button>
+      <button id="stop">STOP</button>
+      <button id="step">STEP</button>
+    </div>
+    <div id="canvas-container">
+      <canvas id="canvas" width="300" height="300"></canvas>
+    </div>
     <script src="./index.ts"></script>
   </body>
 
   <style>
     body {
-        margin: 0;
-        width: 100vw;
-        height: 100vh;
+        padding: 4em;
+    }
 
+    #buttons {
+        flex-basis: 100%;
         display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    button {
+        margin: 1em;
+        font-size: 1.2em;
+    }
+
+    #canvas-container {
+        display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: center;
     }

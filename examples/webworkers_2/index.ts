@@ -79,7 +79,7 @@ engine
   .createEntity("circle")
   .addComponent(PositionComponent, {x: 50, y: 50, angle: 0})
 
-for(let i=0; i<1000; i++){
+for(let i=0; i<10; i++){
   engine
     .createEntity("circle")
     .addComponent(PositionComponent, {x: 50, y: 50, angle: 180})
