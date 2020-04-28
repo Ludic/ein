@@ -72,3 +72,14 @@ export function greenlet(asyncFunction: any) {
 		});
 	};
 }
+
+
+export function isObject(val: any): val is object {
+  return val !== null && typeof val === 'object'
+}
+
+export const isArray = Array.isArray
+
+export function hasChanged(value: any, oldValue: any): boolean {
+  return value !== oldValue && (value === value || oldValue === oldValue)
+}
