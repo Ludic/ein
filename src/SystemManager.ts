@@ -38,6 +38,7 @@ export class SystemManager {
       const system: System = this.systems[i]
       if(system.shouldExecute()){
         await system.execute(delta, time)
+        system.executions++
       }
     }
   }

@@ -41,7 +41,7 @@ export class ComponentManager {
     return this.entity_id_to_components[entity_id]
   }
 
-  componentForEntity(entity_id: string, class_name: string): Component {
+  componentForEntity<T>(entity_id: string, class_name: string): Component {
     return this.hash_to_component[entity_id+class_name]
   }
 

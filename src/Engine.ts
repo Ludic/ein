@@ -18,6 +18,7 @@ export class Engine {
   family_manager: FamilyManager
   query_manager: QueryManager
 
+  executions: number
   enabled: boolean
 
   constructor(){
@@ -26,6 +27,8 @@ export class Engine {
     this.system_manager = new SystemManager(this)
     this.family_manager = new FamilyManager(this)
     this.query_manager = new QueryManager(this)
+
+    this.executions = 0
     this.enabled = true
   }
 
@@ -45,6 +48,7 @@ export class Engine {
     if(this.enabled){
       await this.system_manager.execute(delta, time)
     }
+    this.executions++
   }
 
   entitiesForQuery(query: Query): Entity[] {
