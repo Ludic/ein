@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { Component, TransferableComponent, Query, Entity, System, Engine } from '../../src/'
+import { Component, Query, Entity, System, Engine } from '../../src/'
 
 
 describe('QueryManager', ()=>{

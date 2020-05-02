@@ -1,4 +1,4 @@
-import { Component, TransferableComponent, Entity, System, Query, Engine, Utils } from '../../src/'
+import { Component, Entity, System, Query, Engine, Utils } from '../../src/'
 console.log("webworker 2 example")
 
 // copied from ludic since ts doesn't have offscreen canvas types

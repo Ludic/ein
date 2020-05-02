@@ -1,4 +1,4 @@
-import { Component, TransferableComponent, Entity, System, Query, Engine, Utils } from '../../src/'
+import { Component, Entity, System, Query, Engine, Utils } from '../../src/'
 
 export class MovementSystem extends System {
   entities: Entity[]

@@ -2,7 +2,6 @@ export { Klass } from './Klass'
 export { EventDispatcher } from './EventDispatcher'
 
 export { Component } from './Component'
-export { TransferableComponent } from './TransferableComponent'
 export { ComponentManager } from './ComponentManager'
 
 export { Entity } from './Entity'

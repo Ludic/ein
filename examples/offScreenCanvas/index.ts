@@ -1,4 +1,4 @@
-import { Component, TransferableComponent, Entity, System, Query, Engine } from '../../src/'
+import { Component, Entity, System, Query, Engine } from '../../src/'
 console.log("basic example")
 
 

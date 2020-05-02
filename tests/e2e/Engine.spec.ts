@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { Component, TransferableComponent, Entity, System, Engine } from '../../src/'
+import { Component, Entity, System, Engine } from '../../src/'
 
 const engine: Engine = new Engine()
 let test_executions: number = 0
@@ -17,15 +17,17 @@ class TestSystem extends System {
 
 describe('Engine', ()=>{
 
-  it('should probably initialize', async()=>{
-    assert.equal(!!engine, true)
+  it('createEntity()', async()=>{
+    const entity: Entity = engine.createEntity("player")
+    assert.equal(entity.name, "player")
+    assert.equal(engine.entity_manager.entities.length, 1)
   })
 
   it('addSystem()', async()=>{
-    engine.addSystem(TestSystem)
+    const system: System = engine.addSystem(TestSystem)
+    assert.equal(system.enabled, true)
     assert.equal(engine.system_manager.systems.length, 1)
   })
-
 
   it('execute()', async()=>{
     assert.equal(engine.system_manager.systems.length, 1)

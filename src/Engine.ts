@@ -1,10 +1,10 @@
 import {
+  Component,
   ComponentManager,
   Entity,
   EntityManager,
   System,
   SystemManager,
-  Family,
   FamilyManager,
   Query,
   QueryManager,
@@ -29,23 +29,25 @@ export class Engine {
     this.enabled = true
   }
 
-  async execute(delta: number, time: number): Promise<void> {
-    if(this.enabled){
-      await this.system_manager.execute(delta, time)
-    }
-  }
-
-  addSystem(system_klass: Klass<System>): System {
-    return this.system_manager.addSystem(system_klass)
+  addComponentToEntity(entity: Entity, component_klass: Klass<Component>, data?: any): Component {
+    return this.component_manager.addComponentToEntity(entity, component_klass, data)
   }
 
   createEntity(name?: string): Entity {
     return this.entity_manager.createEntity(name)
   }
 
-  // TODO
+  addSystem(system_klass: Klass<System>): System {
+    return this.system_manager.addSystem(system_klass)
+  }
+
+  async execute(delta: number, time: number): Promise<void> {
+    if(this.enabled){
+      await this.system_manager.execute(delta, time)
+    }
+  }
+
   entitiesForQuery(query: Query): Entity[] {
     return this.query_manager.entitiesForQuery(query)
   }
-
 }
