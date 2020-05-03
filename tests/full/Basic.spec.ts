@@ -43,8 +43,7 @@ describe('Full - Basic', ()=>{
 })
 
 
-
-export class PositionComponent extends Component {
+class PositionComponent extends Component {
   data: {
     x: number
     y: number
