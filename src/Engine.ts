@@ -32,10 +32,6 @@ export class Engine {
     this.enabled = true
   }
 
-  addComponentToEntity(entity: Entity, component_klass: Klass<Component>, data?: any): Component {
-    return this.component_manager.addComponentToEntity(entity, component_klass, data)
-  }
-
   createEntity(name?: string): Entity {
     return this.entity_manager.createEntity(name)
   }

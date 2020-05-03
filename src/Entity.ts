@@ -6,36 +6,31 @@ export class Entity {
   active: boolean
   name: string
 
-  constructor(name: string = "default_name") {
+  engine: Engine
+
+  constructor(engine: Engine, name: string = "") {
     this.id = uuid()
     this.name = name
     this.active = true
+
+    this.engine = engine
   }
 
-  // addComponent(component_class: Klass<Component>, data: any): Entity {
-  //   // If the Entity already has this Component, return
-  //   if(this.class_to_component[component_class.name]) return this
+  addComponent(component_class: Klass<Component>, data?: any): Entity {
+    this.engine.component_manager.addComponent(this, component_class, data)
+    return this
+  }
 
-  //   let component = new component_class(data)
-  //   this.class_to_component[component_class.name] = component
-  //   this.id_to_component[component.id] = component
-  //   this.components.push(component)
+  removeComponent(component_class: Klass<Component>): Entity {
+    this.engine.component_manager.removeComponent(this, component_class)
+    return this
+  }
 
-  //   // TODO notify a component was added to this entity
+  getComponent(component_class: Klass<Component>): Component | undefined {
+    return this.engine.component_manager.componentForEntity(this.id, component_class.name)
+  }
 
-  //   return this
-  // }
-
-  // removeComponent(component_class: Klass<Component>): Entity {
-  //   this.entity_manager.removeComponent(this, component_class)
-  //   return this
-  // }
-
-
-  // getComponent(component_class: Klass<Component>): Component | undefined {
-  //   return this.class_to_component.get(component_class)
-  // }
-
+  // TODO
   // getComponentClasses(): Klass<Component>[] {
   //   this.class_to_component.keys())
   // }

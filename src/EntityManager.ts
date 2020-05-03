@@ -15,10 +15,10 @@ export class EntityManager {
     this.engine = engine
   }
 
-  createEntity(name: string = ""): Entity {
+  createEntity(name?: string): Entity {
     // TODO Object pool (prevent GC)
     // TODO Operation pool (bundle operations to be done later)
-    let entity: Entity = new Entity(name)
+    let entity: Entity = new Entity(this.engine, name)
     this.addEntity(entity)
     return entity
   }
@@ -33,23 +33,23 @@ export class EntityManager {
     }
   }
 
-  addComponentToEntity(entity: Entity, component_class: Klass<Component>, data: any): Entity {
-    // If the Entity already has this Component, return
-    if(entity.class_to_component.has(component_class)) return entity
+  // addComponentToEntity(entity: Entity, component_class: Klass<Component>, data: any): Entity {
+  //   // If the Entity already has this Component, return
+  //   if(entity.class_to_component.has(component_class)) return entity
 
-    // TODO don't like this
-    let component: Component
-    if(is_transferable){
-      component = new TransferableComponent(data)
-    } else {
-      component = new Component(data)
-    }
+  //   // TODO don't like this
+  //   let component: Component
+  //   if(is_transferable){
+  //     component = new TransferableComponent(data)
+  //   } else {
+  //     component = new Component(data)
+  //   }
 
-    entity.class_to_component.set(component_class, component)
-    // this.engine.component_manager.componentAddedToEntity(component_class, component, entity)
+  //   entity.class_to_component.set(component_class, component)
+  //   // this.engine.component_manager.componentAddedToEntity(component_class, component, entity)
 
-    return entity
-  }
+  //   return entity
+  // }
 
   // removeComponent(entity: Entity, component_class: Klass<Component>): Entity {
   //   let component: Component | undefined = entity.class_to_component.get(component_class)
@@ -80,21 +80,21 @@ export class EntityManager {
 
 
   // TODO - see below
-  syncEntities(entities: Entity[]): void {
-    entities.forEach((entity: Entity)=>{
-      let e: Entity = this.id_to_entity[entity.id]
-      if(e == null){
-        this.addEntity(entity)
-      } else {
-        e.components.forEach((c: Component)=>{
-          c.data = entity.class_to_component[c.class_name].data
-        })
-      }
-    })
-  }
+  // syncEntities(entities: Entity[]): void {
+  //   entities.forEach((entity: Entity)=>{
+  //     let e: Entity = this.id_to_entity[entity.id]
+  //     if(e == null){
+  //       this.addEntity(entity)
+  //     } else {
+  //       e.components.forEach((c: Component)=>{
+  //         c.data = entity.class_to_component[c.class_name].data
+  //       })
+  //     }
+  //   })
+  // }
 
 
-  syncEntitiesTODO(current_frame_entities: Entity[], next_frame_entities: Entity[]): void {
-    // Smart Diff here
-  }
+  // syncEntitiesTODO(current_frame_entities: Entity[], next_frame_entities: Entity[]): void {
+  //   // Smart Diff here
+  // }
 }

@@ -1,10 +1,12 @@
 import { assert } from 'chai'
 import { Component, Entity, System, Query, Engine } from '../../src/'
 
+let engine: Engine
 
 describe('Full - Basic', ()=>{
 
   it('init', async()=>{
+    engine = new Engine()
     assert.equal(engine.component_manager.components.length, 0)
     assert.equal(engine.entity_manager.entities.length, 0)
     assert.equal(engine.system_manager.systems.length, 0)
@@ -16,7 +18,10 @@ describe('Full - Basic', ()=>{
   })
 
   it('add entities', async()=>{
-    createPlayer(engine)
+    engine
+      .createEntity("Player")
+      .addComponent(PositionComponent, {x: 5, y :10})
+
     assert.equal(engine.entity_manager.entities.length, 1)
     assert.equal(engine.component_manager.components.length, 1)
   })
@@ -31,13 +36,7 @@ describe('Full - Basic', ()=>{
 
 })
 
-const engine: Engine = new Engine()
 
-function createPlayer(engine: Engine): Entity {
-  let entity: Entity = engine.createEntity("Player")
-  engine.addComponentToEntity(entity, PositionComponent, {x: 5, y :10})
-  return entity
-}
 
 export class PositionComponent extends Component {
   data: {
