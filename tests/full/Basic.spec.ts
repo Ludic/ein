@@ -32,6 +32,12 @@ describe('Full - Basic', ()=>{
 
     assert.equal(engine.system_manager.systems[0].executions, 2)
     assert.equal(engine.executions, 2)
+
+    const player: Entity = engine.entity_manager.entities[0]
+    const pos: PositionComponent = player.getComponent(PositionComponent)
+
+    assert.equal(pos.data.x, 7)
+    assert.equal(pos.data.y, 12)
   })
 
 })
@@ -64,8 +70,8 @@ class MovementSystem extends System {
   }
 
   execute(delta: number, time: number): void {
-    this.players.forEach((player: Entity)=>{
-      let pos: PositionComponent = this.engine.component_manager.hash_to_component[player.id + "PositionComponent"]
+    this.players.forEach((entity: Entity)=>{
+      let pos: PositionComponent = entity.getComponent(PositionComponent)
       pos.data.x++
       pos.data.y++
     })

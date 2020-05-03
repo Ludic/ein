@@ -26,7 +26,7 @@ export class Entity {
     return this
   }
 
-  getComponent(component_class: Klass<Component>): Component | undefined {
+  getComponent(component_class: Klass<Component>): Component {
     return this.engine.component_manager.componentForEntity(this.id, component_class.name)
   }
 
