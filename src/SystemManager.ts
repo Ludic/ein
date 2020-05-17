@@ -1,4 +1,6 @@
-import { Klass, System, Engine } from './'
+import { Klass } from './Klass'
+import { System } from './System'
+import { Engine } from './Engine'
 
 export class SystemManager {
   engine: Engine

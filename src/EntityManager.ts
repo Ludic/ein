@@ -1,4 +1,9 @@
-import { Klass, Component, ComponentManager, Entity, EventDispatcher, Engine } from "./"
+import { Klass } from './Klass'
+import { Component } from './Component'
+import { ComponentManager } from './ComponentManager'
+import { Entity } from './Entity'
+import { EventDispatcher } from './EventDispatcher'
+import { Engine } from './Engine'
 
 export class EntityManager {
   entities: Entity[]

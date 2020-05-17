@@ -1,15 +1,20 @@
-import { Klass, Component, EntityManager, Engine } from './'
-import { v4 as uuid } from 'uuid'
+import { Klass } from "./Klass"
+import { Component } from "./Component"
+import { EntityManager } from "./EntityManager"
+import { Engine } from "./Engine"
+
+// import { v4 as uuid } from 'uuid'
+var next_id = 0
 
 export class Entity {
-  id: string
+  id: number
   active: boolean
   name: string
 
   engine: Engine
 
   constructor(engine: Engine, name: string = "") {
-    this.id = uuid()
+    this.id = next_id++
     this.name = name
     this.active = true
 

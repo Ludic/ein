@@ -1,4 +1,6 @@
-import { Component, Entity, Engine } from './'
+import { Component } from './Component'
+import { Entity } from './Entity'
+import { Engine } from './Engine'
 
 export class Family {
   id: number

@@ -1,14 +1,12 @@
-import {
-  Klass,
-  Component,
-  ComponentManager,
-  Entity,
-  EntityManager,
-  EventDispatcher,
-  System,
-  Engine,
-  Query
-} from "./"
+import { Component } from './Component'
+import { ComponentManager } from './ComponentManager'
+import { Entity } from './Entity'
+import { EntityManager } from './EntityManager'
+import { System } from './System'
+import { Query } from './Query'
+import { EventDispatcher } from './EventDispatcher'
+import { Klass } from './Klass'
+import { Engine } from './Engine'
 
 export class QueryManager {
   queries: Query[]

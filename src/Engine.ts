@@ -1,15 +1,13 @@
-import {
-  Component,
-  ComponentManager,
-  Entity,
-  EntityManager,
-  System,
-  SystemManager,
-  FamilyManager,
-  Query,
-  QueryManager,
-  Klass,
-} from "./"
+import { Component } from './Component'
+import { ComponentManager } from './ComponentManager'
+import { Entity } from './Entity'
+import { EntityManager } from './EntityManager'
+import { System } from './System'
+import { SystemManager } from './SystemManager'
+import { FamilyManager } from './FamilyManager'
+import { Query } from './Query'
+import { QueryManager } from './QueryManager'
+import { Klass } from './Klass'
 
 export class Engine {
   component_manager: ComponentManager

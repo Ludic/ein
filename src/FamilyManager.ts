@@ -1,4 +1,7 @@
-import { Component, Entity, Family, Engine } from './'
+import { Component } from './Component'
+import { Entity } from './Entity'
+import { Family } from './Family'
+import { Engine } from './Engine'
 
 export class FamilyManager {
   engine: Engine

@@ -1,4 +1,7 @@
-import { Component, Entity, Klass, Engine } from "./"
+import { Component } from "./Component"
+import { Entity } from "./Entity"
+import { Klass } from "./Klass"
+import { Engine } from "./Engine"
 
 export class ComponentManager {
   components: Component[]
@@ -54,11 +57,11 @@ export class ComponentManager {
     }
   }
 
-  componentsForEntityId(entity_id: string): Component[] {
+  componentsForEntityId(entity_id: number): Component[] {
     return this.entity_id_to_components[entity_id]
   }
 
-  componentForEntity<T>(entity_id: string, class_name: string): Component {
+  componentForEntity<T>(entity_id: number, class_name: string): Component {
     return this.hash_to_component[entity_id+class_name]
   }
 
