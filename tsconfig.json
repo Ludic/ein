@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "ES2019",
     "lib": [
-      "es6",
       "webworker",
       "dom",
       "esnext"
     ],
-    "module": "ESNext",
     "sourceMap": true,
+    "moduleResolution": "node",
     "baseUrl": ".",
     "declaration": true,
     "outDir": "build/",
@@ -24,7 +23,7 @@
     "node",
     "mocha",
     "chai",
-    "sinon"
+    "sinon",
   ],
   "include": [
     "src"

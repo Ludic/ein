@@ -1,38 +1,40 @@
 import { Klass } from "./Klass"
-import { Component } from "./Component"
+import { Component, ComponentData } from "./Component"
 import { EntityManager } from "./EntityManager"
 import { Engine } from "./Engine"
 
-// import { v4 as uuid } from 'uuid'
 var next_id = 0
 
 export class Entity {
   id: number
   active: boolean
   name: string
+  // active: boolean
 
   engine: Engine
 
   constructor(engine: Engine, name: string = "") {
-    this.id = next_id++
-    this.name = name
-    this.active = true
-
+    this.$reset(name)
     this.engine = engine
   }
 
-  addComponent(component_class: Klass<Component>, data?: any): Entity {
+  addComponent<C extends Component>(component_class: Klass<C>, data?: ComponentData<C>): this {
     this.engine.component_manager.addComponent(this, component_class, data)
     return this
   }
+  
+  addReactiveComponent<C extends Component>(component_class: Klass<C>, data?: any): this {
+    this.engine.component_manager.addComponent(this, component_class, data, true)
+    return this
+  }
 
-  removeComponent(component_class: Klass<Component>): Entity {
+  removeComponent<C extends Component>(component_class: Klass<C>): this {
     this.engine.component_manager.removeComponent(this, component_class)
     return this
   }
 
-  getComponent(component_class: Klass<Component>): Component {
-    return this.engine.component_manager.componentForEntity(this.id, component_class.name)
+  getComponent<C extends Component>(component_class: Klass<C>): C|undefined {
+    return this.engine.component_manager.componentForEntity(this, component_class)
   }
 
   // TODO
@@ -70,5 +72,11 @@ export class Entity {
   // remove(): void {
   //   return this.entity_manager.removeEntity(this)
   // }
+
+  $reset(name: string = ''){
+    this.id = next_id++
+    this.name = name
+    this.active = true
+  }
 
 }

@@ -20,7 +20,7 @@ describe('Engine', ()=>{
   it('createEntity()', async()=>{
     const entity: Entity = engine.createEntity("player")
     assert.equal(entity.name, "player")
-    assert.equal(engine.entity_manager.entities.length, 1)
+    assert.equal(engine.entity_manager.entities.size, 1)
   })
 
   it('addSystem()', async()=>{

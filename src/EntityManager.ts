@@ -4,38 +4,54 @@ import { ComponentManager } from './ComponentManager'
 import { Entity } from './Entity'
 import { EventDispatcher } from './EventDispatcher'
 import { Engine } from './Engine'
+import Pool from './pool'
+import { reactive } from './reactivity'
+import { shallowReactive, isReactive } from '@vue/reactivity'
 
 export class EntityManager {
-  entities: Entity[]
-  name_to_entities: {[key: string]: Entity[]}
-  id_to_entity: {[key: string]: Entity}
+  entities: Set<Entity> = new Set()
+  nameToEntities: Map<string, Set<Entity>> = reactive(new Map())
+  idToEntity: Map<number, Entity> = shallowReactive(new Map())
 
   engine: Engine
+  pool: Pool<Entity>
 
   constructor(engine: Engine){
-    this.entities = []
-    this.name_to_entities = {}
-    this.id_to_entity = {}
-
+    this.pool = new Pool(()=>new Entity(engine))
     this.engine = engine
   }
 
   createEntity(name?: string): Entity {
-    // TODO Object pool (prevent GC)
-    // TODO Operation pool (bundle operations to be done later)
-    let entity: Entity = new Entity(this.engine, name)
+    let entity = this.pool.get()
+    entity.$reset(name)
     this.addEntity(entity)
     return entity
   }
 
   private addEntity(entity: Entity){
-    this.entities.push(entity)
-    this.id_to_entity[entity.id] = entity
-    if(this.name_to_entities[entity.name]){
-      this.name_to_entities[entity.name].push(entity)
-    } else {
-      this.name_to_entities[entity.name] = [entity]
+    this.entities.add(entity)
+    this.idToEntity.set(entity.id, entity)
+    this.getEntitiesForName(entity.name).add(entity)
+  }
+
+  deleteEntity(entity: Entity){
+    this.removeEntity(entity)
+    this.pool.free(entity)
+  }
+
+  private removeEntity(entity: Entity){
+    this.entities.delete(entity)
+    this.idToEntity.delete(entity.id)
+    this.nameToEntities.get(entity.name)?.delete(entity)
+  }
+
+  getEntitiesForName(name: string){
+    let entities = this.nameToEntities.get(name)
+    if(!entities){
+      entities = shallowReactive(new Set()) as Set<Entity>
+      this.nameToEntities.set(name, entities)
     }
+    return entities
   }
 
   // addComponentToEntity(entity: Entity, component_class: Klass<Component>, data: any): Entity {
@@ -74,10 +90,6 @@ export class EntityManager {
 
   //   return entity
   // }
-
-  removeEntity(entity: Entity): void {
-    // TODO
-  }
 
   removeAllEntities(){
     // TODO

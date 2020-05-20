@@ -35,11 +35,12 @@ export class SystemManager {
     return true
   }
 
-  async execute(delta: number, time: number): Promise<void> {
+  execute(delta: number, time: number, afterEach: (system: System)=>void) {
     for(let i=0; i<this.systems.length; i++){
       const system: System = this.systems[i]
       if(system.shouldExecute()){
-        await system.execute(delta, time)
+        system.execute(delta, time)
+        afterEach(system)
         system.executions++
       }
     }

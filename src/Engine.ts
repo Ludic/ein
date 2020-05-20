@@ -1,13 +1,12 @@
-import { Component } from './Component'
+import { QueryOptions, Query } from './Query'
 import { ComponentManager } from './ComponentManager'
-import { Entity } from './Entity'
 import { EntityManager } from './EntityManager'
-import { System } from './System'
 import { SystemManager } from './SystemManager'
 import { FamilyManager } from './FamilyManager'
-import { Query } from './Query'
 import { QueryManager } from './QueryManager'
+import { Entity } from './Entity'
 import { Klass } from './Klass'
+import { System } from './System'
 
 export class Engine {
   component_manager: ComponentManager
@@ -31,21 +30,30 @@ export class Engine {
   }
 
   createEntity(name?: string): Entity {
-    return this.entity_manager.createEntity(name)
+    const entity = this.entity_manager.createEntity(name)
+    this.query_manager.update()
+    return entity
   }
 
   addSystem(system_klass: Klass<System>): System {
     return this.system_manager.addSystem(system_klass)
   }
 
-  async execute(delta: number, time: number): Promise<void> {
+  execute(delta: number, time: number) {
     if(this.enabled){
-      await this.system_manager.execute(delta, time)
+      this.system_manager.execute(delta, time, ()=>{
+        // after each system execute, update the queries that are pending updates
+        this.query_manager.update()
+      })
     }
     this.executions++
   }
 
-  entitiesForQuery(query: Query): Entity[] {
-    return this.query_manager.entitiesForQuery(query)
+  // entitiesForQuery(query: Query): Entity[] {
+  //   return this.query_manager.entitiesForQuery(query)
+  // }
+
+  createQuery(options: QueryOptions): Query {
+    return this.query_manager.createQuery(options)
   }
 }

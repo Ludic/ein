@@ -2,67 +2,84 @@ import { Component } from "./Component"
 import { Entity } from "./Entity"
 import { Klass } from "./Klass"
 import { Engine } from "./Engine"
+import { reactive, shallowReactive } from '@vue/reactivity'
 
 export class ComponentManager {
-  components: Component[]
-  class_name_to_components: {[key: string]: Component[]}
-  id_to_component: {[key: string]: Component}
-
-  hash_to_component: {[key: string]: Component}
-  entity_id_to_components: {[key: string]: Component[]}
+  components: Set<Component> = new Set()
+  nameToComponents: Map<string, Set<Component>> = new Map()
+  idToComponent: Map<number, Component> = new Map()
+  hashToComponent: Map<string, Component> = new Map()
+  entityToComponents: WeakMap<Entity, Set<Component>> = new WeakMap()
+  entityToComponent: WeakMap<Entity, WeakMap<Klass<Component>, Component>> = new WeakMap()
+  componentToEntities: WeakMap<Klass<Component>, Set<Entity>> = new WeakMap()
 
 
   engine: Engine
 
   constructor(engine: Engine){
-    this.components = []
-    this.class_name_to_components = {}
-    this.id_to_component = {}
+    // this.components = []
+    // this.class_name_to_components = {}
+    // this.id_to_component = {}
 
-    this.hash_to_component = {}
-    this.entity_id_to_components = {}
+    // this.hash_to_component = {}
+    // this.entity_id_to_components = {}
 
     this.engine = engine
   }
 
-  addComponent(entity: Entity, klass: Klass<Component>, data: any = {}): Component {
+  addComponent(entity: Entity, klass: Klass<Component>, data?: any, isReactive: boolean = false): Component {
     // TODO Object pool
     // TODO Operation pool (bundle operations to be done later)
-    let component: Component = new klass(data)
-    this.components.push(component)
-    this.class_name_to_components[component.class_name] ? this.class_name_to_components[component.class_name].push(component) : this.class_name_to_components[component.class_name] = [component]
-    this.id_to_component[component.id] = component
-
-    const hash: string = entity.id + component.class_name
-    this.hash_to_component[hash] = component
-    this.entity_id_to_components[entity.id] ? this.entity_id_to_components[entity.id].push(component) : this.entity_id_to_components[entity.id] = [component]
+    // let component: Component = isReactive ? reactive(new klass(data)) : new klass(data)
+    let component: Component = Reflect.construct(klass, [data])
+    this.components.add(component)
+    this.nameToComponents.has(component._name) ? this.nameToComponents.get(component._name)?.add(component) : this.nameToComponents.set(component._name, new Set([component]))
+    this.idToComponent.set(component._id, component)
+    
+    const hash: string = entity.id + component._name
+    this.hashToComponent.set(hash, component)
+    this.entityToComponents.has(entity) ? this.entityToComponents.get(entity)?.add(component) : this.entityToComponents.set(entity, new Set([component]))
+    this.entityToComponent.has(entity) ? this.entityToComponent.get(entity)?.set(klass, component) : this.entityToComponent.set(entity, new WeakMap([[klass, component]]))
+    // this.componentToEntities.has(klass) ? this.componentToEntities.get(klass)?.add(entity) : this.componentToEntities.set(klass, new Set([entity]))
+    this.getEntitiesForComponent(klass).add(entity)
 
     return component
   }
 
   removeComponent(entity: Entity, klass: Klass<Component>): void {
     const hash: string = entity.id + klass.name
-    const component = this.hash_to_component[hash]
+    const component = this.hashToComponent.get(hash)
 
     if(component){
-      delete this.id_to_component[component.id]
-      this.class_name_to_components[component.class_name].splice(this.class_name_to_components[component.class_name].indexOf(component), 1)
-      this.components.splice(this.components.indexOf(component), 1)
+      this.idToComponent.delete(component._id)
+      this.nameToComponents.get(component._name)?.delete(component)
+      this.components.delete(component)
 
-      delete this.hash_to_component[hash]
-      this.entity_id_to_components[entity.id].splice(this.entity_id_to_components[entity.id].indexOf(component), 1)
+      this.hashToComponent.delete(hash)
+      this.entityToComponents.get(entity)?.delete(component)
+      this.entityToComponent.get(entity)?.delete(klass)
+      this.componentToEntities.get(klass)?.delete(entity)
 
     } else {
       throw "ComponentManager.removeComponent(): Component not found"
     }
   }
 
-  componentsForEntityId(entity_id: number): Component[] {
-    return this.entity_id_to_components[entity_id]
+  componentsForEntity(entity: Entity): Component[] {
+    return Array.from(this.entityToComponents.get(entity) || [])
   }
 
-  componentForEntity<T>(entity_id: number, class_name: string): Component {
-    return this.hash_to_component[entity_id+class_name]
+  componentForEntity<C extends Component>(entity: Entity, klass: Klass<C>): C|undefined {
+    return this.entityToComponent.get(entity)?.get(klass) as C
+  }
+
+  getEntitiesForComponent(klass: Klass<Component>){
+    let entities = this.componentToEntities.get(klass)
+    if(!entities){
+      entities = shallowReactive(new Set()) as Set<Entity>
+      this.componentToEntities.set(klass, entities)
+    }
+    return entities
   }
 
 }

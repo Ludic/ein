@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "ES2019",
     "lib": [
       "es6",
       "webworker",

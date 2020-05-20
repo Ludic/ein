@@ -74,11 +74,24 @@ export function greenlet(asyncFunction: any) {
 }
 
 
+const toString = Object.prototype.toString
+const hasOwnProperty = Object.prototype.hasOwnProperty
+
 export function isObject(val: any): val is object {
   return val !== null && typeof val === 'object'
 }
 
 export const isArray = Array.isArray
+
+export const isSymbol = (val: any): val is symbol => typeof val == 'symbol'
+
+export function getType(val: any): string {
+  return toString.call(val).slice(8, -1)
+}
+
+export function hasOwn(val: object, key: string | symbol): key is keyof typeof val {
+  return hasOwnProperty.call(val, key)
+}
 
 export function hasChanged(value: any, oldValue: any): boolean {
   return value !== oldValue && (value === value || oldValue === oldValue)

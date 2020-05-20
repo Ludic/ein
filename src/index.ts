@@ -20,3 +20,5 @@ export { Engine } from './Engine'
 
 import * as Utils from './Utils'
 export { Utils }
+
+export * from './reactivity'
