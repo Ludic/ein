@@ -1,5 +1,4 @@
 export { Klass } from './Klass'
-export { EventDispatcher } from './EventDispatcher'
 
 export { Component } from './Component'
 export { ComponentManager } from './ComponentManager'

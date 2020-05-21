@@ -4,7 +4,6 @@ import { Entity } from './Entity'
 import { EntityManager } from './EntityManager'
 import { System } from './System'
 import { Query, QueryOptions } from './Query'
-import { EventDispatcher } from './EventDispatcher'
 import { Klass } from './Klass'
 import { Engine } from './Engine'
 import { effect, ReactiveEffect } from './reactivity'
@@ -14,7 +13,6 @@ export class QueryManager {
   queries: Query[]
   query_to_entities: Map<Query, Entity[]>
 
-  event_dispatcher: EventDispatcher
   engine: Engine
 
   pendingUpdates: Set<ReactiveEffect> = new Set()
@@ -69,7 +67,7 @@ export class QueryManager {
     if(Query.isNameQuery(query)){
       // TODO: use this when vue bug is fixed https://github.com/vuejs/vue-next/issues/1210
       // query.entities = Array.from(this.engine.entity_manager.getEntitiesForName(query._options.name) || [])
-      
+
       // TEMP:
       query.entities = []
       this.engine.entity_manager.getEntitiesForName(query._options.name).forEach(ent => query.entities.push(ent))
