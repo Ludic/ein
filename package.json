@@ -21,7 +21,7 @@
     "build": "rollup -c rollup.config.js",
     "bnt": "npm run build && npm run test",
     "example": "npm run dev --serve",
-    "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
+    "test": "npm run build && ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
     "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
     "test:performance": "ts-mocha tests/performance/**/*.spec.ts"
   },

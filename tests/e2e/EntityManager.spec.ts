@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { Component, Entity, EntityManager, System, Engine } from '../../src/'
+import { Component, Entity, EntityManager, System, Engine } from '../../dist/'
 
 
 describe('EntityManager', ()=>{

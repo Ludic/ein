@@ -13,17 +13,9 @@ export class ComponentManager {
   entityToComponent: WeakMap<Entity, WeakMap<Klass<Component>, Component>> = new WeakMap()
   componentToEntities: WeakMap<Klass<Component>, Set<Entity>> = new WeakMap()
 
-
   engine: Engine
 
   constructor(engine: Engine){
-    // this.components = []
-    // this.class_name_to_components = {}
-    // this.id_to_component = {}
-
-    // this.hash_to_component = {}
-    // this.entity_id_to_components = {}
-
     this.engine = engine
   }
 
@@ -35,7 +27,7 @@ export class ComponentManager {
     this.components.add(component)
     this.nameToComponents.has(component._name) ? this.nameToComponents.get(component._name)?.add(component) : this.nameToComponents.set(component._name, new Set([component]))
     this.idToComponent.set(component._id, component)
-    
+
     const hash: string = entity.id + component._name
     this.hashToComponent.set(hash, component)
     this.entityToComponents.has(entity) ? this.entityToComponents.get(entity)?.add(component) : this.entityToComponents.set(entity, new Set([component]))

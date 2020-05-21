@@ -1,8 +1,6 @@
 import { assert } from 'chai'
-import { Component, Query, Entity, System, Engine } from '../../src/'
-import { ComponentData } from '../../src/Component'
+import { Component, Query, Entity, System, Engine } from '../../dist/'
 import { isReactive } from '@vue/reactivity'
-
 
 describe('QueryManager', ()=>{
 
@@ -17,11 +15,11 @@ describe('QueryManager', ()=>{
     query.update()
     assert.equal(query.entities.length, 1)
 
-    
+
     engine.createEntity("player")
     query.update()
     assert.equal(query.entities.length, 2)
-    
+
     engine.createEntity("not a player")
     query.update()
     assert.equal(query.entities.length, 2)
@@ -44,10 +42,10 @@ describe('QueryManager', ()=>{
 
     // manually update the query
     query.update()
-    
+
     assert.equal(query.entities.length, 1)
   })
-  
+
   it('include entities', ()=>{
     const engine: Engine = new Engine()
 
@@ -71,10 +69,10 @@ describe('QueryManager', ()=>{
 
     // manually update the query
     query.update()
-    
+
     assert.equal(query.entities.length, 1)
   })
-  
+
   it('exclude entities', ()=>{
     const engine: Engine = new Engine()
 
@@ -105,7 +103,7 @@ describe('QueryManager', ()=>{
 
     // manually update the query
     query.update()
-    
+
     assert.equal(query.entities.length, 1)
     assert.isTrue(query.entities.includes(b))
   })

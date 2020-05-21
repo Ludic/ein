@@ -27,13 +27,18 @@ export default {
   input: 'src/index.ts',
   output: [
     {
-      format: 'iife',
+      format: 'commonjs',
       file: 'dist/index.js',
       name: 'ein'
     },
     {
       format: 'es',
       file: 'dist/index.es.js',
+      name: 'ein'
+    },
+    {
+      format: 'iife',
+      file: 'dist/index.iife.js',
       name: 'ein'
     },
   ],
