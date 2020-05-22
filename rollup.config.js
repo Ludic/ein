@@ -41,6 +41,11 @@ export default {
       file: 'dist/index.iife.js',
       name: 'ein'
     },
+    {
+      format: 'umd',
+      file: 'dist/index.umd.js',
+      name: 'ein'
+    },
   ],
   plugins: [
     typescript(),
