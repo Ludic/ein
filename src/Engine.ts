@@ -32,6 +32,7 @@ export class Engine {
   createEntity(name?: string): Entity {
     const entity = this.entity_manager.createEntity(name)
     this.query_manager.update()
+    console.log('create entity')
     return entity
   }
 

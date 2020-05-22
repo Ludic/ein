@@ -1,4 +1,22 @@
 import { reactive, effect, System, Entity, Query, Engine, Component } from '../../dist/index.es.js'
+import { hot } from 'vite/hmr'
+
+// this code will be stripped out when building
+// @ts-ignore
+if (__DEV__) {
+  console.log('hmr enabled')
+  hot.accept('../../dist/index.es.js', (newFoo) => {
+    // the callback receives the updated './foo.js' module
+    console.log('got new index')
+    // newFoo.foo()
+  })
+  
+  // Can also accept an array of dep modules:
+  // hot.accept(['./foo.js', './bar.js'], ([newFooModule, newBarModule]) => {
+  //   // the callback receives the updated mdoules in an Array
+  //   console.log('got new index')
+  // })
+}
 
 console.log('reactivity example')
 
