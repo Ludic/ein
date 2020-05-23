@@ -9,9 +9,6 @@ export { EntityManager } from './EntityManager'
 export { System } from './System'
 export { SystemManager } from './SystemManager'
 
-export { Family } from './Family'
-export { FamilyManager } from './FamilyManager'
-
 export { Query } from './Query'
 export { QueryManager } from './QueryManager'
 
@@ -21,3 +18,5 @@ import * as Utils from './Utils'
 export { Utils }
 
 export * from './reactivity'
+
+export { Pool, ObjectPoolFactory } from './pool'

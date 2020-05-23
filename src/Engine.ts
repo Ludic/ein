@@ -2,7 +2,6 @@ import { QueryOptions, Query } from './Query'
 import { ComponentManager } from './ComponentManager'
 import { EntityManager } from './EntityManager'
 import { SystemManager } from './SystemManager'
-import { FamilyManager } from './FamilyManager'
 import { QueryManager } from './QueryManager'
 import { Entity } from './Entity'
 import { Klass } from './Klass'
@@ -12,7 +11,6 @@ export class Engine {
   component_manager: ComponentManager
   entity_manager: EntityManager
   system_manager: SystemManager
-  family_manager: FamilyManager
   query_manager: QueryManager
 
   executions: number
@@ -22,7 +20,6 @@ export class Engine {
     this.component_manager = new ComponentManager(this)
     this.entity_manager = new EntityManager(this)
     this.system_manager = new SystemManager(this)
-    this.family_manager = new FamilyManager(this)
     this.query_manager = new QueryManager(this)
 
     this.executions = 0
@@ -32,7 +29,6 @@ export class Engine {
   createEntity(name?: string): Entity {
     const entity = this.entity_manager.createEntity(name)
     this.query_manager.update()
-    console.log('create entity')
     return entity
   }
 
