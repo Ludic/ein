@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { Component, Query, Entity, System, Engine } from '../../dist/'
+import { Engine } from '../../src/Engine'
+import { Component } from '../../src/Component'
 import { isReactive } from '@vue/reactivity'
 
 describe('QueryManager', ()=>{
@@ -55,17 +56,22 @@ describe('QueryManager', ()=>{
     class ComponentB extends Component {
       b: any
     }
+    class ComponentC extends Component {
+      c: any
+    }
 
     let query = engine.createQuery({
       components: {
-        include: [ComponentA]
+        include: [ComponentA, ComponentC]
       },
     })
 
     engine.createEntity()
       .addComponent(ComponentA, {a: 0})
+      .addComponent(ComponentC, {c: 0})
     engine.createEntity()
       .addComponent(ComponentB, {b: 0})
+      .addComponent(ComponentC, {c: 0})
 
     // manually update the query
     query.update()

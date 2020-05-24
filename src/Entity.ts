@@ -37,6 +37,10 @@ export class Entity {
     return this.engine.component_manager.componentForEntity(this, component_class)
   }
 
+  getComponents(): Component[] {
+    return this.engine.component_manager.componentsForEntity(this)
+  }
+
   // TODO
   // getComponentClasses(): Klass<Component>[] {
   //   this.class_to_component.keys())

@@ -7,7 +7,7 @@ import { Query, QueryOptions } from './Query'
 import { Klass } from './Klass'
 import { Engine } from './Engine'
 import { effect, ReactiveEffect } from './reactivity'
-import { isArray } from './Utils'
+import { isArray, setIntersection, setDifference } from './Utils'
 
 export class QueryManager {
   queries: Query[]
@@ -73,27 +73,35 @@ export class QueryManager {
       this.engine.entity_manager.getEntitiesForName(query._options.name).forEach(ent => query.entities.push(ent))
 
     } else if(Query.isComponentsQuery(query)){
-      const entities: Set<Entity> = new Set()
+      // let entities: Set<Entity> = new Set()
 
-      const addComponents = isArray(query._options.components)
-        ? query._options.components
-        : query._options.components.include || []
+      const withComponentsSets = (
+        isArray(query._options.components)
+          ? query._options.components
+          : query._options.components.include || []
+      ).sort((compA, compB) => this.engine.component_manager.getEntitiesForComponent(compA).size - this.engine.component_manager.getEntitiesForComponent(compB).size)
+      .map(comp => this.engine.component_manager.getEntitiesForComponent(comp))
 
-      const removeComponents = isArray(query._options.components)
-        ? []
-        : query._options.components.exclude || []
+      const notWithComponentsSets = (
+        isArray(query._options.components)
+          ? []
+          : query._options.components.exclude || []
+      ).sort((compA, compB) => this.engine.component_manager.getEntitiesForComponent(compA).size - this.engine.component_manager.getEntitiesForComponent(compB).size)
+      .map(comp => this.engine.component_manager.getEntitiesForComponent(comp))
 
-      addComponents.forEach(comp => {
-        this.engine.component_manager.getEntitiesForComponent(comp).forEach(ent => {
-          entities.add(ent)
-        })
-      })
+      const entities: Set<Entity> = withComponentsSets
+        // the initial value is the first set in the list (the largest set)
+        // or the set of all entities since we were given no filters
+        .reduce((setA, setB) => setIntersection(setA, setB), withComponentsSets[0] || new Set())
 
-      removeComponents.forEach(comp => {
-        this.engine.component_manager.getEntitiesForComponent(comp).forEach(ent => {
-          entities.delete(ent)
-        })
-      })
+      const notEntities: Set<Entity> = notWithComponentsSets
+        // the initial value is the first set in the list (the largest set)
+        // or an empty set since we will be doing a difference with the entities above
+        .reduce((setA, setB) => setIntersection(setA, setB), notWithComponentsSets[0] || new Set())
+
+      // query.entities = [...setDifference(entities, notEntities)]
+
+      notEntities.forEach(ent => entities.delete(ent))
 
       query.entities = [...entities]
     }

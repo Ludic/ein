@@ -96,3 +96,15 @@ export function hasOwn(val: object, key: string | symbol): key is keyof typeof v
 export function hasChanged(value: any, oldValue: any): boolean {
   return value !== oldValue && (value === value || oldValue === oldValue)
 }
+
+export function setIntersection<T>(setA: Set<T>, setB: Set<T>): Set<T> {
+  // TEMP: use spread when this when vue bug is fixed https://github.com/vuejs/vue-next/issues/1210
+  // return new Set([...setA].filter(i => setB.has(i)))
+  let a = new Set<T>()
+  setA.forEach(i => setB.has(i) ? a.add(i) : null)
+  return a
+}
+
+export function setDifference<T>(setA: Set<T>, setB: Set<T>): Set<T> {
+  return new Set([...setA].filter(i => !setB.has(i)))
+}
