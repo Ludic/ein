@@ -3,7 +3,7 @@ import resolve from '@rollup/plugin-node-resolve'
 
 
 export default {
-  input: 'src/ein.ts',
+  input: 'src/index.ts',
   output: [
     {
       format: 'commonjs',
