@@ -12,8 +12,9 @@ export class SystemManager {
   }
 
   addSystem(system_klass: Klass<System>): System {
-    let system: System = new system_klass()
+    let system: System = Reflect.construct(system_klass, [])
     system.order = this.systems.length
+    system.engine = this.engine
     system.onAdded(this.engine)
 
     this.systems.push(system)

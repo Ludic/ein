@@ -1,9 +1,11 @@
 import { Klass } from "./Klass"
-import { Component, ComponentData } from "./Component"
+import { Component, ComponentData, SingletonComponent } from "./Component"
 import { EntityManager } from "./EntityManager"
 import { Engine } from "./Engine"
 
 var next_id = 0
+
+// type Abc<C extends Component> = C extends 
 
 export class Entity {
   id: number
@@ -18,8 +20,15 @@ export class Entity {
     this.engine = engine
   }
 
-  addComponent<C extends Component>(component_class: Klass<C>, data?: ComponentData<C>): this {
-    this.engine.component_manager.addComponent(this, component_class, data)
+  addComponent<C extends Component>(component_class: Klass<C>, ...data: (C extends SingletonComponent ? [] : [ComponentData<C>])): this {
+    // with this conditional typescript syntax we are checking if the type of the 
+    // component extends SingletonComponent and removing the `data` parameter from
+    // the function. We do this because if we made a traditional override like
+    // `addComponent<C extends SingletonComponent>(cls: Klass<C>): this` the normal
+    // override with the data param would still be valid because SingletonComponent
+    // extends Component as well. We just want to enforce that you should not be passing
+    // data with a singleton component class, it should be registered with the engine.
+    this.engine.component_manager.addComponent(this, component_class, ...data)
     return this
   }
   

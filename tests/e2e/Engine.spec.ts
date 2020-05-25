@@ -1,5 +1,7 @@
 import { assert } from 'chai'
-import { Component, Entity, System, Engine } from '../../dist/'
+import { Entity } from '../../src/Entity'
+import { System } from '../../src/System'
+import { Engine } from '../../src/Engine'
 
 const engine: Engine = new Engine()
 let test_executions: number = 0

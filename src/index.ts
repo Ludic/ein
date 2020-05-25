@@ -1,6 +1,6 @@
 export { Klass } from './Klass'
 
-export { Component } from './Component'
+export { Component, SingletonComponent } from './Component'
 export { ComponentManager } from './ComponentManager'
 
 export { Entity } from './Entity'

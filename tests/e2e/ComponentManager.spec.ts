@@ -1,5 +1,7 @@
 import { assert } from 'chai'
-import { Component, ComponentManager, Entity, System, Engine } from '../../dist/'
+import { Engine } from '../../src/Engine'
+import { Component, SingletonComponent } from '../../src/Component'
+import { ComponentManager } from '../../src/ComponentManager'
 
 
 class PositionComponent extends Component {
@@ -21,4 +23,29 @@ describe('ComponentManager', ()=>{
     assert.equal(!!cm.nameToComponents.get("PositionComponent") , true)
   })
 
+  it('should error on unregistered singleton component', ()=>{
+    const engine: Engine = new Engine()
+    
+    class CameraComponent extends SingletonComponent {
+      camera: any
+    }
+    
+    assert.throws(()=>{
+      engine.createEntity("player")
+        .addComponent(CameraComponent)
+    })
+  })
+  
+  it('should add singleton component', ()=>{
+    const engine: Engine = new Engine()
+    
+    class CameraComponent extends SingletonComponent {
+      camera: any
+    }
+
+    engine.addSingletonComponent(CameraComponent, {camera: {}})
+    
+    engine.createEntity("player")
+      .addComponent(CameraComponent)
+  })
 })

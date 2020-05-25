@@ -6,6 +6,7 @@ import { QueryManager } from './QueryManager'
 import { Entity } from './Entity'
 import { Klass } from './Klass'
 import { System } from './System'
+import { ComponentData, SingletonComponent } from './Component'
 
 export class Engine {
   component_manager: ComponentManager
@@ -44,6 +45,13 @@ export class Engine {
       })
     }
     this.executions++
+  }
+
+  addSingletonComponent<C extends SingletonComponent>(component_class: Klass<C>, data?: ComponentData<C>) {
+    this.component_manager.addSingletonComponent(component_class, data)
+  }
+  getSingletonComponent<C extends SingletonComponent>(component_class: Klass<C>): C | undefined {
+    return this.component_manager.getSingletonComponent(component_class)
   }
 
   // entitiesForQuery(query: Query): Entity[] {

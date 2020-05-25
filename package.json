@@ -4,7 +4,7 @@
   "description": "Entity Component System",
   "main": "dist/ein.umd.js",
   "module": "dist/ein.es.js",
-  "types": "dist/ein.d.ts",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ludic/ein.git"

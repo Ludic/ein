@@ -1,4 +1,4 @@
-import { Component } from "./Component"
+import { Component, SingletonComponent, ComponentData, isSingletonComponent } from "./Component"
 import { Entity } from "./Entity"
 import { Klass } from "./Klass"
 import { Engine } from "./Engine"
@@ -12,6 +12,7 @@ export class ComponentManager {
   entityToComponents: WeakMap<Entity, Set<Component>> = new WeakMap()
   entityToComponent: WeakMap<Entity, WeakMap<Klass<Component>, Component>> = new WeakMap()
   componentToEntities: WeakMap<Klass<Component>, Set<Entity>> = new WeakMap()
+  componentSingletons: WeakMap<Klass<SingletonComponent>, SingletonComponent> = new WeakMap()
 
   engine: Engine
 
@@ -20,10 +21,20 @@ export class ComponentManager {
   }
 
   addComponent(entity: Entity, klass: Klass<Component>, data?: any, isReactive: boolean = false): Component {
+    let component: Component
+    if(isSingletonComponent(klass)){
+      // check for singleton component
+      if(this.componentSingletons.has(klass)){
+        component = this.componentSingletons.get(klass) as Component
+      } else {
+        throw new Error(`Singlton Component [${klass}] is not registered yet. please call Engine.addSingletonComponent first.`)
+      }
+    } else {
+      component = Reflect.construct(klass, [data])
+    }
     // TODO Object pool
     // TODO Operation pool (bundle operations to be done later)
     // let component: Component = isReactive ? reactive(new klass(data)) : new klass(data)
-    let component: Component = Reflect.construct(klass, [data])
     this.components.add(component)
     this.nameToComponents.has(component._name) ? this.nameToComponents.get(component._name)?.add(component) : this.nameToComponents.set(component._name, new Set([component]))
     this.idToComponent.set(component._id, component)
@@ -36,6 +47,14 @@ export class ComponentManager {
     this.getEntitiesForComponent(klass).add(entity)
 
     return component
+  }
+
+  addSingletonComponent<C extends SingletonComponent>(klass: Klass<C>, data?: ComponentData<C>): void {
+    let component = Reflect.construct(klass, [data])
+    this.componentSingletons.set(klass, component)
+  }
+  getSingletonComponent<C extends SingletonComponent>(klass: Klass<C>): C | undefined {
+    return this.componentSingletons.get(klass) as C
   }
 
   removeComponent(entity: Entity, klass: Klass<Component>): void {
