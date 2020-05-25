@@ -3,26 +3,26 @@ import resolve from '@rollup/plugin-node-resolve'
 
 
 export default {
-  input: 'src/index.ts',
+  input: 'src/ein.ts',
   output: [
     {
       format: 'commonjs',
-      file: 'dist/index.js',
+      file: 'dist/ein.js',
       name: 'ein'
     },
     {
       format: 'es',
-      file: 'dist/index.es.js',
+      file: 'dist/ein.es.js',
       name: 'ein'
     },
     {
       format: 'iife',
-      file: 'dist/index.iife.js',
+      file: 'dist/ein.iife.js',
       name: 'ein'
     },
     {
       format: 'umd',
-      file: 'dist/index.umd.js',
+      file: 'dist/ein.umd.js',
       name: 'ein'
     },
   ],
