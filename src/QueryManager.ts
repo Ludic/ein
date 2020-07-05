@@ -65,13 +65,7 @@ export class QueryManager {
 
   updateQuery(query: Query){
     if(Query.isNameQuery(query)){
-      // TODO: use this when vue bug is fixed https://github.com/vuejs/vue-next/issues/1210
-      // query.entities = Array.from(this.engine.entity_manager.getEntitiesForName(query._options.name) || [])
-
-      // TEMP:
-      query.entities = []
-      this.engine.entity_manager.getEntitiesForName(query._options.name).forEach(ent => query.entities.push(ent))
-
+      query.entities = Array.from(this.engine.entity_manager.getEntitiesForName(query._options.name) || [])
     } else if(Query.isComponentsQuery(query)){
       // let entities: Set<Entity> = new Set()
 
