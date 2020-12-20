@@ -10,7 +10,6 @@ dist/
 # yarn stuff
 .pnp.js
 .yarn/
-.yarnrc.yml
 
 # mac stuff
 *.DS_Store
