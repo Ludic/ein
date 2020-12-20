@@ -22,12 +22,13 @@
     "dev": "rollup -c rollup.config.js --watch",
     "clean": "rimraf ./dist",
     "build": "rollup -c rollup.config.js",
-    "bnt": "npm run build && npm run test",
+    "bnt": "yarn run build && yarn run test",
     "example": "run-p dev serve",
     "serve": "vite serve examples --config vite.config.js --debug",
     "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
     "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
-    "test:performance": "ts-mocha tests/performance/**/*.spec.ts"
+    "test:performance": "ts-mocha tests/performance/**/*.spec.ts",
+    "prepublishOnly": "yarn run build"
   },
   "keywords": [],
   "author": "",

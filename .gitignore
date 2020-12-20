@@ -8,8 +8,10 @@ dist/
 .cache/
 
 # yarn stuff
-.pnp.js
-.yarn/
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*
 
 # mac stuff
 *.DS_Store
