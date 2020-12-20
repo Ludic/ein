@@ -1,5 +1,6 @@
 import { assert } from 'chai'
-import { Component, Entity, System, Query, Engine } from '../../dist/ein'
+import { Component, Entity, System, Query, Engine } from '../../src/index'
+
 
 let engine: Engine
 
