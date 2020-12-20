@@ -6,3 +6,5 @@ dist/
 .rts2*
 .parcel-cache/
 .cache/
+
+*.DS_Store
