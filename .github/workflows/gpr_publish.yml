@@ -15,7 +15,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: yarn install
+      - run: yarn set version berry
+      - run: yarn install --frozen-lockfile
       - run: yarn test
 
   publish-gpr:
@@ -27,7 +28,9 @@ jobs:
         with:
           node-version: 12
           registry-url: https://npm.pkg.github.com/
-      - run: yarn install
+      
+      - run: yarn set version berry
+      - run: yarn install --frozen-lockfile
       - run: yarn npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
