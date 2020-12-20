@@ -7,6 +7,9 @@ on:
   release:
     types: [created]
 
+env:
+  NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,5 +35,3 @@ jobs:
       - run: yarn set version berry
       - run: yarn
       - run: yarn npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
