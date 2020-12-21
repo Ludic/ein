@@ -1,6 +1,6 @@
 {
   "name": "@ludic/ein",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Entity Component System",
   "main": "dist/ein.umd.js",
   "module": "dist/ein.es.js",
@@ -28,7 +28,7 @@
     "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
     "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
     "test:performance": "ts-mocha tests/performance/**/*.spec.ts",
-    "prepublishOnly": "yarn run build"
+    "prepublish": "yarn run build"
   },
   "keywords": [],
   "author": "",
