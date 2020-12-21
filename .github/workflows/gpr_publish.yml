@@ -30,9 +30,8 @@ jobs:
         with:
           node-version: 12
           registry-url: https://npm.pkg.github.com/
-      
+          scope: '@ludic'
       - run: yarn
-      - uses: luvies/action-yarn-publish@v0.1.1
-        with:
+      - run: yarn npm publish --tag $GITHUB_REF
+        env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
