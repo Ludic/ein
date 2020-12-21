@@ -18,11 +18,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: npm whoami
       - run: yarn
       - run: yarn test
-      - run: yarn npm whoami
-      - run: yarn npm whoami --scope @ludic
 
   publish-gpr:
     needs: build
