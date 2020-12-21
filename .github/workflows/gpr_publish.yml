@@ -18,9 +18,10 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: yarn set version berry
       - run: yarn
       - run: yarn test
+      - run: yarn npm whoami
+      - run: yarn npm whoami --scope @ludic
 
   publish-gpr:
     needs: build
@@ -32,6 +33,5 @@ jobs:
           node-version: 12
           registry-url: https://npm.pkg.github.com/
       
-      - run: yarn set version berry
       - run: yarn
       - run: yarn npm publish --tag $GITHUB_REF
