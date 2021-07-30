@@ -6,18 +6,16 @@ export class System {
   priority: number
   order: number
   enabled: boolean
-  executions: number
 
   engine!: Engine|null
 
   constructor(priority: number = 0, enabled: boolean = true) {
     this.priority = priority
     this.enabled = enabled
-    this.executions = 0
     this.engine = null
   }
 
-  execute(delta: number, time: number): void {}
+  update(delta: number, time: number): void {}
 
   shouldExecute(): boolean {
     return this.enabled

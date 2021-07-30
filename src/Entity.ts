@@ -1,13 +1,15 @@
 import { Klass } from "./Klass"
-import { Component, ComponentData, SingletonComponent } from "./Component"
+import { Component, ComponentConstructor, ComponentData, ComponentInstance } from "./Component"
 import { EntityManager } from "./EntityManager"
 import { Engine } from "./Engine"
+import { bitDel, bitSet } from './Utils'
 
 var next_id = 0
 
 // type Abc<C extends Component> = C extends 
 
 export class Entity {
+  mask: number
   id: number
   active: boolean
   name: string
@@ -15,40 +17,50 @@ export class Entity {
 
   engine: Engine
 
+  // components: WeakMap<ComponentConstructor, Component> = new WeakMap()
+  // private $components: Map<ComponentConstructor, Component> = new Map()
+  private $componentsById: {[key: number]: Component} = {}
+
   constructor(engine: Engine, name: string = "") {
     this.$reset(name)
     this.engine = engine
   }
 
-  addComponent<C extends Component>(component_class: Klass<C>, ...data: (C extends SingletonComponent ? [] : [ComponentData<C>])): this {
-    // with this conditional typescript syntax we are checking if the type of the 
-    // component extends SingletonComponent and removing the `data` parameter from
-    // the function. We do this because if we made a traditional override like
-    // `addComponent<C extends SingletonComponent>(cls: Klass<C>): this` the normal
-    // override with the data param would still be valid because SingletonComponent
-    // extends Component as well. We just want to enforce that you should not be passing
-    // data with a singleton component class, it should be registered with the engine.
-    this.engine.component_manager.addComponent(this, component_class, ...data)
-    return this
-  }
-  
-  addReactiveComponent<C extends Component>(component_class: Klass<C>, data?: any): this {
-    this.engine.component_manager.addComponent(this, component_class, data, true)
+  addComponent<C extends Component>(cls: ComponentConstructor<C>, data?: ComponentData<C>): this {
+    // this.engine.component_manager.addComponent(this, cls, ...data)
+    const instance = this.engine.component_manager.getFreeComponent(cls, data)
+
+    this.mask = bitSet(this.mask, cls.mask)
+    // this.$components.set(cls, instance)
+    this.$componentsById[cls.id] = instance
+
     return this
   }
 
-  removeComponent<C extends Component>(component_class: Klass<C>): this {
-    this.engine.component_manager.removeComponent(this, component_class)
+  removeComponent<C extends Component>(cls: ComponentConstructor<C>): this {
+    // this.engine.component_manager.removeComponent(this, component_class)
+    this.mask = bitDel(this.mask, cls.mask)
+    // this.freeComponent(this.$components.get(cls))
+    // this.$components.delete(cls)
+    this.freeComponent(this.$componentsById[cls.id])
+    delete this.$componentsById[cls.id]
     return this
   }
 
-  getComponent<C extends Component>(component_class: Klass<C>): C|undefined {
-    return this.engine.component_manager.componentForEntity(this, component_class)
+  getComponent<C extends Component>(cls: ComponentConstructor<C>): ComponentInstance<C>|undefined {
+    // return this.$components.get(cls) as C
+    return this.$componentsById[cls.id] as C
   }
 
-  getComponents(): Component[] {
-    return this.engine.component_manager.componentsForEntity(this)
+  private freeComponent<C extends Component>(instance: C|undefined){
+    if(instance){
+      this.engine.component_manager.freeComponent(instance)
+    }
   }
+
+  // getComponents(): Component[] {
+  //   return this.engine.component_manager.componentsForEntity(this)
+  // }
 
   // TODO
   // getComponentClasses(): Klass<Component>[] {
@@ -87,9 +99,22 @@ export class Entity {
   // }
 
   $reset(name: string = ''){
+    this.mask = 0
     this.id = next_id++
     this.name = name
     this.active = true
+    this.clearComponents()
+  }
+
+  private clearComponents(){
+    // this.$components.forEach((instance)=>{
+    //   this.freeComponent(instance)
+    // })
+    // this.$components.clear()
+    Object.values(this.$componentsById).forEach((c)=>{
+      this.freeComponent(c)
+    })
+    this.$componentsById = {}
   }
 
 }

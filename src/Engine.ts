@@ -6,7 +6,12 @@ import { QueryManager } from './QueryManager'
 import { Entity } from './Entity'
 import { Klass } from './Klass'
 import { System } from './System'
-import { ComponentData, SingletonComponent } from './Component'
+import { Component, ComponentConstructor, ComponentData } from './Component'
+import { performance } from './Utils'
+
+export interface EngineOptions {
+  entityAllocation?: number
+}
 
 export class Engine {
   component_manager: ComponentManager
@@ -14,16 +19,14 @@ export class Engine {
   system_manager: SystemManager
   query_manager: QueryManager
 
-  executions: number
   enabled: boolean
 
-  constructor(){
+  constructor(options: EngineOptions = {}){
     this.component_manager = new ComponentManager(this)
-    this.entity_manager = new EntityManager(this)
+    this.entity_manager = new EntityManager(this, options?.entityAllocation ?? 1000)
     this.system_manager = new SystemManager(this)
     this.query_manager = new QueryManager(this)
 
-    this.executions = 0
     this.enabled = true
   }
 
@@ -37,21 +40,20 @@ export class Engine {
     return this.system_manager.addSystem(system_klass)
   }
 
-  execute(delta: number, time: number) {
-    if(this.enabled){
-      this.system_manager.execute(delta, time, ()=>{
-        // after each system execute, update the queries that are pending updates
-        this.query_manager.update()
-      })
-    }
-    this.executions++
+  registerComponent<C extends Component>(component: ComponentConstructor<C>, allocate?: number): this {
+    this.component_manager.registerComponent(component, allocate)
+    return this
   }
 
-  addSingletonComponent<C extends SingletonComponent>(component_class: Klass<C>, data?: ComponentData<C>) {
-    this.component_manager.addSingletonComponent(component_class, data)
-  }
-  getSingletonComponent<C extends SingletonComponent>(component_class: Klass<C>): C | undefined {
-    return this.component_manager.getSingletonComponent(component_class)
+  update(delta: number, time: number) {
+    if(this.enabled){
+      this.query_manager.update(true)
+      this.system_manager.update(delta, time)
+      // this.system_manager.execute(delta, time, ()=>{
+      //   // after each system execute, update the queries that are pending updates
+      //   this.query_manager.update()
+      // })
+    }
   }
 
   // entitiesForQuery(query: Query): Entity[] {
@@ -61,4 +63,5 @@ export class Engine {
   createQuery(options: QueryOptions): Query {
     return this.query_manager.createQuery(options)
   }
+
 }

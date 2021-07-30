@@ -1,4 +1,4 @@
-import { Component } from './Component'
+import { Component, ComponentConstructor } from './Component'
 import { ComponentManager } from './ComponentManager'
 import { Entity } from './Entity'
 import { EntityManager } from './EntityManager'
@@ -7,11 +7,11 @@ import { Query, QueryOptions } from './Query'
 import { Klass } from './Klass'
 import { Engine } from './Engine'
 import { effect, ReactiveEffect } from './reactivity'
-import { isArray, setIntersection, setDifference } from './Utils'
+import { isArray, setIntersection, setDifference, performance } from './Utils'
 
 export class QueryManager {
   queries: Query[]
-  query_to_entities: Map<Query, Entity[]>
+  // query_to_entities: Map<Query, Entity[]>
 
   engine: Engine
 
@@ -21,7 +21,7 @@ export class QueryManager {
     this.engine = engine
 
     this.queries = []
-    this.query_to_entities = new Map()
+    // this.query_to_entities = new Map()
   }
 
   // entitiesForQuery(query: Query): Entity[] {
@@ -45,67 +45,59 @@ export class QueryManager {
 
   createQuery(options: QueryOptions): Query {
     const query = new Query(options)
+    this.updateQuery(query)
 
-    query.update = effect(()=>{
-      this.updateQuery(query)
-    }, {
-      scheduler: (job) => {
-        this.pendingUpdates.add(job)
-      },
-      // onTrack(e){
-      //   console.log('on track:', e)
-      // },
-      // onTrigger(e){
-      //   console.log('on trigger:', e)
-      // },
-    })
+    // query.update = effect(()=>{
+    //   this.updateQuery(query)
+    // }, {
+    //   scheduler: (job) => {
+    //     this.pendingUpdates.add(job)
+    //   },
+    //   // onTrack(e){
+    //   //   console.log('on track:', e)
+    //   // },
+    //   // onTrigger(e){
+    //   //   console.log('on trigger:', e)
+    //   // },
+    // })
     this.queries.push(query)
     return query
   }
 
   updateQuery(query: Query){
-    if(Query.isNameQuery(query)){
-      query.entities = Array.from(this.engine.entity_manager.getEntitiesForName(query._options.name) || [])
-    } else if(Query.isComponentsQuery(query)){
-      // let entities: Set<Entity> = new Set()
-
-      const withComponentsSets = (
-        isArray(query._options.components)
-          ? query._options.components
-          : query._options.components.include || []
-      ).sort((compA, compB) => this.engine.component_manager.getEntitiesForComponent(compA).size - this.engine.component_manager.getEntitiesForComponent(compB).size)
-      .map(comp => this.engine.component_manager.getEntitiesForComponent(comp))
-
-      const notWithComponentsSets = (
-        isArray(query._options.components)
-          ? []
-          : query._options.components.exclude || []
-      ).sort((compA, compB) => this.engine.component_manager.getEntitiesForComponent(compA).size - this.engine.component_manager.getEntitiesForComponent(compB).size)
-      .map(comp => this.engine.component_manager.getEntitiesForComponent(comp))
-
-      const entities: Set<Entity> = withComponentsSets
-        // the initial value is the first set in the list (the largest set)
-        // or the set of all entities since we were given no filters
-        .reduce((setA, setB) => setIntersection(setA, setB), withComponentsSets[0] || new Set())
-
-      const notEntities: Set<Entity> = notWithComponentsSets
-        // the initial value is the first set in the list (the largest set)
-        // or an empty set since we will be doing a difference with the entities above
-        .reduce((setA, setB) => setIntersection(setA, setB), notWithComponentsSets[0] || new Set())
-
-      // query.entities = [...setDifference(entities, notEntities)]
-
-      notEntities.forEach(ent => entities.delete(ent))
-
-      query.entities = [...entities]
+    query.clear()
+    // this.engine.entity_manager.entities.forEach((entity)=>{
+    //   if(query.matches(entity)){
+    //     query.add(entity)
+    //   }
+    // })
+    for(let entity of this.engine.entity_manager.entities){
+      if(query.matches(entity)){
+        query.add(entity)
+      }
     }
   }
 
-  update(){
-    this.pendingUpdates.forEach(job => {
-      job()
+  update(force: boolean = false){
+    if(force){
+      // force update all queries
+      this.queries.forEach((query)=>{
+        this.updateQuery(query)
+      })
+    } else {
+      this.pendingUpdates.forEach(job => {
+        job()
+      })
+      this.pendingUpdates.clear()
+    }
+  }
+
+  onComponentAdded<C extends Component>(entity: Entity, cls: ComponentConstructor, component: C){
+    this.queries.forEach((query)=>{
+      if(query.flush == 'immediate'){
+        this.updateQuery(query)
+      }
     })
-    this.pendingUpdates.clear()
   }
 
 }

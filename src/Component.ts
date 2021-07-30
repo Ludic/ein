@@ -1,34 +1,38 @@
 import { Klass } from './Klass'
+import { WritableKeysOf, WritablePart, ExcludeFunctionProps } from './Utils'
 
-let next: number = 0
+interface ComponentStaticProps {
+  id: number
+  mask: number
+  property: any
+  data: {[key: string]: any}
+}
 
-export type ComponentData<C extends Component> = Omit<C, '_id'|'_name'|'_isSingleton'>
+// export type ComponentData<C extends Component = Component> = ComponentConstructor<C>['data']
+
+type HiddenProperties = '_reset'
+
+export type ComponentInstance<C extends Component> = Omit<C, HiddenProperties>
+export type ComponentData<C extends Component> = Omit<WritablePart<C>, HiddenProperties>
 
 export class Component {
-  static readonly _isSingleton: boolean = false
-  readonly _isSingleton: boolean = false
-  _id: number
-  _name: string
+  static id: ComponentStaticProps['id'] = 0
+  static mask: ComponentStaticProps['mask'] = 0
+  static property: ComponentStaticProps['property'] = ''
+  static data: ComponentStaticProps['data'] = {}
 
-  constructor(data: any = {}){
-    this._id = next++
-    this._name = this.constructor.name
-    Object.entries(data).forEach(([key, value])=>{
-      // do not want ability to set these
-      if(key !== '_id' && key !== '_name'){
-        // @ts-ignore
-        this[key] = value
-      }
-    })
+  private _data: ComponentStaticProps['data'] = {}
+
+  // a: ComponentConstructor<this>['data']
+
+  private $keys: string[]
+
+  _reset(data: any = {}): this {
+    Object.assign(this, data)
+    return this
   }
 }
 
+// export const Component: ComponentConstructor&typeof ComponentInstance['data'] = ComponentInstance
 
-export class SingletonComponent extends Component {
-  static readonly _isSingleton: true = true
-  readonly _isSingleton: true = true
-}
-
-export function isSingletonComponent(klass: Klass<Component|SingletonComponent>): klass is Klass<SingletonComponent> {
-  return (klass as typeof SingletonComponent)._isSingleton
-}
+export type ComponentConstructor<T extends Component = Component> = Klass<T>&ComponentStaticProps;

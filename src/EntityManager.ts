@@ -9,14 +9,14 @@ import { shallowReactive, isReactive } from '@vue/reactivity'
 
 export class EntityManager {
   entities: Set<Entity> = new Set()
-  nameToEntities: Map<string, Set<Entity>> = reactive(new Map())
-  idToEntity: Map<number, Entity> = shallowReactive(new Map())
+  // nameToEntities: Map<string, Set<Entity>> = reactive(new Map())
+  // idToEntity: Map<number, Entity> = shallowReactive(new Map())
 
   engine: Engine
   pool: Pool<Entity>
 
-  constructor(engine: Engine){
-    this.pool = new Pool(()=>new Entity(engine))
+  constructor(engine: Engine, allocate?: number){
+    this.pool = new Pool(()=>new Entity(engine), allocate)
     this.engine = engine
   }
 
@@ -29,8 +29,8 @@ export class EntityManager {
 
   private addEntity(entity: Entity){
     this.entities.add(entity)
-    this.idToEntity.set(entity.id, entity)
-    this.getEntitiesForName(entity.name).add(entity)
+    // this.idToEntity.set(entity.id, entity)
+    // this.getEntitiesForName(entity.name).add(entity)
   }
 
   deleteEntity(entity: Entity){
@@ -40,18 +40,18 @@ export class EntityManager {
 
   private removeEntity(entity: Entity){
     this.entities.delete(entity)
-    this.idToEntity.delete(entity.id)
-    this.nameToEntities.get(entity.name)?.delete(entity)
+    // this.idToEntity.delete(entity.id)
+    // this.nameToEntities.get(entity.name)?.delete(entity)
   }
 
-  getEntitiesForName(name: string){
-    let entities = this.nameToEntities.get(name)
-    if(!entities){
-      entities = shallowReactive(new Set()) as Set<Entity>
-      this.nameToEntities.set(name, entities)
-    }
-    return entities
-  }
+  // getEntitiesForName(name: string){
+  //   let entities = this.nameToEntities.get(name)
+  //   if(!entities){
+  //     entities = shallowReactive(new Set()) as Set<Entity>
+  //     this.nameToEntities.set(name, entities)
+  //   }
+  //   return entities
+  // }
 
   // addComponentToEntity(entity: Entity, component_class: Klass<Component>, data: any): Entity {
   //   // If the Entity already has this Component, return

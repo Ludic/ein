@@ -1,96 +1,53 @@
-import { Component, SingletonComponent, ComponentData, isSingletonComponent } from "./Component"
+import { Component, ComponentData, ComponentConstructor, ComponentInstance } from "./Component"
 import { Entity } from "./Entity"
 import { Klass } from "./Klass"
 import { Engine } from "./Engine"
 import { reactive, shallowReactive } from '@vue/reactivity'
+import Pool from './pool'
+import { bitShift } from './Utils'
 
 export class ComponentManager {
-  components: Set<Component> = new Set()
-  nameToComponents: Map<string, Set<Component>> = new Map()
-  idToComponent: Map<number, Component> = new Map()
-  hashToComponent: Map<string, Component> = new Map()
-  entityToComponents: WeakMap<Entity, Set<Component>> = new WeakMap()
-  entityToComponent: WeakMap<Entity, WeakMap<Klass<Component>, Component>> = new WeakMap()
-  componentToEntities: WeakMap<Klass<Component>, Set<Entity>> = new WeakMap()
-  componentSingletons: WeakMap<Klass<SingletonComponent>, SingletonComponent> = new WeakMap()
 
+  registry: Set<ComponentConstructor> = new Set()
   engine: Engine
+
+  pools: WeakMap<ComponentConstructor, Pool<Component>> = new WeakMap()
+
+  private componentId: number = 0
 
   constructor(engine: Engine){
     this.engine = engine
   }
 
-  addComponent(entity: Entity, klass: Klass<Component>, data?: any, isReactive: boolean = false): Component {
-    let component: Component
-    if(isSingletonComponent(klass)){
-      // check for singleton component
-      if(this.componentSingletons.has(klass)){
-        component = this.componentSingletons.get(klass) as Component
-      } else {
-        throw new Error(`Singlton Component [${klass}] is not registered yet. please call Engine.addSingletonComponent first.`)
-      }
-    } else {
-      component = Reflect.construct(klass, [data])
+  registerComponent<C extends Component>(ctor: ComponentConstructor<C>, allocate?: number){
+    this.registry.add(ctor)
+    this.pools.set(ctor, new Pool<C>(() => (Reflect.construct(ctor, []) as C)._reset(), allocate))
+    ctor.id = this.nextComponentId()
+    // if(ctor.id > 30){
+    //   // bit shifting 1<<31 results in a negative number because 32-bit signed int
+    //   // TODO: find way to fix this limitation.
+    //   throw new Error('cannot register more than 62 components')
+    // }
+    ctor.mask = bitShift(ctor.id)
+  }
+
+  getFreeComponent<C extends Component>(ctor: ComponentConstructor<C>, data?: ComponentData<C>): C {
+    const pool = this.pools.get(ctor)
+    if(pool){
+      return pool.get()._reset(data) as C
     }
-    // TODO Object pool
-    // TODO Operation pool (bundle operations to be done later)
-    // let component: Component = isReactive ? reactive(new klass(data)) : new klass(data)
-    this.components.add(component)
-    this.nameToComponents.has(component._name) ? this.nameToComponents.get(component._name)?.add(component) : this.nameToComponents.set(component._name, new Set([component]))
-    this.idToComponent.set(component._id, component)
-
-    const hash: string = entity.id + component._name
-    this.hashToComponent.set(hash, component)
-    this.entityToComponents.has(entity) ? this.entityToComponents.get(entity)?.add(component) : this.entityToComponents.set(entity, new Set([component]))
-    this.entityToComponent.has(entity) ? this.entityToComponent.get(entity)?.set(klass, component) : this.entityToComponent.set(entity, new WeakMap([[klass, component]]))
-    // this.componentToEntities.has(klass) ? this.componentToEntities.get(klass)?.add(entity) : this.componentToEntities.set(klass, new Set([entity]))
-    this.getEntitiesForComponent(klass).add(entity)
-
-    return component
+    throw new Error(`Ein: [component manager] - component '${ctor.name}' not registered. (${ctor.id})`)
   }
 
-  addSingletonComponent<C extends SingletonComponent>(klass: Klass<C>, data?: ComponentData<C>): void {
-    let component = Reflect.construct(klass, [data])
-    this.componentSingletons.set(klass, component)
-  }
-  getSingletonComponent<C extends SingletonComponent>(klass: Klass<C>): C | undefined {
-    return this.componentSingletons.get(klass) as C
-  }
-
-  removeComponent(entity: Entity, klass: Klass<Component>): void {
-    const hash: string = entity.id + klass.name
-    const component = this.hashToComponent.get(hash)
-
-    if(component){
-      this.idToComponent.delete(component._id)
-      this.nameToComponents.get(component._name)?.delete(component)
-      this.components.delete(component)
-
-      this.hashToComponent.delete(hash)
-      this.entityToComponents.get(entity)?.delete(component)
-      this.entityToComponent.get(entity)?.delete(klass)
-      this.componentToEntities.get(klass)?.delete(entity)
-
-    } else {
-      throw "ComponentManager.removeComponent(): Component not found"
+  freeComponent<C extends Component>(instance: ComponentInstance<C>){
+    const pool = this.pools.get(instance.constructor as ComponentConstructor)
+    if(pool){
+      pool.free(instance as C)
     }
   }
 
-  componentsForEntity(entity: Entity): Component[] {
-    return Array.from(this.entityToComponents.get(entity) || [])
-  }
-
-  componentForEntity<C extends Component>(entity: Entity, klass: Klass<C>): C|undefined {
-    return this.entityToComponent.get(entity)?.get(klass) as C
-  }
-
-  getEntitiesForComponent(klass: Klass<Component>){
-    let entities = this.componentToEntities.get(klass)
-    if(!entities){
-      entities = shallowReactive(new Set()) as Set<Entity>
-      this.componentToEntities.set(klass, entities)
-    }
-    return entities
+  private nextComponentId(){
+    return ++this.componentId
   }
 
 }

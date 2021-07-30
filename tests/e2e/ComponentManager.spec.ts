@@ -1,51 +1,36 @@
 import { assert } from 'chai'
 import { Engine } from '../../src/Engine'
-import { Component, SingletonComponent } from '../../src/Component'
+import { Component } from '../../src/Component'
 import { ComponentManager } from '../../src/ComponentManager'
 
 
 class PositionComponent extends Component {
-  x: number
-  y: number
+  x: number = 0
+  y: number = 0
 }
 
 
 describe('ComponentManager', ()=>{
 
-  it('addComponent()', async()=>{
-    const engine: Engine = new Engine()
-    const cm: ComponentManager = engine.component_manager
-    engine
-      .createEntity("player")
-      .addComponent(PositionComponent, {x: 50, y: 50})
+  it('should register component', async()=>{
+    const engine = new Engine()
+    
+    engine.registerComponent(PositionComponent)
 
-    assert.equal(cm.components.size, 1)
-    assert.equal(!!cm.nameToComponents.get("PositionComponent") , true)
+    const comp = engine.component_manager.getFreeComponent(PositionComponent)
+    assert.isNotNull(comp)
+    assert.equal(comp.x, 0)
+    assert.equal(comp.y, 0)
   })
 
-  it('should error on unregistered singleton component', ()=>{
-    const engine: Engine = new Engine()
-    
-    class CameraComponent extends SingletonComponent {
-      camera: any
-    }
-    
-    assert.throws(()=>{
-      engine.createEntity("player")
-        .addComponent(CameraComponent)
-    })
-  })
-  
-  it('should add singleton component', ()=>{
-    const engine: Engine = new Engine()
-    
-    class CameraComponent extends SingletonComponent {
-      camera: any
-    }
+  it('should set data', ()=>{
+    const engine = new Engine()
 
-    engine.addSingletonComponent(CameraComponent, {camera: {}})
-    
-    engine.createEntity("player")
-      .addComponent(CameraComponent)
+    engine.registerComponent(PositionComponent)
+
+    const comp = engine.component_manager.getFreeComponent(PositionComponent, {x: 4, y: 20})
+    assert.isNotNull(comp)
+    assert.equal(comp.x, 4)
+    assert.equal(comp.y, 20)
   })
 })

@@ -28,7 +28,7 @@
     "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
     "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
     "test:performance": "ts-mocha tests/performance/**/*.spec.ts",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [],
   "author": "",

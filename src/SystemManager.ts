@@ -1,6 +1,9 @@
 import { Klass } from './Klass'
 import { System } from './System'
 import { Engine } from './Engine'
+import { performance } from './Utils'
+
+
 
 export class SystemManager {
   engine: Engine
@@ -36,13 +39,12 @@ export class SystemManager {
     return true
   }
 
-  execute(delta: number, time: number, afterEach: (system: System)=>void) {
+  update(delta: number, time: number, afterEach?: (system: System)=>void) {
     for(let i=0; i<this.systems.length; i++){
       const system: System = this.systems[i]
       if(system.shouldExecute()){
-        system.execute(delta, time)
-        afterEach(system)
-        system.executions++
+        system.update(delta, time)
+        afterEach?.(system)
       }
     }
   }
