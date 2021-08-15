@@ -10,7 +10,7 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "declaration": true,
-    "outDir": "build/",
+    "outDir": "dist/",
     "allowJs": false,
     "alwaysStrict": true,
     "noImplicitAny": true,
@@ -26,6 +26,6 @@
     "sinon",
   ],
   "include": [
-    "src"
+    "./src"
   ]
 }

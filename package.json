@@ -2,15 +2,11 @@
   "name": "@ludic/ein",
   "version": "0.0.4",
   "description": "Entity Component System",
-  "main": "dist/ein.umd.js",
-  "module": "dist/ein.es.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ludic/ein.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
   },
   "directories": {
     "example": "example"
@@ -19,34 +15,23 @@
     "dist"
   ],
   "scripts": {
-    "dev": "rollup -c rollup.config.js --watch",
-    "clean": "rimraf ./dist",
-    "build": "rollup -c rollup.config.js",
+    "dev": "tsc -w",
+    "build": "tsc",
     "bnt": "npm run build && npm run test",
-    "example": "run-p dev serve",
+    "examples": "vite serve ./examples",
     "serve": "vite serve examples --config vite.config.js --debug",
     "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
     "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
-    "test:performance": "ts-mocha tests/performance/**/*.spec.ts",
-    "prepublish": "npm run build"
+    "test:performance": "ts-mocha tests/performance/**/*.spec.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^7.1.3",
-    "@types/chai": "^4.2.9",
-    "@types/mocha": "^7.0.1",
-    "@types/uuid": "^7.0.2",
-    "chai": "^4.2.0",
-    "mocha": "^7.0.1",
-    "npm-run-all": "^4.1.5",
-    "rollup": "^2.10.2",
-    "rollup-plugin-typescript2": "^0.27.1",
-    "ts-mocha": "^7.0.0",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.8.3",
-    "vite": "^0.16.4"
+    "@types/node": "^14.0.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.3.2",
+    "vite": "^2.4.4"
   },
   "dependencies": {
     "@vue/reactivity": "^3.0.0-beta.18"
