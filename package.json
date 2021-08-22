@@ -22,7 +22,6 @@
     "build": "tsc",
     "bnt": "npm run build && npm run test",
     "examples": "npm run dev & vite serve ./examples",
-    "serve": "vite serve examples --config vite.config.js --debug",
     "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
     "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
     "test:performance": "ts-mocha tests/performance/**/*.spec.ts"
