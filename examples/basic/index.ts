@@ -80,7 +80,7 @@ let start: any = null
 function update(timestamp: number){
   if(!start) start = timestamp
   engine.update(timestamp-start, timestamp)
-  console.log("update")
+
   // engine.execute(timestamp-start, timestamp)
   requestAnimationFrame(update)
 }
