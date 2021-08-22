@@ -1,84 +1,87 @@
-import { Component, Entity, System, Query, Engine } from '../../src/'
+import { reactive, effect, System, Entity, Query, Engine, Component, ComponentInstance } from '../../dist/index.js'
 console.log("basic example")
 
 
-const circle_query: Query = {
-  entity_name: "circle"
-}
-
 class MovementSystem extends System {
-  entities: Entity[]
-  entity_query: Query
   angle: number
+  circles: Query
+
   constructor(priority: number = 0, enabled: boolean = true) {
     super(priority, enabled)
-    this.entity_query = circle_query
   }
 
-  onAdded(engine: Engine): void {
-    this.engine = engine
-    this.entities = this.engine.entitiesForQuery(this.entity_query)
+  onAdded(engine: Engine){
+    this.circles = engine.createQuery({
+      all: [PositionComponent]
+    })
   }
 
-  execute(delta: number, time: number): void {
-    this.entities.forEach((entity: Entity)=>{
-      let pos: PositionComponent = entity.getComponent(PositionComponent)!
-      pos.data.x = 150 - Math.cos((Math.PI / 180) * pos.data.angle) * 100
-      pos.data.y = 150 + Math.sin((Math.PI / 180) * pos.data.angle) * 100
-      pos.data.angle -= 2
+  update(delta: number, time: number): void {
+    this.circles.entities.forEach((entity: Entity)=>{
+      let pos: ComponentInstance<PositionComponent> = entity.getComponent(PositionComponent)
+      pos.x = 150 - Math.cos((Math.PI / 180) * pos.angle) * 100
+      pos.y = 150 + Math.sin((Math.PI / 180) * pos.angle) * 100
+      pos.angle -= 2
     })
   }
 }
 
 class RenderSystem extends System {
-  entities: Entity[]
+  entities: Entity[] = []
   ctx: CanvasRenderingContext2D
-  entity_query: Query
+  circles: Query
 
   constructor(priority: number = 0, enabled: boolean = true) {
     super(priority, enabled)
-    this.entity_query = circle_query
   }
 
   onAdded(engine: Engine): void {
-    this.engine = engine
-    this.entities = this.engine.entitiesForQuery(this.entity_query)
     let canvas: any = document.getElementById('canvas')
     this.ctx = canvas.getContext('2d')
+    this.circles = engine.createQuery({all: [PositionComponent]})
   }
 
-  execute(delta: number, time: number): void {
+  update(delta: number, time: number): void {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.fillStyle = "steelblue"
-    this.entities.forEach((entity: Entity)=>{
-      const pos: PositionComponent = entity.getComponent(PositionComponent)!
+    this.circles.entities.forEach((entity: Entity)=>{
+      const pos: ComponentInstance<PositionComponent> = entity.getComponent(PositionComponent)!
       this.ctx.save()
       this.ctx.beginPath();
-      this.ctx.arc(pos.data.x, pos.data.y, 10, 0, Math.PI * 2, true)
+      this.ctx.arc(pos.x, pos.y, 10, 0, Math.PI * 2, true)
       this.ctx.fill()
       this.ctx.restore()
     })
   }
 }
 
-class PositionComponent extends Component {}
+class PositionComponent extends Component {
+  x: number
+  y: number
+  angle: number
+}
 
 const engine: Engine = new Engine()
 engine.addSystem(MovementSystem)
 engine.addSystem(RenderSystem)
+
+engine.registerComponent(PositionComponent)
+
 engine
   .createEntity("circle")
   .addComponent(PositionComponent, {x: 50, y: 50, angle: 0})
 
 engine
-  .createEntity("circle")
-  .addComponent(PositionComponent, {x: 50, y: 50, angle: 180})
+.createEntity("circle")
+.addComponent(PositionComponent, {x: 50, y: 50, angle: 180})
 
 
 let start: any = null
 function update(timestamp: number){
   if(!start) start = timestamp
-  engine.execute(timestamp-start, timestamp)
+  engine.update(timestamp-start, timestamp)
+  console.log("update")
+  // engine.execute(timestamp-start, timestamp)
   requestAnimationFrame(update)
 }
 

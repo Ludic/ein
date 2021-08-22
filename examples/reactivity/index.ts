@@ -10,7 +10,7 @@ if (__DEV__) {
     console.log('got new index')
     // newFoo.foo()
   })
-  
+
   // Can also accept an array of dep modules:
   // hot.accept(['./foo.js', './bar.js'], ([newFooModule, newBarModule]) => {
   //   // the callback receives the updated mdoules in an Array

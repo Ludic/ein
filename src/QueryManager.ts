@@ -86,6 +86,7 @@ export class QueryManager {
       })
     } else {
       this.pendingUpdates.forEach(job => {
+        // @ts-ignore
         job()
       })
       this.pendingUpdates.clear()
