@@ -3,6 +3,7 @@
   "version": "0.0.5",
   "description": "Entity Component System",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
@@ -19,9 +20,11 @@
   ],
   "scripts": {
     "dev": "tsc -w",
+    "dev:es": "tsc -w --project tsconfig.es.json",
     "build": "tsc",
     "bnt": "npm run build && npm run test",
-    "examples": "npm run dev & vite serve ./examples",
+    "examples": "run-p dev:es serve",
+    "serve": "vite serve ./examples --config vite.config.js",
     "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
     "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
     "test:performance": "ts-mocha tests/performance/**/*.spec.ts"
@@ -34,6 +37,7 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.7.1",
     "chai": "^4.3.4",
+    "npm-run-all": "^4.1.5",
     "ts-mocha": "^8.0.0",
     "ts-node": "^10.2.1",
     "typescript": "^4.3.5",
