@@ -1,7 +1,8 @@
 jspm_packages/
 node_modules/
 build/
-dist/
+# TODO
+# dist/
 .nyc_output/
 .rts2*
 .parcel-cache/

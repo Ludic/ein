@@ -12,9 +12,6 @@
   "directories": {
     "example": "example"
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "dev": "tsc -w",
     "dev:es": "tsc -w --project tsconfig.es.json",
