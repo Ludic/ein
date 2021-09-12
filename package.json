@@ -1,5 +1,5 @@
 {
-  "name": "@ludic/ein",
+  "name": "ein",
   "version": "0.0.5",
   "description": "Entity Component System",
   "main": "dist/index.js",
