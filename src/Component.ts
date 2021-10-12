@@ -1,5 +1,5 @@
 import { Klass } from './Klass'
-import { WritableKeysOf, WritablePart, ExcludeFunctionProps } from './Utils'
+import { WritablePart } from './Utils'
 
 interface ComponentStaticProps {
   id: number

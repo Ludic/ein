@@ -154,7 +154,7 @@ export type WritableKeysOf<T> = {
 }[keyof T];
 export type WritablePart<T> = Pick<T, WritableKeysOf<T>>;
 
-export type ExcludeFunctionProps<T> = Omit<T, { [K in keyof T]-?: T[K] extends (...any: [])=>any ? K : never }[keyof T]>
+// export type ExcludeFunctionProps<T> = Omit<T, { [K in keyof T]-?: T[K] extends (...any: [])=>any ? K : never }[keyof T]>
 
 
 let perf = typeof window === 'undefined' ? undefined : window?.performance

@@ -4,6 +4,7 @@ import { Entity } from './Entity'
 import { effect } from './reactivity'
 import { ReactiveEffect } from '@vue/reactivity'
 import { bitSet, bitMask } from './Utils'
+import { ComponentInstance } from 'src'
 
 // TODO, add things like all_component_classes, changed_components, etc
 // export interface Query {
@@ -22,11 +23,29 @@ type QueryComponentOptions = {
 
 export type QueryOptions = QueryComponentOptions
 
-export class Query<Opts extends QueryOptions = QueryOptions> {
+// type ComponentFromConstructor<C> = C extends ComponentConstructor<infer R> ? R : never
+
+// type EntityHasComponent<T> = Entity&{
+//   getComponent<C extends Component=ComponentFromConstructor<T>>(cls: ComponentConstructor<C>): ComponentInstance<C>
+//   // getComponent(cls: string): ComponentInstance<C>
+// }
+
+// class Test extends Component {
+//   test: number
+// }
+
+// let r: ComponentFromConstructor<Test>
+
+// let a: EntityHasComponent<Test> = {} as EntityHasComponent<Test>
+// let b = a.getComponent(Test)
+// let c = a.getComponent()
+
+
+export class Query<All=[], Any=[], None=[]> {
   // entities: Set<Entity> = new Set()
   entities: Entity[] = []
 
-  protected readonly _options: Opts
+  protected readonly _options: QueryOptions
   update: ReactiveEffect
 
   private readonly _any: number
@@ -40,7 +59,7 @@ export class Query<Opts extends QueryOptions = QueryOptions> {
   //   return 'components' in query._options
   // }
   
-  constructor(options: Opts){
+  constructor(options: QueryOptions){
     this._options = options
 
     this._any = (options.any ?? []).reduce((a, c) => bitSet(a, c.mask), 0)

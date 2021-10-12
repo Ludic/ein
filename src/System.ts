@@ -7,12 +7,11 @@ export class System {
   order: number
   enabled: boolean
 
-  engine!: Engine|null
+  engine!: Engine
 
   constructor(priority: number = 0, enabled: boolean = true) {
     this.priority = priority
     this.enabled = enabled
-    this.engine = null
   }
 
   update(delta: number, time: number): void {}
@@ -25,8 +24,6 @@ export class System {
   onAdded(engine: Engine): void {
     this.engine = engine
   }
-  onRemoved(): void {
-    this.engine = null
-  }
+  onRemoved(): void { }
 
 }
