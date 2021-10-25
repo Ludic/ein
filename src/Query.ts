@@ -2,7 +2,7 @@ import { Klass } from './Klass'
 import { Component, ComponentConstructor } from './Component'
 import { Entity } from './Entity'
 import { effect } from './reactivity'
-import { ReactiveEffect } from '@vue/reactivity'
+import { ReactiveEffect, ReactiveEffectRunner } from '@vue/reactivity'
 import { bitSet, bitMask } from './Utils'
 import { ComponentInstance } from 'src'
 
@@ -40,13 +40,15 @@ export type QueryOptions = QueryComponentOptions
 // let b = a.getComponent(Test)
 // let c = a.getComponent()
 
+export type QueryEvent = 'added'|'removed'
 
-export class Query<All=[], Any=[], None=[]> {
-  // entities: Set<Entity> = new Set()
-  entities: Entity[] = []
+export class Query {
+  entities: Set<Entity> = new Set()
+  // entities: Entity[] = []
+
 
   protected readonly _options: QueryOptions
-  update: ReactiveEffect
+  update: ReactiveEffectRunner
 
   private readonly _any: number
   private readonly _all: number
@@ -82,13 +84,22 @@ export class Query<All=[], Any=[], None=[]> {
   }
 
   add(entity: Entity){
-    // this.entities.add(entity)
-    this.entities.push(entity)
+    this.entities.add(entity)
+    // console.log('query.add', entity)
+    // this.entities.push(entity)
+  }
+
+  remove(entity: Entity){
+    this.entities.delete(entity)
   }
 
   clear(){
-    // this.entities.clear()
-    this.entities = []
+    this.entities.clear()
+    // this.entities = []
+  }
+
+  on(event: QueryEvent, fn: ()=>void){
+    console.log('query.on', event)
   }
 
 }

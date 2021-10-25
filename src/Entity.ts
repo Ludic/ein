@@ -6,8 +6,6 @@ import { bitDel, bitSet } from './Utils'
 
 var next_id = 0
 
-// type Abc<C extends Component> = C extends 
-
 export class Entity {
   mask: number
   id: number
@@ -15,7 +13,7 @@ export class Entity {
   name: string
   // active: boolean
 
-  engine: Engine
+  private engine: Engine
 
   // components: WeakMap<ComponentConstructor, Component> = new WeakMap()
   // private $components: Map<ComponentConstructor, Component> = new Map()
@@ -47,9 +45,15 @@ export class Entity {
     return this
   }
 
+  // getComponent<C extends Components>(cls: ComponentConstructor<C>): ComponentInstance<C>
+  // getComponent<C extends Component>(cls: ComponentConstructor<C>): ComponentInstance<C>|undefined {
   getComponent<C extends Component>(cls: ComponentConstructor<C>): ComponentInstance<C>|undefined {
     // return this.$components.get(cls) as C
-    return this.$componentsById[cls.id] as C
+    return this.$componentsById[cls.id] as any
+  }
+
+  hasComponent<C extends Component>(cls: ComponentConstructor<C>): boolean {
+    return cls.id in this.$componentsById
   }
 
   private freeComponent<C extends Component>(instance: C|undefined){

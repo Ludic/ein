@@ -45,27 +45,28 @@ export class QueryManager {
 
   createQuery(options: QueryOptions): Query {
     const query = new Query(options)
-    this.updateQuery(query)
+    // this.updateQuery(query)
 
     // query.update = effect(()=>{
+    //   console.log('update query', query)
     //   this.updateQuery(query)
     // }, {
     //   scheduler: (job) => {
     //     this.pendingUpdates.add(job)
     //   },
-    //   // onTrack(e){
-    //   //   console.log('on track:', e)
-    //   // },
-    //   // onTrigger(e){
-    //   //   console.log('on trigger:', e)
-    //   // },
+    //   onTrack(e){
+    //     console.log('on track:', e)
+    //   },
+    //   onTrigger(e){
+    //     console.log('on trigger:', e)
+    //   },
     // })
     this.queries.push(query)
     return query
   }
 
   updateQuery(query: Query){
-    query.clear()
+    // query.clear()
     // this.engine.entity_manager.entities.forEach((entity)=>{
     //   if(query.matches(entity)){
     //     query.add(entity)
@@ -74,6 +75,8 @@ export class QueryManager {
     for(let entity of this.engine.entity_manager.entities){
       if(query.matches(entity)){
         query.add(entity)
+      } else {
+        query.remove(entity)
       }
     }
   }
@@ -85,6 +88,7 @@ export class QueryManager {
         this.updateQuery(query)
       })
     } else {
+      // console.log('querymanager.update', this.pendingUpdates.size)
       this.pendingUpdates.forEach(job => {
         // @ts-ignore
         job()
@@ -96,6 +100,7 @@ export class QueryManager {
   onComponentAdded<C extends Component>(entity: Entity, cls: ComponentConstructor, component: C){
     this.queries.forEach((query)=>{
       if(query.flush == 'immediate'){
+        console.log('on comp added', query)
         this.updateQuery(query)
       }
     })
