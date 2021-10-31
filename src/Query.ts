@@ -27,6 +27,8 @@ export type QueryEvent = 'added'|'removed'
 
 export class Query<All extends Component=Component> {
   entities: Set<Entity<All>> = new Set()
+  added: Set<Entity<All>> = new Set()
+  removed: Set<Entity<All>> = new Set()
 
 
   protected readonly _options: QueryOptions
@@ -66,18 +68,28 @@ export class Query<All extends Component=Component> {
   }
 
   add(entity: Entity<any>){
+    if(!this.entities.has(entity)){
+      this.added.add(entity)
+    }
     this.entities.add(entity)
-    // console.log('query.add', entity)
-    // this.entities.push(entity)
   }
 
   remove(entity: Entity<any>){
-    this.entities.delete(entity)
+    if(this.entities.delete(entity)){
+      this.removed.add(entity)
+    }
   }
 
   clear(){
     this.entities.clear()
+    this.added.clear()
+    this.removed.clear()
+    // console.log('query.clear')
     // this.entities = []
+  }
+  reset(){
+    this.added.clear()
+    this.removed.clear()
   }
 
   on(event: QueryEvent, fn: ()=>void){

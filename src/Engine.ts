@@ -36,6 +36,11 @@ export class Engine {
     return entity
   }
 
+  destroyEntity(ent: Entity<any>){
+    this.entity_manager.destroyEntity(ent)
+    this.query_manager.onEntityRemoved(ent)
+  }
+
   addSystem(system_klass: Klass<System>): System {
     return this.system_manager.addSystem(system_klass)
   }

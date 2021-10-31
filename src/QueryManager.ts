@@ -73,9 +73,11 @@ export class QueryManager {
     //   }
     // })
     for(let entity of this.engine.entity_manager.entities){
+      query.reset()
       if(query.matches(entity)){
         query.add(entity)
       } else {
+        // console.log('qm.update', 'remove', entity)
         query.remove(entity)
       }
     }
@@ -103,6 +105,12 @@ export class QueryManager {
         console.log('on comp added', query)
         this.updateQuery(query)
       }
+    })
+  }
+
+  onEntityRemoved<C extends Component>(entity: Entity){
+    this.queries.forEach((query)=>{
+      query.remove(entity)
     })
   }
 

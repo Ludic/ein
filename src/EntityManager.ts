@@ -33,7 +33,7 @@ export class EntityManager {
     // this.getEntitiesForName(entity.name).add(entity)
   }
 
-  deleteEntity(entity: Entity){
+  destroyEntity(entity: Entity){
     this.removeEntity(entity)
     this.pool.free(entity)
   }
