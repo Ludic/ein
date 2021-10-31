@@ -8,12 +8,10 @@ interface ComponentStaticProps {
   data: {[key: string]: any}
 }
 
-// export type ComponentData<C extends Component = Component> = ComponentConstructor<C>['data']
-
-type HiddenProperties = '_reset'
+type HiddenProperties = '_reset'|'_types'
 
 export type ComponentInstance<C extends Component> = Omit<C, HiddenProperties>
-export type ComponentData<C extends Component> = Omit<WritablePart<C>, HiddenProperties>
+export type ComponentData<C extends Component> = Omit<WritablePart<C>, HiddenProperties|keyof C['_types']>&C['_types']
 
 export type GetComponent<C> = C extends ComponentConstructor<infer T> ? T : C
 
@@ -23,12 +21,10 @@ export class Component {
   static property: ComponentStaticProps['property'] = ''
   static data: ComponentStaticProps['data'] = {}
 
-  private _data: ComponentStaticProps['data'] = {}
-
-  // a: ComponentConstructor<this>['data']
-
   private $keys: string[]
 
+  // hidden properties
+  _types: {[key: string]: any}
   _reset(data: any = {}): this {
     Object.assign(this, data)
     return this
