@@ -6,7 +6,7 @@ import { QueryManager } from './QueryManager'
 import { Entity } from './Entity'
 import { Klass } from './Klass'
 import { System } from './System'
-import { Component, ComponentConstructor, ComponentData } from './Component'
+import { Component, ComponentConstructor, ComponentData, GetComponent } from './Component'
 import { performance } from './Utils'
 
 export interface EngineOptions {
@@ -60,7 +60,7 @@ export class Engine {
   //   return this.query_manager.entitiesForQuery(query)
   // }
 
-  createQuery(options: QueryOptions): Query {
+  createQuery(options: QueryOptions): Query<any> {
     return this.query_manager.createQuery(options)
   }
 

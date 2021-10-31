@@ -23,28 +23,10 @@ type QueryComponentOptions = {
 
 export type QueryOptions = QueryComponentOptions
 
-// type ComponentFromConstructor<C> = C extends ComponentConstructor<infer R> ? R : never
-
-// type EntityHasComponent<T> = Entity&{
-//   getComponent<C extends Component=ComponentFromConstructor<T>>(cls: ComponentConstructor<C>): ComponentInstance<C>
-//   // getComponent(cls: string): ComponentInstance<C>
-// }
-
-// class Test extends Component {
-//   test: number
-// }
-
-// let r: ComponentFromConstructor<Test>
-
-// let a: EntityHasComponent<Test> = {} as EntityHasComponent<Test>
-// let b = a.getComponent(Test)
-// let c = a.getComponent()
-
 export type QueryEvent = 'added'|'removed'
 
-export class Query {
-  entities: Set<Entity> = new Set()
-  // entities: Entity[] = []
+export class Query<All extends Component=Component> {
+  entities: Set<Entity<All>> = new Set()
 
 
   protected readonly _options: QueryOptions
@@ -83,13 +65,13 @@ export class Query {
     return any && all && none;
   }
 
-  add(entity: Entity){
+  add(entity: Entity<any>){
     this.entities.add(entity)
     // console.log('query.add', entity)
     // this.entities.push(entity)
   }
 
-  remove(entity: Entity){
+  remove(entity: Entity<any>){
     this.entities.delete(entity)
   }
 

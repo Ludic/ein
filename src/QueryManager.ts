@@ -43,7 +43,7 @@ export class QueryManager {
   //   }
   // }
 
-  createQuery(options: QueryOptions): Query {
+  createQuery<C extends Component>(options: QueryOptions): Query<C> {
     const query = new Query(options)
     // this.updateQuery(query)
 
@@ -62,7 +62,7 @@ export class QueryManager {
     //   },
     // })
     this.queries.push(query)
-    return query
+    return query as unknown as Query<C>
   }
 
   updateQuery(query: Query){

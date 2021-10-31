@@ -6,7 +6,7 @@ import { bitDel, bitSet } from './Utils'
 
 var next_id = 0
 
-export class Entity {
+export class Entity<All extends Component=Component> {
   mask: number
   id: number
   active: boolean
@@ -24,6 +24,10 @@ export class Entity {
     this.engine = engine
   }
 
+  // addEventListener<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+  // addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+
+  
   addComponent<C extends Component>(cls: ComponentConstructor<C>, data?: ComponentData<C>): this {
     // this.engine.component_manager.addComponent(this, cls, ...data)
     const instance = this.engine.component_manager.getFreeComponent(cls, data)
@@ -45,9 +49,7 @@ export class Entity {
     return this
   }
 
-  // getComponent<C extends Components>(cls: ComponentConstructor<C>): ComponentInstance<C>
-  // getComponent<C extends Component>(cls: ComponentConstructor<C>): ComponentInstance<C>|undefined {
-  getComponent<C extends Component>(cls: ComponentConstructor<C>): ComponentInstance<C>|undefined {
+  getComponent<C extends Component>(cls: ComponentConstructor<C>): C extends All ? ComponentInstance<C> : ComponentInstance<C>|undefined {
     // return this.$components.get(cls) as C
     return this.$componentsById[cls.id] as any
   }

@@ -15,6 +15,8 @@ type HiddenProperties = '_reset'
 export type ComponentInstance<C extends Component> = Omit<C, HiddenProperties>
 export type ComponentData<C extends Component> = Omit<WritablePart<C>, HiddenProperties>
 
+export type GetComponent<C> = C extends ComponentConstructor<infer T> ? T : C
+
 export class Component {
   static id: ComponentStaticProps['id'] = 0
   static mask: ComponentStaticProps['mask'] = 0
