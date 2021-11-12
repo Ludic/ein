@@ -8,7 +8,8 @@ interface ComponentStaticProps {
   data: {[key: string]: any}
 }
 
-type HiddenProperties = '_reset'|'_types'
+type HiddenProperties = '_reset'|'_types'|'serialize'
+const HIDDEN_PROPERTIES = ['_reset','_types','serialize']
 
 export type ComponentInstance<C extends Component> = Omit<C, HiddenProperties>
 // export type ComponentData<C extends Component> = Omit<WritablePart<C>, HiddenProperties|keyof C['_types']>&C['_types']
@@ -29,6 +30,12 @@ export class Component {
   _reset(data: any = {}): this {
     Object.assign(this, data)
     return this
+  }
+
+  serialize(){
+    return Object.fromEntries(Object.entries(this).filter(([key, val])=>{
+      return !HIDDEN_PROPERTIES.includes(key)
+    }))
   }
 }
 

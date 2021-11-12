@@ -123,4 +123,16 @@ export class Entity<All extends Component=Component> {
     this.$componentsById = {}
   }
 
+  serialize(){
+    return {
+      id: this.id,
+      components: Object.fromEntries(Object.entries(this.$componentsById).map(([id, component])=>{
+        return [
+          component.constructor.name,
+          component.serialize(),
+        ]
+      }))
+    }
+  }
+
 }
