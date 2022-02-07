@@ -1,11 +1,6 @@
-import { Klass } from './Klass'
-import { Component } from './Component'
-import { ComponentManager } from './ComponentManager'
 import { Entity } from './Entity'
 import { Engine } from './Engine'
 import Pool from './pool'
-import { reactive } from './reactivity'
-import { shallowReactive, isReactive } from '@vue/reactivity'
 
 export class EntityManager {
   entities: Set<Entity> = new Set()

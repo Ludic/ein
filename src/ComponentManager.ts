@@ -1,8 +1,5 @@
 import { Component, ComponentData, ComponentConstructor, ComponentInstance } from "./Component"
-import { Entity } from "./Entity"
-import { Klass } from "./Klass"
 import { Engine } from "./Engine"
-import { reactive, shallowReactive } from '@vue/reactivity'
 import Pool from './pool'
 import { bitShift } from './Utils'
 
