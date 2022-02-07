@@ -1,6 +1,6 @@
 {
   "name": "@ludic/ein",
-  "version": "0.0.5",
+  "version": "1.0.2",
   "description": "Entity Component System",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -24,7 +24,8 @@
     "serve": "vite serve ./examples --config vite.config.js",
     "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
     "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
-    "test:performance": "ts-mocha tests/performance/**/*.spec.ts"
+    "test:performance": "ts-mocha tests/performance/**/*.spec.ts",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [],
   "author": "",
