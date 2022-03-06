@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 import { Engine } from '../../src/Engine'
 import { Component } from '../../src/Component'
-import { isReactive } from '@vue/reactivity'
 
 class Position extends Component {
   // static property: 'pos' = 'pos'

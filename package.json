@@ -2,8 +2,8 @@
   "name": "@ludic/ein",
   "version": "1.0.2",
   "description": "Entity Component System",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/ein.umd.js",
+  "module": "dist/ein.es.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
@@ -15,10 +15,18 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/ein.es.js",
+      "require": "./dist/ein.umd.js"
+    }
+  },
   "scripts": {
-    "dev": "tsc -w",
-    "dev:es": "tsc -w --project tsconfig.es.json",
-    "build": "tsc",
+    "dev": "run-p dev:vite dev:tsc",
+    "dev:vite": "vite build --watch",
+    "dev:tsc": "tsc -w --emitDeclarationOnly",
+    "build:tsc": "tsc",
+    "build": "vite build",
     "bnt": "npm run build && npm run test",
     "examples": "run-p dev:es serve",
     "serve": "vite serve ./examples --config vite.config.js",
@@ -39,7 +47,7 @@
     "ts-mocha": "^8.0.0",
     "ts-node": "^10.2.1",
     "typescript": "^4.3.5",
-    "vite": "^2.5.0"
+    "vite": "^2.8.6"
   },
   "dependencies": {
     "@vue/reactivity": "^3.2.4"

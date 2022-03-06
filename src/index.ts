@@ -1,6 +1,7 @@
-export { Klass } from './Klass'
+export type { Klass } from './Klass'
 
-export { Component, ComponentInstance, ComponentData, ComponentConstructor } from './Component'
+export { Component } from './Component'
+export type { ComponentInstance, ComponentData, ComponentConstructor } from './Component'
 export { ComponentManager } from './ComponentManager'
 
 export { Entity } from './Entity'
@@ -9,14 +10,17 @@ export { EntityManager } from './EntityManager'
 export { System } from './System'
 export { SystemManager } from './SystemManager'
 
-export { Query, QueryOptions } from './Query'
+export { Query } from './Query'
+export type { QueryOptions } from './Query'
 export { QueryManager } from './QueryManager'
 
-export { Engine, EngineOptions } from './Engine'
+export { Engine } from './Engine'
+export type { EngineOptions } from './Engine'
 
 import * as Utils from './Utils'
 export { Utils }
 
 export * from './reactivity'
 
-export { Pool, ObjectPoolFactory } from './pool'
+export { Pool } from './pool'
+export type { ObjectPoolFactory } from './pool'

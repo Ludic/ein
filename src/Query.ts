@@ -1,10 +1,9 @@
 import { Klass } from './Klass'
 import { Component, ComponentConstructor } from './Component'
 import { Entity } from './Entity'
-import { effect } from './reactivity'
-import { ReactiveEffect, ReactiveEffectRunner } from '@vue/reactivity'
 import { bitSet, bitMask } from './Utils'
 import { ComponentInstance } from 'src'
+import { ReactiveEffectRunner } from '@vue/reactivity'
 
 // TODO, add things like all_component_classes, changed_components, etc
 // export interface Query {

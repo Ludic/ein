@@ -6,8 +6,8 @@ import { System } from './System'
 import { Query, QueryOptions } from './Query'
 import { Klass } from './Klass'
 import { Engine } from './Engine'
-import { effect, ReactiveEffect } from './reactivity'
 import { isArray, setIntersection, setDifference, performance } from './Utils'
+import { ReactiveEffect } from '@vue/reactivity'
 
 export class QueryManager {
   queries: Query[]
