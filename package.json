@@ -23,7 +23,7 @@
   },
   "scripts": {
     "dev": "run-p dev:vite dev:tsc",
-    "dev:vite": "vite build --watch",
+    "dev:vite": "vite build --watch --mode development",
     "dev:tsc": "tsc -w --emitDeclarationOnly",
     "build:tsc": "tsc",
     "build": "vite build",
