@@ -31,7 +31,7 @@ export class Query<All extends Component=Component> {
 
 
   protected readonly _options: QueryOptions
-  update: ReactiveEffectRunner
+  // update: ReactiveEffectRunner
 
   private readonly _any: number
   private readonly _all: number

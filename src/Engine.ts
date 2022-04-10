@@ -8,6 +8,7 @@ import { Klass } from './Klass'
 import { System } from './System'
 import { Component, ComponentConstructor, ComponentData, GetComponent } from './Component'
 import { performance } from './Utils'
+import { registerSystem, registerEngine } from './hmr/hmr'
 
 export interface EngineOptions {
   entityAllocation?: number
@@ -28,6 +29,10 @@ export class Engine {
     this.query_manager = new QueryManager(this)
 
     this.enabled = true
+
+    if(import.meta.env.DEV){
+      registerEngine(this)
+    }
   }
 
   createEntity(name?: string): Entity {

@@ -3,8 +3,13 @@ import { Entity } from './Entity'
 import { Engine } from './Engine'
 
 export class System {
+  /**
+   * @internal  used for hmr
+   */
+  static __id: string
+
   priority: number
-  order: number
+  order: number = 0
   enabled: boolean
 
   engine!: Engine

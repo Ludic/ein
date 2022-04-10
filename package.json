@@ -5,16 +5,20 @@
   "main": "dist/ein.umd.js",
   "module": "dist/ein.es.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ludic/ein.git"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "directories": {
     "example": "example"
   },
-  "files": [
-    "dist"
-  ],
   "exports": {
     ".": {
       "import": "./dist/ein.es.js",
@@ -22,7 +26,7 @@
     }
   },
   "scripts": {
-    "dev": "run-p dev:vite dev:tsc",
+    "dev": "run-p dev:tsc dev:vite",
     "dev:vite": "vite build --watch --mode development",
     "dev:tsc": "tsc -w --emitDeclarationOnly",
     "build:tsc": "tsc",
@@ -35,19 +39,16 @@
     "test:performance": "ts-mocha tests/performance/**/*.spec.ts",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "@types/chai": "^4.2.21",
+    "@types/chai": "^4.3.0",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.7.1",
-    "chai": "^4.3.4",
+    "chai": "^4.3.6",
     "npm-run-all": "^4.1.5",
     "ts-mocha": "^8.0.0",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.3.5",
-    "vite": "^2.8.6"
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.1"
   },
   "dependencies": {
     "@vue/reactivity": "^3.2.4"

@@ -1,3 +1,4 @@
+/// <reference path="../node_modules/vite/client.d.ts" />
 export type { Klass } from './Klass'
 
 export { Component } from './Component'
@@ -24,3 +25,5 @@ export * from './reactivity'
 
 export { Pool } from './pool'
 export type { ObjectPoolFactory } from './pool'
+
+export { default as VitePluginEin } from './hmr/plugin'

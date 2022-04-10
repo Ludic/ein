@@ -2,7 +2,7 @@ import { Klass } from './Klass'
 import { System } from './System'
 import { Engine } from './Engine'
 import { performance } from './Utils'
-
+import { registerSystem } from './hmr/hmr'
 
 
 export class SystemManager {
@@ -12,16 +12,31 @@ export class SystemManager {
   constructor(engine: Engine){
     this.engine = engine
     this.systems = []
+
+    // if(import.meta.env.DEV){
+    //   if(import.meta.hot){
+    //     import.meta.hot.on('ludic:register-system', (data)=>{
+    //       console.log('on ludic:register-system', data)
+    //     })
+    //     import.meta.hot.on('ludic:update-system', (data)=>{
+    //       console.log('on ludic:update-system', data)
+    //     })
+    //   }
+    // }
   }
 
-  addSystem(system_klass: Klass<System>): System {
+  addSystem(system_klass: Klass<System>, order?: number): System {
     let system: System = Reflect.construct(system_klass, [])
-    system.order = this.systems.length
+    system.order = order ?? this.systems.length
     system.engine = this.engine
     system.onAdded(this.engine)
 
     this.systems.push(system)
     this.sortSystems()
+
+    if(import.meta.env.DEV){
+      registerSystem(system)
+    }
 
     return system
   }

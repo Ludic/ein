@@ -7,10 +7,10 @@ import { bitDel, bitSet } from './Utils'
 var next_id = 0
 
 export class Entity<All extends Component=Component> {
-  mask: number
-  id: number
-  active: boolean
-  name: string
+  mask!: number
+  id!: number
+  active!: boolean
+  name!: string
   // active: boolean
 
   private engine: Engine

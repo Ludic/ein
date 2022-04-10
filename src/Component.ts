@@ -23,10 +23,8 @@ export class Component {
   static property: ComponentStaticProps['property'] = ''
   static data: ComponentStaticProps['data'] = {}
 
-  private $keys: string[]
-
   // hidden properties
-  _types: null|{[key: string]: any}
+  declare _types: null|{[key: string]: any}
   _reset(data: any = {}): this {
     Object.assign(this, data)
     return this

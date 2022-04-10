@@ -4,6 +4,7 @@ const { defineConfig } = require('vite')
 
 module.exports = defineConfig({
   build: {
+    emptyOutDir: false,
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'ein',
@@ -21,5 +22,8 @@ module.exports = defineConfig({
       //   }
       // }
     }
-  }
+  },
+  define: {
+    '__HOT__': 'import.meta.hot',
+  },
 })
