@@ -1,3 +1,5 @@
+import { Component, ComponentConstructor } from '../Component'
+import { COMPONENT_ENTITY_ID_MAP, SYSTEM_QUERY_MAP } from '../shared'
 import { Engine } from '../Engine'
 import { Klass } from '../Klass'
 import { System } from '../System'
@@ -20,12 +22,14 @@ export const getGlobalThis = (): any => {
 }
 
 export interface EinHMRRuntime {
-
+  reloadSystem: typeof reloadSystem
+  reloadComponent: typeof reloadComponent
 }
 
 if(import.meta.env.DEV){
   getGlobalThis().__EIN_HMR_RUNTIME__ = {
-    reloadSystem: tryWrap(reloadSystem)
+    reloadSystem: tryWrap(reloadSystem),
+    reloadComponent: tryWrap(reloadComponent),
   } as EinHMRRuntime
 }
 
@@ -56,8 +60,58 @@ function reloadSystem(id: string, systemClass: Klass<System>){
   if(ENGINE){
     const cfg = SYSTEM_MAP.get(id)
     if(cfg){
+      // clear the queries from the system map
+      SYSTEM_QUERY_MAP.get(cfg.instance)?.forEach((query)=>{
+        ENGINE.query_manager.queries.delete(query)
+        SYSTEM_QUERY_MAP.get(cfg.instance)?.delete(query)
+      })
+      // remove the existing system instance from the manager and add the
+      // new one with the same order
       ENGINE.system_manager.removeSystem(cfg.instance)
       ENGINE.system_manager.addSystem(systemClass, cfg.instance.order)
+    }
+  }
+}
+
+const COMPONENT_MAP: Map<string, {
+  ctor: ComponentConstructor<Component>,
+  allocate?: number
+}> = new Map()
+
+export function registerComponent(ctor: ComponentConstructor<Component>, allocate?: number){
+  const id = ctor.__id
+  if(id){
+    COMPONENT_MAP.set(id, {
+      ctor,
+      allocate,
+    })
+  }
+}
+
+function reloadComponent(id: string, componentClass: ComponentConstructor<Component>){
+  if(ENGINE){
+    const cfg = COMPONENT_MAP.get(id)
+    if(cfg){
+      // to reload components we need to remove the previous component from the registry and 
+      // register the new class
+      const clsStore = COMPONENT_ENTITY_ID_MAP.get(cfg.ctor)
+
+      ENGINE.component_manager.pools.delete(cfg.ctor)
+      ENGINE.component_manager.registerComponent(componentClass, cfg.allocate, cfg.ctor.id)
+
+      // then we need to replace every component
+      if(clsStore){
+        clsStore.forEach((inst, entId)=>{
+          console.log('set new component data', inst)
+          clsStore.set(entId, ENGINE.component_manager.getFreeComponent(componentClass, inst))
+        })
+        // update the comp/ent store to use the new ctor
+        COMPONENT_ENTITY_ID_MAP.set(componentClass, clsStore)
+      } else {
+        console.log('no comp store', cfg, COMPONENT_ENTITY_ID_MAP)
+      }
+    } else {
+      console.log('no cfg', id)
     }
   }
 }

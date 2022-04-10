@@ -1,11 +1,11 @@
 import { Component, ComponentData, ComponentConstructor, ComponentInstance } from "./Component"
 import { Engine } from "./Engine"
+import { registerComponent } from './hmr/hmr'
 import Pool from './pool'
 import { bitShift } from './Utils'
 
 export class ComponentManager {
 
-  registry: Set<ComponentConstructor> = new Set()
   engine: Engine
 
   pools: WeakMap<ComponentConstructor, Pool<Component>> = new WeakMap()
@@ -16,16 +16,19 @@ export class ComponentManager {
     this.engine = engine
   }
 
-  registerComponent<C extends Component>(ctor: ComponentConstructor<C>, allocate?: number){
-    this.registry.add(ctor)
+  registerComponent<C extends Component>(ctor: ComponentConstructor<C>, allocate?: number, id?: number){
     this.pools.set(ctor, new Pool<C>(() => (Reflect.construct(ctor, []) as C)._reset(), allocate))
-    ctor.id = this.nextComponentId()
+    ctor.id = id ?? this.nextComponentId()
     // if(ctor.id > 30){
     //   // bit shifting 1<<31 results in a negative number because 32-bit signed int
     //   // TODO: find way to fix this limitation.
     //   throw new Error('cannot register more than 62 components')
     // }
     ctor.mask = bitShift(ctor.id)
+
+    if(import.meta.env.DEV){
+      registerComponent(ctor, allocate)
+    }
   }
 
   getFreeComponent<C extends Component>(ctor: ComponentConstructor<C>, data?: ComponentData<C>): C {

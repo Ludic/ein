@@ -10,7 +10,7 @@ import { isArray, setIntersection, setDifference, performance } from './Utils'
 import { ReactiveEffect } from '@vue/reactivity'
 
 export class QueryManager {
-  queries: Query[]
+  queries: Set<Query> = new Set()
   // query_to_entities: Map<Query, Entity[]>
 
   engine: Engine
@@ -19,8 +19,6 @@ export class QueryManager {
 
   constructor(engine: Engine){
     this.engine = engine
-
-    this.queries = []
     // this.query_to_entities = new Map()
   }
 
@@ -61,7 +59,7 @@ export class QueryManager {
     //     console.log('on trigger:', e)
     //   },
     // })
-    this.queries.push(query)
+    this.queries.add(query)
     return query as unknown as Query<C>
   }
 

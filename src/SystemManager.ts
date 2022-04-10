@@ -3,6 +3,7 @@ import { System } from './System'
 import { Engine } from './Engine'
 import { performance } from './Utils'
 import { registerSystem } from './hmr/hmr'
+import { trackSystem } from './shared'
 
 
 export class SystemManager {
@@ -29,7 +30,14 @@ export class SystemManager {
     let system: System = Reflect.construct(system_klass, [])
     system.order = order ?? this.systems.length
     system.engine = this.engine
+
+    if(import.meta.env.DEV){
+      trackSystem(system)
+    }
     system.onAdded(this.engine)
+    if(import.meta.env.DEV){
+      trackSystem(null)
+    }
 
     this.systems.push(system)
     this.sortSystems()

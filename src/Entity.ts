@@ -3,6 +3,7 @@ import { Component, ComponentConstructor, ComponentData, ComponentInstance } fro
 import { EntityManager } from "./EntityManager"
 import { Engine } from "./Engine"
 import { bitDel, bitSet } from './Utils'
+import { COMPONENT_ENTITY_ID_MAP, ENTITY_ID_COMPONENT_MAP } from './shared'
 
 var next_id = 0
 
@@ -17,7 +18,7 @@ export class Entity<All extends Component=Component> {
 
   // components: WeakMap<ComponentConstructor, Component> = new WeakMap()
   // private $components: Map<ComponentConstructor, Component> = new Map()
-  private $componentsById: {[key: number]: Component} = {}
+  // private $componentsById: {[key: number]: Component} = {}
 
   constructor(engine: Engine, name: string = "") {
     this.$reset(name)
@@ -34,7 +35,18 @@ export class Entity<All extends Component=Component> {
 
     this.mask = bitSet(this.mask, cls.mask)
     // this.$components.set(cls, instance)
-    this.$componentsById[cls.id] = instance
+    // this.$componentsById[cls.id] = instance
+    // addComponent(cls, this.id, instance)
+    if(cls.name == 'PlayerComponent'){
+      console.log('add PlayerComponent')
+    }
+    const map = COMPONENT_ENTITY_ID_MAP.get(cls) ?? new Map()
+    COMPONENT_ENTITY_ID_MAP.set(cls, map)
+    map.set(this.id, instance)
+    
+    const set = ENTITY_ID_COMPONENT_MAP.get(this.id) ?? new Set()
+    ENTITY_ID_COMPONENT_MAP.set(this.id, set)
+    set.add(cls)
 
     return this
   }
@@ -44,65 +56,21 @@ export class Entity<All extends Component=Component> {
     this.mask = bitDel(this.mask, cls.mask)
     // this.freeComponent(this.$components.get(cls))
     // this.$components.delete(cls)
-    this.freeComponent(this.$componentsById[cls.id])
-    delete this.$componentsById[cls.id]
+    const val = COMPONENT_ENTITY_ID_MAP.get(cls)?.get(this.id)
+    COMPONENT_ENTITY_ID_MAP.get(cls)?.delete(this.id)
+    ENTITY_ID_COMPONENT_MAP.get(this.id)?.delete(cls)
+    this.freeComponent(val)
     return this
   }
 
   getComponent<C extends Component>(cls: ComponentConstructor<C>): C extends All ? ComponentInstance<C> : ComponentInstance<C>|undefined {
     // return this.$components.get(cls) as C
-    return this.$componentsById[cls.id] as any
+    return COMPONENT_ENTITY_ID_MAP.get(cls)?.get(this.id) as any
   }
 
   hasComponent<C extends Component>(cls: ComponentConstructor<C>): boolean {
-    return cls.id in this.$componentsById
+    return !!COMPONENT_ENTITY_ID_MAP.get(cls)?.has(this.id)
   }
-
-  private freeComponent<C extends Component>(instance: C|undefined){
-    if(instance){
-      this.engine.component_manager.freeComponent(instance)
-    }
-  }
-
-  // getComponents(): Component[] {
-  //   return this.engine.component_manager.componentsForEntity(this)
-  // }
-
-  // TODO
-  // getComponentClasses(): Klass<Component>[] {
-  //   this.class_to_component.keys())
-  // }
-
-  // getComponents(): Component[] {
-  //   return Array.from(this.class_to_component.values())
-  // }
-
-
-  // hasComponent(component_class: Klass<Component>): boolean {
-  //   return this.getComponentClasses().includes(component_class)
-  // }
-
-  // hasAllComponents(component_classes: Klass<Component>[]): boolean {
-  //   for(let i = 0; i < component_classes.length; i++){
-  //     if(!this.hasComponent(component_classes[i])) return false
-  //   }
-  //   return true
-  // }
-
-  // hasAnyComponents(component_classes: Klass<Component>[]): boolean {
-  //   for(let i = 0; i < component_classes.length; i++){
-  //     if(this.hasComponent(component_classes[i])) return true
-  //   }
-  //   return false
-  // }
-
-  // removeAllComponents(){
-  //   return this.entity_manager.removeAllComponents(this)
-  // }
-
-  // remove(): void {
-  //   return this.entity_manager.removeEntity(this)
-  // }
 
   $reset(name: string = ''){
     this.mask = 0
@@ -112,26 +80,33 @@ export class Entity<All extends Component=Component> {
     this.clearComponents()
   }
 
+  private freeComponent<C extends Component>(instance: C|undefined){
+    if(instance){
+      this.engine.component_manager.freeComponent(instance)
+    }
+  }
+
   private clearComponents(){
-    // this.$components.forEach((instance)=>{
-    //   this.freeComponent(instance)
-    // })
-    // this.$components.clear()
-    Object.values(this.$componentsById).forEach((c)=>{
-      this.freeComponent(c)
+    COMPONENT_ENTITY_ID_MAP.forEach((map)=>{
+      const inst = map.get(this.id)
+      this.freeComponent(inst)
+      map.delete(this.id)
     })
-    this.$componentsById = {}
+    ENTITY_ID_COMPONENT_MAP.set(this.id, new Set())
   }
 
   serialize(){
+    const obj: {[name: string]: any} = {}
+    const set = ENTITY_ID_COMPONENT_MAP.get(this.id)
+    if(set){
+      set.forEach((cls)=>{
+        const inst = COMPONENT_ENTITY_ID_MAP.get(cls)?.get(this.id)
+        obj[cls.name] = inst?.serialize()
+      })
+    }
     return {
       id: this.id,
-      components: Object.fromEntries(Object.entries(this.$componentsById).map(([id, component])=>{
-        return [
-          component.constructor.name,
-          component.serialize(),
-        ]
-      }))
+      components: obj,
     }
   }
 

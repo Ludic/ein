@@ -26,7 +26,13 @@ export class Component {
   // hidden properties
   declare _types: null|{[key: string]: any}
   _reset(data: any = {}): this {
-    Object.assign(this, data)
+    // NOTE: can this be optimized??
+    Object.entries(data).forEach(([key, val])=>{
+      if(!HIDDEN_PROPERTIES.includes(key) && this.hasOwnProperty(key)){
+        // @ts-ignore
+        this[key] = val
+      }
+    })
     return this
   }
 
