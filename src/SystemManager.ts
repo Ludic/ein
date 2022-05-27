@@ -3,7 +3,7 @@ import { System } from './System'
 import { Engine } from './Engine'
 import { performance } from './Utils'
 import { registerSystem } from './hmr/hmr'
-import { trackSystem } from './shared'
+import { trackSystem, SYSTEM_HANDLER_MAP, callHandlers } from './shared'
 
 
 export class SystemManager {
@@ -31,13 +31,9 @@ export class SystemManager {
     system.order = order ?? this.systems.length
     system.engine = this.engine
 
-    if(import.meta.env.DEV){
-      trackSystem(system)
-    }
+    trackSystem(system)
     system.onAdded(this.engine)
-    if(import.meta.env.DEV){
-      trackSystem(null)
-    }
+    trackSystem(null)
 
     this.systems.push(system)
     this.sortSystems()
@@ -59,6 +55,8 @@ export class SystemManager {
     let index: number = this.systems.indexOf(system)
     if(index == -1) return false
     this.systems.splice(index, 1)
+    system.onRemoved()
+    callHandlers(system)
     return true
   }
 
@@ -67,6 +65,7 @@ export class SystemManager {
       const system: System = this.systems[i]
       if(system.shouldExecute()){
         system.update(delta, time)
+        system.updateTimers(delta, time)
         afterEach?.(system)
       }
     }

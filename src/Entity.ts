@@ -53,6 +53,7 @@ export class Entity<All extends Component=Component> {
 
   removeComponent<C extends Component>(cls: ComponentConstructor<C>): this {
     // this.engine.component_manager.removeComponent(this, component_class)
+    this.engine.query_manager.onComponentRemoved(this)
     this.mask = bitDel(this.mask, cls.mask)
     // this.freeComponent(this.$components.get(cls))
     // this.$components.delete(cls)

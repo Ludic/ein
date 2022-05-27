@@ -11,9 +11,8 @@ interface ComponentStaticProps {
 type HiddenProperties = '_reset'|'_types'|'serialize'
 const HIDDEN_PROPERTIES = ['_reset','_types','serialize']
 
-export type ComponentInstance<C extends Component> = Omit<C, HiddenProperties>
-// export type ComponentData<C extends Component> = Omit<WritablePart<C>, HiddenProperties|keyof C['_types']>&C['_types']
-export type ComponentData<C extends Component> = C['_types'] extends null ? Omit<WritablePart<C>, HiddenProperties> : Omit<WritablePart<C>, HiddenProperties|keyof C['_types']>&C['_types']
+export type ComponentInstance<C extends Component> = Required<Omit<C, HiddenProperties>>
+export type ComponentData<C extends Component> = Omit<WritablePart<C>, HiddenProperties>
 
 export type GetComponent<C> = C extends ComponentConstructor<infer T> ? T : C
 
@@ -24,7 +23,6 @@ export class Component {
   static data: ComponentStaticProps['data'] = {}
 
   // hidden properties
-  declare _types: null|{[key: string]: any}
   _reset(data: any = {}): this {
     // NOTE: can this be optimized??
     Object.entries(data).forEach(([key, val])=>{
@@ -42,7 +40,5 @@ export class Component {
     }))
   }
 }
-
-// export const Component: ComponentConstructor&typeof ComponentInstance['data'] = ComponentInstance
 
 export type ComponentConstructor<T extends Component = Component> = Klass<T>&ComponentStaticProps;

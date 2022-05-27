@@ -9,6 +9,7 @@ export class EntityManager {
 
   engine: Engine
   pool: Pool<Entity>
+  freeQueue: Entity[] = []
 
   constructor(engine: Engine, allocate?: number){
     this.pool = new Pool(()=>new Entity(engine), allocate)
@@ -18,25 +19,20 @@ export class EntityManager {
   createEntity(name?: string): Entity {
     let entity = this.pool.get()
     entity.$reset(name)
-    this.addEntity(entity)
+    this.entities.add(entity)
     return entity
   }
 
-  private addEntity(entity: Entity){
-    this.entities.add(entity)
-    // this.idToEntity.set(entity.id, entity)
-    // this.getEntitiesForName(entity.name).add(entity)
-  }
-
   destroyEntity(entity: Entity){
-    this.removeEntity(entity)
-    this.pool.free(entity)
+    this.entities.delete(entity)
+    this.freeQueue.push(entity)
   }
 
-  private removeEntity(entity: Entity){
-    this.entities.delete(entity)
-    // this.idToEntity.delete(entity.id)
-    // this.nameToEntities.get(entity.name)?.delete(entity)
+  update(){
+    // empty the free queue and free each entity back to the pool
+    this.freeQueue.splice(0, this.freeQueue.length).forEach((ent)=>{
+      this.pool.free(ent)
+    })
   }
 
   // getEntitiesForName(name: string){

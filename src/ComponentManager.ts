@@ -42,7 +42,7 @@ export class ComponentManager {
   freeComponent<C extends Component>(instance: ComponentInstance<C>){
     const pool = this.pools.get(instance.constructor as ComponentConstructor)
     if(pool){
-      pool.free(instance as C)
+      pool.free(instance as unknown as C)
     }
   }
 

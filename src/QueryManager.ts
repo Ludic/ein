@@ -70,8 +70,8 @@ export class QueryManager {
     //     query.add(entity)
     //   }
     // })
+    query.reset()
     for(let entity of this.engine.entity_manager.entities){
-      query.reset()
       if(query.matches(entity)){
         query.add(entity)
       } else {
@@ -84,6 +84,7 @@ export class QueryManager {
   update(force: boolean = false){
     if(force){
       // force update all queries
+      // console.log('query manager : update', this.queries.size)
       this.queries.forEach((query)=>{
         this.updateQuery(query)
       })
@@ -97,11 +98,20 @@ export class QueryManager {
     }
   }
 
-  onComponentAdded<C extends Component>(entity: Entity, cls: ComponentConstructor, component: C){
+  // onComponentAdded<C extends Component>(entity: Entity, cls: ComponentConstructor, component: C){
+  //   this.queries.forEach((query)=>{
+  //     if(query.flush == 'immediate'){
+  //       console.log('on comp added', query)
+  //       this.updateQuery(query)
+  //     }
+  //   })
+  // }
+  onComponentRemoved<C extends Component>(entity: Entity<any>){
     this.queries.forEach((query)=>{
-      if(query.flush == 'immediate'){
-        console.log('on comp added', query)
-        this.updateQuery(query)
+      if(query.matches(entity)){
+        query.add(entity)
+      } else {
+        query.remove(entity)
       }
     })
   }

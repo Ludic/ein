@@ -26,4 +26,6 @@ export * from './reactivity'
 export { Pool } from './pool'
 export type { ObjectPoolFactory } from './pool'
 
+export { trackHandler } from './shared'
+
 export { default as VitePluginEin } from './hmr/plugin'

@@ -87,6 +87,7 @@ export class Query<All extends Component=Component> {
     // this.entities = []
   }
   reset(){
+    // console.log('reset query', this.removed.size)
     this.added.clear()
     this.removed.clear()
   }

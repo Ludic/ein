@@ -22,6 +22,9 @@ export class Engine {
 
   enabled: boolean
 
+  delta!: number
+  time!: number
+
   constructor(options: EngineOptions = {}){
     this.component_manager = new ComponentManager(this)
     this.entity_manager = new EntityManager(this, options?.entityAllocation ?? 1000)
@@ -56,7 +59,10 @@ export class Engine {
   }
 
   update(delta: number, time: number) {
+    this.delta = delta
+    this.time = time
     if(this.enabled){
+      // console.log('engine : update')
       this.query_manager.update(true)
       this.system_manager.update(delta, time)
       // this.system_manager.execute(delta, time, ()=>{
