@@ -3,11 +3,11 @@ import { Component, ComponentConstructor, ComponentData, ComponentInstance } fro
 import { EntityManager } from "./EntityManager"
 import { Engine } from "./Engine"
 import { bitDel, bitSet } from './Utils'
-import { COMPONENT_ENTITY_ID_MAP, ENTITY_ID_COMPONENT_MAP } from './shared'
+import { COMPONENT_ENTITY_ID_MAP, ENTITY_ID_COMPONENT_MAP, TAG_ENTITY_ID_MAP } from './shared'
 
 var next_id = 0
 
-export class Entity<All extends Component=Component> {
+export class Entity<All extends Component=any> {
   mask!: number
   id!: number
   active!: boolean
@@ -29,7 +29,7 @@ export class Entity<All extends Component=Component> {
   // addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
 
   
-  addComponent<C extends Component>(cls: ComponentConstructor<C>, data?: ComponentData<C>): this {
+  add<C extends Component>(cls: ComponentConstructor<C>, data?: ComponentData<C>): this {
     // this.engine.component_manager.addComponent(this, cls, ...data)
     const instance = this.engine.component_manager.getFreeComponent(cls, data)
 
@@ -51,7 +51,7 @@ export class Entity<All extends Component=Component> {
     return this
   }
 
-  removeComponent<C extends Component>(cls: ComponentConstructor<C>): this {
+  remove<C extends Component>(cls: ComponentConstructor<C>): this {
     // this.engine.component_manager.removeComponent(this, component_class)
     this.engine.query_manager.onComponentRemoved(this)
     this.mask = bitDel(this.mask, cls.mask)
@@ -64,13 +64,31 @@ export class Entity<All extends Component=Component> {
     return this
   }
 
-  getComponent<C extends Component>(cls: ComponentConstructor<C>): C extends All ? ComponentInstance<C> : ComponentInstance<C>|undefined {
+  get<C extends Component>(cls: ComponentConstructor<C>): C extends All ? ComponentInstance<C> : ComponentInstance<C>|undefined {
     // return this.$components.get(cls) as C
     return COMPONENT_ENTITY_ID_MAP.get(cls)?.get(this.id) as any
   }
 
-  hasComponent<C extends Component>(cls: ComponentConstructor<C>): boolean {
+  has<C extends Component>(cls: ComponentConstructor<C>): boolean {
     return !!COMPONENT_ENTITY_ID_MAP.get(cls)?.has(this.id)
+  }
+
+  tag(tag: string): this {
+    const entityIdSet = TAG_ENTITY_ID_MAP.get(tag) ?? new Set()
+    if(!TAG_ENTITY_ID_MAP.has(tag)){
+      TAG_ENTITY_ID_MAP.set(tag, entityIdSet)
+    }
+    entityIdSet.add(this.id)
+    return this
+  }
+
+  untag(tag: string): this {
+    TAG_ENTITY_ID_MAP.get(tag)?.delete(this.id)
+    return this
+  }
+
+  is(tag: string): boolean {
+    return TAG_ENTITY_ID_MAP.get(tag)?.has(this.id) ?? false
   }
 
   $reset(name: string = ''){
@@ -94,6 +112,10 @@ export class Entity<All extends Component=Component> {
       map.delete(this.id)
     })
     ENTITY_ID_COMPONENT_MAP.set(this.id, new Set())
+    // also clear tags
+    TAG_ENTITY_ID_MAP.forEach(tags => {
+      tags.delete(this.id)
+    })
   }
 
   serialize(){

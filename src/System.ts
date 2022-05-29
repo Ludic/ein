@@ -14,20 +14,19 @@ export class System {
 
   engine!: Engine
 
-  private timers!: Array<SystemTimer>
+  private timers: Set<SystemTimer> = new Set()
 
   constructor(priority: number = 0, enabled: boolean = true) {
     this.priority = priority
     this.enabled = enabled
-    this.timers = []
   }
 
   update(delta: number, time: number): void { }
 
   updateTimers(delta: number, time: number){
-    this.timers.slice().forEach((timer, ix)=>{
+    this.timers.forEach((timer)=>{
       if(time >= timer.end){
-        this.timers.splice(ix, 1)
+        this.timers.delete(timer)
         timer.handler()
       }
     })
@@ -43,12 +42,15 @@ export class System {
   }
   onRemoved(): void { }
 
-  setTimeout(handler: ()=>void, duration: number){
-    const timer = {
+  setTimeout(handler: ()=>void, duration: number): SystemTimerCancel {
+    const timer: SystemTimer = {
       handler,
       end: this.engine.time + duration
     }
-    this.timers.push(timer)
+    this.timers.add(timer)
+    return ()=>{
+      return this.timers.delete(timer)
+    }
   }
 
 }
@@ -57,3 +59,4 @@ interface SystemTimer {
   end: number
   handler: ()=>void
 }
+export type SystemTimerCancel = ()=>boolean

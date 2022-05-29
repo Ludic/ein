@@ -12,6 +12,11 @@ export const ENTITY_ID_COMPONENT_MAP: Map<
   Set<ComponentConstructor>
 > = new Map()
 
+export const TAG_ENTITY_ID_MAP: Map<
+  string,
+  Set<number>
+> = new Map()
+
 export const SYSTEM_QUERY_MAP: Map<
   System,
   Set<Query>
