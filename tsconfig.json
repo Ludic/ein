@@ -7,7 +7,7 @@
     "baseUrl": ".",
     "outDir": "dist/",
     "sourceMap": true,
-    "lib": ["esnext"],
+    "lib": ["esnext", "WebWorker", "DOM"],
     "declaration": true,
     "alwaysStrict": true,
     "noImplicitAny": true,

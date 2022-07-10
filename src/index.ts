@@ -28,4 +28,4 @@ export type { ObjectPoolFactory } from './pool'
 
 export { trackHandler } from './shared'
 
-export { default as VitePluginEin } from './hmr/plugin'
+// export { default as VitePluginEin } from './hmr/plugin'

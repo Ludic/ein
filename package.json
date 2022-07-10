@@ -31,6 +31,7 @@
     "dev:tsc": "tsc -w --emitDeclarationOnly",
     "build:tsc": "tsc",
     "build": "vite build",
+    "build:dev": "vite build --mode development",
     "bnt": "npm run build && npm run test",
     "examples": "run-p dev:es serve",
     "serve": "vite serve ./examples --config vite.config.js",
@@ -44,13 +45,14 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.7.1",
     "chai": "^4.3.6",
+    "mocha": "^10.0.0",
     "npm-run-all": "^4.1.5",
     "ts-mocha": "^8.0.0",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.3",
-    "vite": "^2.9.1"
+    "typescript": "^4.6.3"
   },
   "dependencies": {
-    "@vue/reactivity": "^3.2.4"
+    "@vue/reactivity": "^3.2.37",
+    "vite": "^2.9.13"
   }
 }

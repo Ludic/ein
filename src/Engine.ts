@@ -41,20 +41,50 @@ export class Engine {
   createEntity(name?: string): Entity {
     const entity = this.entity_manager.createEntity(name)
     this.query_manager.update()
+    if(import.meta.hot){
+      import.meta.hot.send('ein:create-entity', {
+        id: entity.id,
+      })
+    }
     return entity
   }
 
   destroyEntity(ent: Entity<any>){
+    const id = ent.id
     this.entity_manager.destroyEntity(ent)
     this.query_manager.onEntityRemoved(ent)
+    if(import.meta.hot){
+      import.meta.hot.send('ein:destroy-entity', {
+        id,
+      })
+    }
   }
 
   addSystem(system_klass: Klass<System>): System {
-    return this.system_manager.addSystem(system_klass)
+    const system = this.system_manager.addSystem(system_klass)
+    if(import.meta.hot){
+      import.meta.hot.send('ein:register-system', {
+        id: system_klass.__id,
+        name: system.constructor.name,
+        priority: system.priority,
+        order: system.order,
+        enabled: system.enabled,
+      })
+    }
+    return system
   }
 
   registerComponent<C extends Component>(component: ComponentConstructor<C>, allocate?: number): this {
     this.component_manager.registerComponent(component, allocate)
+    // emit this info to the ludic plugin
+    if(import.meta.hot){
+      import.meta.hot.send('ein:register-component', {
+        id: component.__id,
+        allocate,
+        name: component.name,
+        // keys: Object.keys(ctor),
+      })
+    }
     return this
   }
 

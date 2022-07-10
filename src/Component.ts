@@ -26,7 +26,8 @@ export class Component {
   _reset(data: any = {}): this {
     // NOTE: can this be optimized??
     Object.entries(data).forEach(([key, val])=>{
-      if(!HIDDEN_PROPERTIES.includes(key) && this.hasOwnProperty(key)){
+      //  && this.hasOwnProperty(key) - remove this from the if check here after upgrading vite??
+      if(!HIDDEN_PROPERTIES.includes(key)){
         // @ts-ignore
         this[key] = val
       }
