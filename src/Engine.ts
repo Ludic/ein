@@ -40,7 +40,8 @@ export class Engine {
 
   createEntity(name?: string): Entity {
     const entity = this.entity_manager.createEntity(name)
-    this.query_manager.update()
+    // this.query_manager.update()
+    this.query_manager.onEntityAdded(entity)
     if(import.meta.hot){
       import.meta.hot.send('ein:create-entity', {
         id: entity.id,
@@ -93,7 +94,7 @@ export class Engine {
     this.time = time
     if(this.enabled){
       // console.log('engine : update')
-      this.query_manager.update(true)
+      this.query_manager.update()
       this.system_manager.update(delta, time)
       // this.system_manager.execute(delta, time, ()=>{
       //   // after each system execute, update the queries that are pending updates

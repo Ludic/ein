@@ -2,7 +2,7 @@
 export type { Klass } from './Klass'
 
 export { Component } from './Component'
-export type { ComponentInstance, ComponentData, ComponentConstructor } from './Component'
+export type { ComponentInstance, ComponentData, ComponentConstructor, EntityComponents } from './Component'
 export { ComponentManager } from './ComponentManager'
 
 export { Entity } from './Entity'

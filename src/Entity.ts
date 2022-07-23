@@ -32,6 +32,7 @@ export class Entity<All extends Component=any> {
   add<C extends Component>(cls: ComponentConstructor<C>, data?: ComponentData<C>): this {
     // this.engine.component_manager.addComponent(this, cls, ...data)
     const instance = this.engine.component_manager.getFreeComponent(cls, data)
+    this.engine.query_manager.onComponentAdded(this, cls)
 
     this.mask = bitSet(this.mask, cls.mask)
     // this.$components.set(cls, instance)
@@ -64,7 +65,7 @@ export class Entity<All extends Component=any> {
     return this
   }
 
-  get<C extends Component>(cls: ComponentConstructor<C>): C extends All ? ComponentInstance<C> : ComponentInstance<C>|undefined {
+  get<C extends Component>(cls: ComponentConstructor<C>): C extends All ? ComponentInstance<C> : Required<ComponentInstance<C>>|undefined {
     // return this.$components.get(cls) as C
     return COMPONENT_ENTITY_ID_MAP.get(cls)?.get(this.id) as any
   }

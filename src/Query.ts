@@ -22,7 +22,9 @@ type QueryComponentOptions = {
 
 export type QueryOptions = QueryComponentOptions
 
-export type QueryEvent = 'added'|'removed'
+export type QueryEvent = 'added'|'removed'|'updated'
+export type QueryListener<C extends Component> = (entity: Entity<C>)=>void
+export type QueryListenerDispose = ()=>void
 
 export class Query<All extends Component=Component> {
   entities: Set<Entity<All>> = new Set()
@@ -36,6 +38,8 @@ export class Query<All extends Component=Component> {
   private readonly _any: number
   private readonly _all: number
   private readonly _none: number
+
+  private listeners = new Map<QueryEvent, Set<QueryListener<All>>>()
 
   // static isNameQuery(query: Query): query is Query<QueryOptionsByName> {
   //   return 'name' in query._options
@@ -69,13 +73,15 @@ export class Query<All extends Component=Component> {
   add(entity: Entity<any>){
     if(!this.entities.has(entity)){
       this.added.add(entity)
+      this.entities.add(entity)
+      this.notify('added', entity)
     }
-    this.entities.add(entity)
   }
 
   remove(entity: Entity<any>){
     if(this.entities.delete(entity)){
       this.removed.add(entity)
+      this.notify('removed', entity)
     }
   }
 
@@ -92,8 +98,35 @@ export class Query<All extends Component=Component> {
     this.removed.clear()
   }
 
-  on(event: QueryEvent, fn: ()=>void){
-    console.log('query.on', event)
+  update(entities: Set<Entity<All>>){
+    for(let entity of entities){
+      if(this.matches(entity)){
+        this.add(entity)
+      } else {
+        this.remove(entity)
+      }
+    }
+    this.notify('updated')
+  }
+
+  on(event: 'updated', fn: ()=>void): QueryListenerDispose
+  on(event: 'added', fn: QueryListener<All>): QueryListenerDispose
+  on(event: 'removed', fn: QueryListener<All>): QueryListenerDispose
+  on(event: QueryEvent, fn: QueryListener<All>): QueryListenerDispose {
+    // if(event === 'added'){
+    //   this.addedListeners.add(fn)
+    // } else if(event === 'removed') {
+    //   this.removedListeners.add(fn)
+    // }
+    const listeners = this.listeners.get(event) ?? this.listeners.set(event, new Set()).get(event)!
+    listeners.add(fn)
+    return ()=>{
+      listeners.delete(fn)
+    }
+  }
+
+  private notify(event: QueryEvent, entity?: Entity){
+    const listeners = this.listeners.get(event)?.forEach(fn => fn(entity!))
   }
 
 }

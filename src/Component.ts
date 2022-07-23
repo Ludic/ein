@@ -1,3 +1,4 @@
+import { Entity } from './Entity'
 import { Klass } from './Klass'
 import { WritablePart } from './Utils'
 
@@ -15,6 +16,7 @@ export type ComponentInstance<C extends Component> = Required<Omit<C, HiddenProp
 export type ComponentData<C extends Component> = Omit<WritablePart<C>, HiddenProperties>
 
 export type GetComponent<C> = C extends ComponentConstructor<infer T> ? T : C
+export type EntityComponents<E> = E extends Entity<infer C> ? C : never
 
 export class Component {
   static id: ComponentStaticProps['id'] = 0

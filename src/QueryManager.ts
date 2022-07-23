@@ -16,30 +16,12 @@ export class QueryManager {
   engine: Engine
 
   pendingUpdates: Set<ReactiveEffect> = new Set()
+  pendingEntities: Set<Entity> = new Set()
 
   constructor(engine: Engine){
     this.engine = engine
     // this.query_to_entities = new Map()
   }
-
-  // entitiesForQuery(query: Query): Entity[] {
-  //   if(this.query_to_entities.has(query)){
-  //     return this.query_to_entities.get(query)!
-  //   }
-  //   if(query.entity_name){
-  //     let entities: Entity[] | undefined = this.engine.entity_manager.name_to_entities[query.entity_name]
-  //     if(!!entities){
-  //       this.query_to_entities.set(query, entities)
-  //     } else {
-  //       this.engine.entity_manager.name_to_entities[query.entity_name] = []
-  //       entities = this.engine.entity_manager.name_to_entities[query.entity_name]
-  //       this.query_to_entities.set(query, entities!)
-  //     }
-  //     return entities!
-  //   } else {
-  //     return []
-  //   }
-  // }
 
   createQuery<C extends Component>(options: QueryOptions): Query<C> {
     const query = new Query(options)
@@ -64,62 +46,45 @@ export class QueryManager {
   }
 
   updateQuery(query: Query){
-    // query.clear()
-    // this.engine.entity_manager.entities.forEach((entity)=>{
+    query.reset()
+    query.update(this.pendingEntities)
+  }
+
+  update(){
+    this.queries.forEach((query)=>{
+      this.updateQuery(query)
+    })
+    this.pendingEntities.clear()
+  }
+
+  onComponentAdded<C extends Component>(entity: Entity, cls: ComponentConstructor<C>){
+    this.pendingEntities.add(entity)
+  }
+  onComponentRemoved(entity: Entity<any>){
+    this.pendingEntities.add(entity)
+    // this.queries.forEach((query)=>{
+    //   if(query.matches(entity)){
+    //     query.add(entity)
+    //   } else {
+    //     query.remove(entity)
+    //   }
+    // })
+  }
+
+  onEntityAdded(entity: Entity){
+    this.pendingEntities.add(entity)
+    // this.queries.forEach((query)=>{
     //   if(query.matches(entity)){
     //     query.add(entity)
     //   }
     // })
-    query.reset()
-    for(let entity of this.engine.entity_manager.entities){
-      if(query.matches(entity)){
-        query.add(entity)
-      } else {
-        // console.log('qm.update', 'remove', entity)
-        query.remove(entity)
-      }
-    }
   }
-
-  update(force: boolean = false){
-    if(force){
-      // force update all queries
-      // console.log('query manager : update', this.queries.size)
-      this.queries.forEach((query)=>{
-        this.updateQuery(query)
-      })
-    } else {
-      // console.log('querymanager.update', this.pendingUpdates.size)
-      this.pendingUpdates.forEach(job => {
-        // @ts-ignore
-        job()
-      })
-      this.pendingUpdates.clear()
-    }
-  }
-
-  // onComponentAdded<C extends Component>(entity: Entity, cls: ComponentConstructor, component: C){
-  //   this.queries.forEach((query)=>{
-  //     if(query.flush == 'immediate'){
-  //       console.log('on comp added', query)
-  //       this.updateQuery(query)
-  //     }
-  //   })
-  // }
-  onComponentRemoved<C extends Component>(entity: Entity<any>){
-    this.queries.forEach((query)=>{
-      if(query.matches(entity)){
-        query.add(entity)
-      } else {
-        query.remove(entity)
-      }
-    })
-  }
-
-  onEntityRemoved<C extends Component>(entity: Entity){
-    this.queries.forEach((query)=>{
-      query.remove(entity)
-    })
+  
+  onEntityRemoved(entity: Entity){
+    this.pendingEntities.add(entity)
+    // this.queries.forEach((query)=>{
+    //   query.remove(entity)
+    // })
   }
 
 }
