@@ -69,6 +69,7 @@ function reloadSystem(id: string, systemClass: Klass<System>){
       // new one with the same order
       ENGINE.system_manager.removeSystem(cfg.instance)
       ENGINE.system_manager.addSystem(systemClass, cfg.instance.order)
+      console.log('reload system', id)
     }
   }
 }

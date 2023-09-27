@@ -37,12 +37,14 @@ export function bitShift(count: number){
   return 1 << count
 }
 
-export function bitSet(num: number, bit: number){
-  return num | bit
+export function bitSet(num: number, ...bits: number[]): number {
+  // return num | bit
+  return bits.reduce((agg, bit)=>agg|bit, num)
 }
 
-export function bitDel(num: number, bit: number){
-  return num & ~bit
+export function bitDel(num: number, ...bits: number[]){
+  // return num & ~bit
+  return bits.reduce((agg, bit)=>agg & ~bit, num)
 }
 
 export function bitMask(num1: number, num2: number){

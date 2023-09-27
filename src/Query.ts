@@ -100,7 +100,7 @@ export class Query<All extends Component=Component> {
 
   update(entities: Set<Entity<All>>){
     for(let entity of entities){
-      if(this.matches(entity)){
+      if(entity.active && this.matches(entity)){
         this.add(entity)
       } else {
         this.remove(entity)

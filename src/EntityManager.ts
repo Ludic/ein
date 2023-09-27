@@ -4,6 +4,7 @@ import Pool from './pool'
 
 export class EntityManager {
   entities: Set<Entity> = new Set()
+  idToEntity: Map<number, Entity> = new Map()
   // nameToEntities: Map<string, Set<Entity>> = reactive(new Map())
   // idToEntity: Map<number, Entity> = shallowReactive(new Map())
 
@@ -20,17 +21,20 @@ export class EntityManager {
     let entity = this.pool.get()
     entity.$reset(name)
     this.entities.add(entity)
+    this.idToEntity.set(entity.id, entity)
     return entity
   }
 
   destroyEntity(entity: Entity){
-    this.entities.delete(entity)
+    entity.active = false
     this.freeQueue.push(entity)
   }
 
   update(){
     // empty the free queue and free each entity back to the pool
     this.freeQueue.splice(0, this.freeQueue.length).forEach((ent)=>{
+      this.entities.delete(ent)
+      this.idToEntity.delete(ent.id)
       this.pool.free(ent)
     })
   }

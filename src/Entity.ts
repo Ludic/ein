@@ -4,6 +4,7 @@ import { EntityManager } from "./EntityManager"
 import { Engine } from "./Engine"
 import { bitDel, bitSet } from './Utils'
 import { COMPONENT_ENTITY_ID_MAP, ENTITY_ID_COMPONENT_MAP, TAG_ENTITY_ID_MAP } from './shared'
+import { EntityComponents } from '.'
 
 var next_id = 0
 
@@ -70,7 +71,7 @@ export class Entity<All extends Component=any> {
     return COMPONENT_ENTITY_ID_MAP.get(cls)?.get(this.id) as any
   }
 
-  has<C extends Component>(cls: ComponentConstructor<C>): boolean {
+  has<C extends Component>(cls: ComponentConstructor<C>): this is Entity<All|C> {
     return !!COMPONENT_ENTITY_ID_MAP.get(cls)?.has(this.id)
   }
 
@@ -132,6 +133,11 @@ export class Entity<All extends Component=any> {
       id: this.id,
       components: obj,
     }
+  }
+
+
+  static has<C extends Component, A extends Component, E extends Entity<A>>(entity: E|Entity<A>|Entity<A|C>, cls: ComponentConstructor<C>): entity is Entity<A|C> {
+    return entity.has(cls)
   }
 
 }

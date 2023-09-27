@@ -50,6 +50,10 @@ export class Engine {
     return entity
   }
 
+  getEntity(id: number): Entity|undefined {
+    return this.entity_manager.idToEntity.get(id)
+  }
+
   destroyEntity(ent: Entity<any>){
     const id = ent.id
     this.entity_manager.destroyEntity(ent)
