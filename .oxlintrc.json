@@ -6,7 +6,9 @@
     "suspicious": "warn"
   },
   "rules": {
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "no-underscore-dangle": "off",
+    "typescript/no-extraneous-class": "off"
   },
   "ignorePatterns": ["dist/", "node_modules/", "coverage/"]
 }

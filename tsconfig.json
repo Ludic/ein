@@ -2,7 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "isolatedDeclarations": false,
+    "isolatedDeclarations": true,
     "declaration": true,
     "declarationMap": true
   },
