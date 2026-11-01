@@ -14,7 +14,8 @@ export interface EngineOptions {
    * When queries pick up structural changes during `update()`.
    * `'frame'` (default): once, before the first system runs.
    * `'system'`: additionally after every system, so later systems see what
-   * earlier ones added or removed in the same frame.
+   * earlier ones added or removed in the same frame. Query `added`/`removed`
+   * lists stay per frame in both modes.
    */
   flush?: 'frame' | 'system'
   /** Initial number of entity slots to allocate. */
@@ -113,6 +114,7 @@ export class Engine {
     this.events.emit('update:start', delta, time)
     this.queries._beginFrame()
     this.flush()
+    this.queries._beginSystems()
     const systems = this.systems.list
     const perSystem = this.flushMode === 'system'
     for (let i = 0; i < systems.length; i++) {

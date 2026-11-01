@@ -8,12 +8,13 @@ A ground-up rewrite. The npm `latest` tag previously pointed at an unrelated
 
 ### Breaking changes
 
-- ESM only, Node 22.12 or newer for tooling. `main`/`module`/UMD builds are gone;
-  the `exports` map has `types` conditions for every entry.
+- ESM only. `main`/`module`/UMD builds are gone; the `exports` map has `types`
+  conditions for every entry. Developing the library needs Node 22.12 or newer.
 - Manager fields are camelCase: `engine.entities`, `engine.components`,
   `engine.systems`, `engine.queries` (were `entity_manager` and friends).
 - `entity.active` is `entity.alive`. Destroyed entities are released on the next
-  flush and their storage slot is recycled; a stale handle stays dead.
+  flush and their storage slot is recycled; a stale handle stays dead and reads
+  as empty.
 - `query.entities`, `query.added` and `query.removed` are arrays, not sets, and
   `entities` is unordered. Queries are iterable.
 - Systems no longer take constructor arguments. Set `priority`/`enabled` as
@@ -36,7 +37,8 @@ A ground-up rewrite. The npm `latest` tag previously pointed at an unrelated
 - Tags are queryable: `createQuery({ all: [Position, 'enemy'] })`.
 - Typed entities: `entity.add(A)` returns `Entity<A>` with a non-nullable
   `get(A)`; `has()` narrows; query entity types are inferred from `all`.
-- `Engine` option `flush: 'frame' | 'system'`, and `engine.flush()`.
+- `Engine` option `flush: 'frame' | 'system'`, and `engine.flush()`. Query
+  `added`/`removed` are per frame and identical for every system.
 - Query `updated` event, `dispose()`, `first`, `size`, `has()`, `matches()`.
 - Plain functions as systems, `System.query()`, `systems.get(Class)`.
 - Typed `engine.events` for tooling.

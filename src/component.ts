@@ -189,15 +189,17 @@ export class ComponentManager implements Iterable<ComponentInfo> {
   /**
    * Swap the class behind a registered component type, keeping its id, name and
    * options. Existing instances are re-created from the new class with their
-   * fields copied over, so queries and entities are unaffected. Used by hot
-   * module replacement.
+   * fields copied over, so queries and entities are unaffected. The previous
+   * class keeps resolving to the same store, so code that still holds it works
+   * too. Used by hot module replacement. Returns the existing info, unchanged,
+   * when `next` already backs `prev`.
    */
   replace<T extends object>(prev: ComponentType, next: ComponentType<T>): ComponentInfo<T> {
     const old = this.stores.get(prev)
     if (!old) throw new Error('ein: cannot replace a component type that is not registered')
-    if ((prev as ComponentType) === next) return old.info as ComponentInfo<T>
-    if (this.stores.has(next))
-      throw new Error('ein: the replacement component type is already registered')
+    const current = this.stores.get(next)
+    if (current === old) return old.info as ComponentInfo<T>
+    if (current) throw new Error('ein: the replacement component type is already registered')
     const info: ComponentInfo<T> = {
       type: next,
       id: old.info.id,
@@ -212,7 +214,10 @@ export class ComponentManager implements Iterable<ComponentInfo> {
       Object.assign(fresh, instance)
       store.attach(slot, fresh)
     }
-    this.stores.delete(prev)
+    // Every class that resolved to the old store, including earlier replacements, now
+    // resolves to the new one: modules that still import an old class keep working.
+    for (const [type, s] of this.stores)
+      if (s === old) this.stores.set(type, store as ComponentStore)
     this.stores.set(next, store as ComponentStore)
     this.storesById[info.id] = store as ComponentStore
     this.byName.set(info.name, store as ComponentStore)
@@ -220,7 +225,6 @@ export class ComponentManager implements Iterable<ComponentInfo> {
     const tagName = this.tagNames.get(prev)
     if (tagName !== undefined) {
       this.tags.set(tagName, next as ComponentType<Tag>)
-      this.tagNames.delete(prev)
       this.tagNames.set(next, tagName)
     }
     this.engine.events.emit('component:replaced', old.info, info)
@@ -252,6 +256,7 @@ export class ComponentManager implements Iterable<ComponentInfo> {
     return this.byName.get(name)?.info
   }
 
+  /** Whether a type is registered. Stays true for classes swapped out by `replace()`. */
   has(type: ComponentType): boolean {
     return this.stores.has(type)
   }

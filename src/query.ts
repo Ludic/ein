@@ -35,9 +35,14 @@ export type QueryEvents<T extends object> = {
 export class Query<T extends object = never> implements Iterable<Entity<T>> {
   readonly engine: Engine
   readonly entities: Entity<T>[] = []
-  /** Entities that joined since the last frame the systems processed. */
+  /**
+   * Entities that joined since the previous frame. The list is the same for every
+   * system in a frame: changes applied by a flush while systems are running (with
+   * `flush: 'system'`, or `engine.flush()` called from a system) appear from the
+   * next frame on, so every system sees each entry exactly once.
+   */
   readonly added: Entity<T>[] = []
-  /** Entities that left since the last frame the systems processed. */
+  /** Entities that left since the previous frame. See `added`. */
   readonly removed: Entity<T>[] = []
 
   private readonly allIds: number[]
@@ -48,6 +53,9 @@ export class Query<T extends object = never> implements Iterable<Entity<T>> {
   private none!: Uint32Array
   private readonly events = new Emitter<QueryEvents<T>>()
   private positions = new Int32Array(0)
+  /** Diff entries held back until the next frame begins. */
+  private readonly stagedAdded: Entity<T>[] = []
+  private readonly stagedRemoved: Entity<T>[] = []
   private addedSeen: number = 0
   private removedSeen: number = 0
   private changed: boolean = false
@@ -84,7 +92,11 @@ export class Query<T extends object = never> implements Iterable<Entity<T>> {
   }
 
   has(entity: Entity): boolean {
-    return entity.index < this.positions.length && this.positions[entity.index]! >= 0
+    return (
+      !entity._released &&
+      entity.index < this.positions.length &&
+      this.positions[entity.index]! >= 0
+    )
   }
 
   /** Whether an entity's current components match, regardless of flush state. */
@@ -117,12 +129,14 @@ export class Query<T extends object = never> implements Iterable<Entity<T>> {
     this.entities.length = 0
     this.added.length = 0
     this.removed.length = 0
+    this.stagedAdded.length = 0
+    this.stagedRemoved.length = 0
     this.positions = new Int32Array(0)
     this.events.clear()
   }
 
-  /** @internal */
-  _evaluate(entity: Entity): void {
+  /** @internal Re-evaluate one entity. With `stage`, its diff entry waits for the next frame. */
+  _evaluate(entity: Entity, stage: boolean): void {
     const slot = entity.index
     const present = this.has(entity)
     const match = this.matches(entity)
@@ -130,7 +144,8 @@ export class Query<T extends object = never> implements Iterable<Entity<T>> {
       this.ensure(slot)
       this.positions[slot] = this.entities.length
       this.entities.push(entity as Entity<T>)
-      this.added.push(entity as Entity<T>)
+      const added = stage ? this.stagedAdded : this.added
+      added.push(entity as Entity<T>)
       this.changed = true
       this.events.emit('added', entity as Entity<T>)
     } else if (!match && present) {
@@ -141,7 +156,8 @@ export class Query<T extends object = never> implements Iterable<Entity<T>> {
         this.positions[last.index] = pos
       }
       this.positions[slot] = -1
-      this.removed.push(entity as Entity<T>)
+      const removed = stage ? this.stagedRemoved : this.removed
+      removed.push(entity as Entity<T>)
       this.changed = true
       this.events.emit('removed', entity as Entity<T>)
     }
@@ -154,7 +170,7 @@ export class Query<T extends object = never> implements Iterable<Entity<T>> {
     this.events.emit('updated')
   }
 
-  /** @internal Drop the diff entries the previous frame already processed. */
+  /** @internal Drop the diff entries the previous frame processed, then surface the held-back ones. */
   _beginFrame(): void {
     if (this.addedSeen > 0) {
       this.added.splice(0, this.addedSeen)
@@ -164,6 +180,8 @@ export class Query<T extends object = never> implements Iterable<Entity<T>> {
       this.removed.splice(0, this.removedSeen)
       this.removedSeen = 0
     }
+    moveAll(this.stagedAdded, this.added)
+    moveAll(this.stagedRemoved, this.removed)
   }
 
   /** @internal */
@@ -189,10 +207,18 @@ export class Query<T extends object = never> implements Iterable<Entity<T>> {
   }
 }
 
+function moveAll<T>(from: T[], to: T[]): void {
+  if (from.length === 0) return
+  for (const item of from) to.push(item)
+  from.length = 0
+}
+
 export class QueryManager implements Iterable<Query> {
   readonly engine: Engine
   private readonly queries = new Set<Query>()
   private readonly dirty = new Set<Entity>()
+  /** True while systems run: diff entries are held back until the next frame. */
+  private staging: boolean = false
 
   constructor(engine: Engine) {
     this.engine = engine
@@ -206,7 +232,7 @@ export class QueryManager implements Iterable<Query> {
     options: QueryOptions<A>,
   ): Query<QueryComponents<A>> {
     const query = new Query<QueryComponents<A>>(this.engine, options)
-    for (const entity of this.engine.entities) query._evaluate(entity)
+    for (const entity of this.engine.entities) query._evaluate(entity, this.staging)
     query._finishFlush()
     this.queries.add(query)
     this.engine.events.emit('query:created', query)
@@ -240,20 +266,27 @@ export class QueryManager implements Iterable<Query> {
   _flush(): boolean {
     if (this.dirty.size === 0) return false
     for (const entity of this.dirty) {
-      for (const query of this.queries) query._evaluate(entity)
+      for (const query of this.queries) query._evaluate(entity, this.staging)
     }
     this.dirty.clear()
     for (const query of this.queries) query._finishFlush()
     return true
   }
 
-  /** @internal */
+  /** @internal Start a frame: entries the previous frame processed are dropped, held-back ones surface. */
   _beginFrame(): void {
+    this.staging = false
     for (const query of this.queries) query._beginFrame()
+  }
+
+  /** @internal After the frame-start flush: later flushes in this frame hold their diffs back. */
+  _beginSystems(): void {
+    this.staging = true
   }
 
   /** @internal */
   _endFrame(): void {
+    this.staging = false
     for (const query of this.queries) query._endFrame()
   }
 

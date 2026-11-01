@@ -15,6 +15,11 @@ export interface EntitySnapshot {
  * this entity is known to have; `get()` is non-nullable for those. `K` grows
  * through `add()` and the `has()` type guard, and any `Entity<K>` is assignable
  * to a plain `Entity`.
+ *
+ * A destroyed entity stays readable until the next flush, so listeners can see
+ * what is going away. Once the engine has released it the handle is inert: reads
+ * return nothing and `remove()` does nothing, even though its storage slot may
+ * already belong to a new entity.
  */
 export class Entity<K extends object = never> {
   /**
@@ -28,8 +33,10 @@ export class Entity<K extends object = never> {
   readonly index: number
   readonly engine: Engine
   name: string
-  /** @internal */
+  /** @internal False after `destroy()`. */
   _alive: boolean = true
+  /** @internal True once the engine has released the components and the slot. */
+  _released: boolean = false
 
   constructor(engine: Engine, id: number, index: number, name: string) {
     this.engine = engine
@@ -48,13 +55,13 @@ export class Entity<K extends object = never> {
    * Adding a component the entity already has only assigns `data`.
    */
   add<T extends object>(type: ComponentType<T>, data?: ComponentData<T>): Entity<K | T> {
+    if (!this._alive) throw new Error('ein: cannot add a component to a destroyed entity')
     const store = this.engine.components.store(type)
     const existing = store.get(this.index)
     if (existing !== undefined) {
       if (data !== undefined) Object.assign(existing, data)
       return this as unknown as Entity<K | T>
     }
-    if (!this._alive) throw new Error('ein: cannot add a component to a destroyed entity')
     const instance = store.acquire(data)
     store.attach(this.index, instance)
     this.engine.masks.set(this.index, store.info.id)
@@ -65,6 +72,7 @@ export class Entity<K extends object = never> {
 
   /** Remove a component. The instance stays readable until the next flush. */
   remove<T extends object>(type: ComponentType<T>): Entity<Exclude<K, T>> {
+    if (this._released) return this as unknown as Entity<Exclude<K, T>>
     const store = this.engine.components.find(type)
     const instance = store?.detach(this.index)
     if (store && instance !== undefined) {
@@ -78,12 +86,12 @@ export class Entity<K extends object = never> {
 
   /** Get a component. Non-nullable when `T` is one of the known components `K`. */
   get<T extends object>(type: ComponentType<T>): T | ([T] extends [K] ? never : undefined) {
-    return this.engine.components.find(type)?.get(this.index) as
-      T | ([T] extends [K] ? never : undefined)
+    const instance = this._released ? undefined : this.engine.components.find(type)?.get(this.index)
+    return instance as T | ([T] extends [K] ? never : undefined)
   }
 
   has<T extends object>(type: ComponentType<T>): this is Entity<K | T> {
-    return this.engine.components.find(type)?.has(this.index) ?? false
+    return !this._released && (this.engine.components.find(type)?.has(this.index) ?? false)
   }
 
   /** Add a string tag. Tags are zero-field components, so queries can use them. */
@@ -106,7 +114,7 @@ export class Entity<K extends object = never> {
   /** The entity's tags. */
   get tags(): string[] {
     const out: string[] = []
-    for (const id of this.engine.masks.bits(this.index)) {
+    for (const id of this.bits()) {
       const info = this.engine.components.getById(id)
       if (info?.isTag) out.push(this.engine.components.tagName(info.type)!)
     }
@@ -116,7 +124,7 @@ export class Entity<K extends object = never> {
   /** The component types the entity currently has, tags excluded. */
   types(): ComponentType[] {
     const out: ComponentType[] = []
-    for (const id of this.engine.masks.bits(this.index)) {
+    for (const id of this.bits()) {
       const info = this.engine.components.getById(id)
       if (info && !info.isTag) out.push(info.type)
     }
@@ -130,7 +138,7 @@ export class Entity<K extends object = never> {
   serialize(): EntitySnapshot {
     const components: Record<string, ComponentSnapshot> = {}
     const tags: string[] = []
-    for (const id of this.engine.masks.bits(this.index)) {
+    for (const id of this.bits()) {
       const store = this.engine.components._storeById(id)
       if (!store) continue
       if (store.info.isTag) {
@@ -141,5 +149,10 @@ export class Entity<K extends object = never> {
       }
     }
     return { id: this.id, name: this.name, tags, components }
+  }
+
+  /** The component bits set for this entity; none once released. */
+  private bits(): number[] {
+    return this._released ? [] : this.engine.masks.bits(this.index)
   }
 }

@@ -81,7 +81,9 @@ e.destroy() // alive becomes false; released on the next flush
 
 `id` is unique for the lifetime of the engine. `index` is the storage slot and
 is recycled after destruction. Adding a component the entity already has only
-assigns the data. Removed components stay readable until the next flush.
+assigns the data. Removed components stay readable until the next flush, and so
+is a destroyed entity; after that flush its handle is inert and reads as empty,
+even once a new entity occupies the slot.
 
 ### Components
 
@@ -120,10 +122,12 @@ q.dispose()
 
 Membership changes when the engine flushes, not when components change. By
 default that happens once at the start of `update()`, so every system sees the
-same membership and the same `added`/`removed` lists for the whole frame. With
-`new Engine({ flush: 'system' })` the engine also flushes after each system, so
-later systems see what earlier ones changed. `engine.flush()` applies pending
-changes immediately, for example after setup.
+same membership for the whole frame. With `new Engine({ flush: 'system' })` the
+engine also flushes after each system, so later systems see what earlier ones
+changed. `added` and `removed` are per frame in both modes: they hold the
+changes since the previous frame and are identical for every system, so a change
+flushed while systems are running shows up in them from the next frame on.
+`engine.flush()` applies pending changes immediately, for example after setup.
 
 ### Systems
 
@@ -216,6 +220,8 @@ module that creates the engine is not re-run.
 | components pooled by default            | `registerComponent(T, { pool: n })`                |
 
 ## Development
+
+Node 22.12 or newer.
 
 ```sh
 npm install

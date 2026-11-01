@@ -78,6 +78,7 @@ export class EntityManager implements Iterable<Entity> {
         }
       }
       masks.reset(entity.index)
+      entity._released = true
       this.byId.delete(entity.id)
       this.bySlot[entity.index] = undefined
       this.freeSlots.push(entity.index)

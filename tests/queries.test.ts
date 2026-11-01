@@ -213,3 +213,69 @@ describe('queries', () => {
     })
   })
 })
+
+describe('query diffs across frames', () => {
+  class Spawner extends System {
+    override update(): void {
+      this.engine.createEntity().add(Position)
+    }
+  }
+  function observe(engine: Engine): { before: number[]; after: number[]; size: () => number } {
+    const q = engine.createQuery({ all: [Position] })
+    const before: number[] = []
+    const after: number[] = []
+    engine.addSystem(() => before.push(q.added.length))
+    engine.addSystem(Spawner)
+    engine.addSystem(() => after.push(q.added.length))
+    return { before, after, size: () => q.size }
+  }
+
+  it.each(['frame', 'system'] as const)(
+    '%s: every system sees each added entity exactly once, from the next frame',
+    (flush) => {
+      const engine = new Engine({ flush })
+      const { before, after, size } = observe(engine)
+      engine.update(0, 0)
+      engine.update(0, 0)
+      engine.update(0, 0)
+      expect(before).toEqual([0, 1, 1])
+      expect(after).toEqual([0, 1, 1])
+      engine.flush()
+      expect(size()).toBe(3)
+    },
+  )
+
+  it('holds back diffs from a flush inside a system until the next frame', () => {
+    const engine = new Engine()
+    const q = engine.createQuery({ all: [Position] })
+    const seen: Array<[size: number, added: number]> = []
+    engine.addSystem(() => {
+      engine.createEntity().add(Position)
+      engine.flush()
+    })
+    engine.addSystem(() => seen.push([q.size, q.added.length]))
+    engine.update(0, 0)
+    engine.update(0, 0)
+    expect(seen).toEqual([
+      [1, 0],
+      [2, 1],
+    ])
+  })
+
+  it('system: removals made by a system reach every system next frame', () => {
+    const engine = new Engine({ flush: 'system' })
+    const q = engine.createQuery({ all: [Position] })
+    const e = engine.createEntity().add(Position)
+    const seen: number[] = []
+    engine.addSystem(() => seen.push(q.removed.length))
+    engine.addSystem(() => {
+      if (e.alive) e.destroy()
+    })
+    engine.addSystem(() => seen.push(q.removed.length))
+    engine.update(0, 0)
+    engine.update(0, 0)
+    engine.update(0, 0)
+    expect(seen).toEqual([0, 0, 1, 1, 0, 0])
+    expect(q.size).toBe(0)
+  })
+})

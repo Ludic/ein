@@ -51,9 +51,8 @@ export function createHmrRuntime(): HmrRuntime {
   const replaceComponent = (prev: ComponentType, next: ComponentType): number => {
     let count = 0
     for (const engine of engines) {
-      if (!engine.components.has(prev)) continue
-      engine.components.replace(prev, next)
-      count++
+      const before = engine.components.get(prev)
+      if (before && engine.components.replace(prev, next) !== before) count++
     }
     return count
   }

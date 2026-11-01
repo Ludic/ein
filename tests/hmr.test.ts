@@ -63,8 +63,12 @@ describe('hmr runtime', () => {
       z = 9
     }
     expect(runtime.reload({ Position }, { Position: Position2 })).toBe(1)
-    expect(engine.components.has(Position)).toBe(false)
+    // Modules that still import the old class keep working: it resolves to the new store.
+    expect(engine.components.has(Position)).toBe(true)
+    expect(engine.components.get(Position)!.type).toBe(Position2)
     expect(engine.components.get(Position2)).toMatchObject({ id, name: 'Position' })
+    expect(e.get(Position)).toBe(e.get(Position2))
+    expect(runtime.reload({ Position }, { Position: Position2 })).toBe(0)
     expect(e.has(Position2)).toBe(true)
     expect(e.get(Position2)).toMatchObject({ x: 3, y: 4, z: 9 })
     expect(e.get(Position2)).toBeInstanceOf(Position2)
@@ -74,7 +78,18 @@ describe('hmr runtime', () => {
     engine.update(0, 0)
     expect(q.has(later)).toBe(true)
     expect(e.serialize().components['Position']).toEqual({ x: 3, y: 4, z: 9 })
-    expect(runtime.reload({ Position }, { Position: Position2 })).toBe(0)
+
+    class Position3 {
+      x = 0
+      y = 0
+      z = 0
+      w = 1
+    }
+    expect(runtime.reload({ Position: Position2 }, { Position: Position3 })).toBe(1)
+    expect(e.get(Position)).toBeInstanceOf(Position3)
+    expect(e.get(Position)).toMatchObject({ x: 3, y: 4, z: 9, w: 1 })
+    expect(engine.createEntity().add(Position).get(Position)).toBeInstanceOf(Position3)
+    expect(runtime.reload({ Position: Position2 }, { Position: Position3 })).toBe(0)
   })
 
   it('ignores engines after they unregister', () => {
