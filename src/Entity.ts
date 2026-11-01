@@ -1,10 +1,11 @@
-import { Klass } from "./Klass"
-import { Component, ComponentConstructor, ComponentData, ComponentInstance } from "./Component"
+import type { Klass } from "./Klass"
+import { Component } from "./Component"
+import type { ComponentConstructor, ComponentData, ComponentInstance } from "./Component"
 import { EntityManager } from "./EntityManager"
 import { Engine } from "./Engine"
 import { bitDel, bitSet } from './Utils'
 import { COMPONENT_ENTITY_ID_MAP, ENTITY_ID_COMPONENT_MAP, TAG_ENTITY_ID_MAP } from './shared'
-import { EntityComponents } from '.'
+import type { EntityComponents } from './Component'
 
 var next_id = 0
 

@@ -1,10 +1,10 @@
-import { Klass } from './Klass'
-import { Component, ComponentConstructor } from './Component'
+import type { Klass } from './Klass'
+import { Component } from './Component'
+import type { ComponentConstructor } from './Component'
 import { Entity } from './Entity'
 import { bitSet, bitMask } from './Utils'
-import { ComponentInstance } from 'src'
-import { ReactiveEffectRunner } from '@vue/reactivity'
-
+import type { ComponentInstance } from './Component'
+import type { ReactiveEffectRunner } from '@vue/reactivity'
 // TODO, add things like all_component_classes, changed_components, etc
 // export interface Query {
 //   entity_name?: string

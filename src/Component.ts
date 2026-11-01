@@ -1,7 +1,6 @@
 import { Entity } from './Entity'
-import { Klass } from './Klass'
-import { WritablePart } from './Utils'
-
+import type { Klass } from './Klass'
+import type { WritablePart } from './Utils'
 interface ComponentStaticProps {
   id: number
   mask: number

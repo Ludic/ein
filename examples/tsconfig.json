@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "..",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "paths": {
+      "@ludic/ein": ["../src/index.ts"],
+      "@ludic/ein/reactivity": ["../src/reactivity/index.ts"],
+      "@ludic/ein/vite": ["../src/vite/index.ts"],
+      "@ludic/ein/hmr": ["../src/hmr/index.ts"]
+    }
+  },
+  "include": ["../src", "."]
+}

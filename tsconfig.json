@@ -1,25 +1,10 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "strict": true,
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "baseUrl": ".",
-    "outDir": "dist/",
-    "sourceMap": true,
-    "lib": ["esnext", "WebWorker", "DOM"],
+    "rootDir": "src",
+    "isolatedDeclarations": false,
     "declaration": true,
-    "alwaysStrict": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "esModuleInterop": true,
-    "strictNullChecks": true,
-    "skipLibCheck": true
+    "declarationMap": true
   },
-  "types": [
-    "vite/client"
-  ],
-  "include": [
-    "src/**/*.ts", "src/**/*.d.ts"
-  ]
+  "include": ["src"]
 }

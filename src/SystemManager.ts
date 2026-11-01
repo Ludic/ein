@@ -1,11 +1,9 @@
-import { Klass } from './Klass'
+import type { Klass } from './Klass'
 import { System } from './System'
 import { Engine } from './Engine'
 import { performance } from './Utils'
 import { registerSystem } from './hmr/hmr'
 import { trackSystem, SYSTEM_HANDLER_MAP, callHandlers } from './shared'
-
-
 export class SystemManager {
   engine: Engine
   systems: System[]
@@ -14,7 +12,7 @@ export class SystemManager {
     this.engine = engine
     this.systems = []
 
-    // if(import.meta.env.DEV){
+    // if(import.meta.env?.DEV){
     //   if(import.meta.hot){
     //     import.meta.hot.on('ludic:register-system', (data)=>{
     //       console.log('on ludic:register-system', data)
@@ -38,7 +36,7 @@ export class SystemManager {
     this.systems.push(system)
     this.sortSystems()
 
-    if(import.meta.env.DEV){
+    if(import.meta.env?.DEV){
       registerSystem(system)
     }
 

@@ -1,9 +1,9 @@
-import { Component, ComponentConstructor } from '../Component'
+import { Component } from '../Component'
+import type { ComponentConstructor } from '../Component'
 import { COMPONENT_ENTITY_ID_MAP, SYSTEM_QUERY_MAP } from '../shared'
 import { Engine } from '../Engine'
-import { Klass } from '../Klass'
+import type { Klass } from '../Klass'
 import { System } from '../System'
-
 let _globalThis: any
 export const getGlobalThis = (): any => {
   return (
@@ -26,7 +26,7 @@ export interface EinHMRRuntime {
   reloadComponent: typeof reloadComponent
 }
 
-if(import.meta.env.DEV){
+if(import.meta.env?.DEV){
   getGlobalThis().__EIN_HMR_RUNTIME__ = {
     reloadSystem: tryWrap(reloadSystem),
     reloadComponent: tryWrap(reloadComponent),

@@ -1,7 +1,5 @@
-/// <reference path="../../node_modules/vite/client.d.ts" />
-import { PluginOption } from 'vite'
+import type { PluginOption } from 'vite'
 import { transformSystem } from './systemTransform'
-
 export default function(): PluginOption {
   console.log('ludic plugin')
 

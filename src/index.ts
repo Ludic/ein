@@ -1,4 +1,3 @@
-/// <reference path="../node_modules/vite/client.d.ts" />
 export type { Klass } from './Klass'
 
 export { Component } from './Component'

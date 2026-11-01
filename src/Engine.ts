@@ -1,15 +1,16 @@
-import { QueryOptions, Query } from './Query'
+import { Query } from './Query'
+import type { QueryOptions } from './Query'
 import { ComponentManager } from './ComponentManager'
 import { EntityManager } from './EntityManager'
 import { SystemManager } from './SystemManager'
 import { QueryManager } from './QueryManager'
 import { Entity } from './Entity'
-import { Klass } from './Klass'
+import type { Klass } from './Klass'
 import { System } from './System'
-import { Component, ComponentConstructor, ComponentData, GetComponent } from './Component'
+import { Component } from './Component'
+import type { ComponentConstructor, ComponentData, GetComponent } from './Component'
 import { performance } from './Utils'
 import { registerSystem, registerEngine } from './hmr/hmr'
-
 export interface EngineOptions {
   entityAllocation?: number
 }
@@ -33,7 +34,7 @@ export class Engine {
 
     this.enabled = true
 
-    if(import.meta.env.DEV){
+    if(import.meta.env?.DEV){
       registerEngine(this)
     }
   }

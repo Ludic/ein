@@ -1,58 +1,91 @@
 {
   "name": "@ludic/ein",
-  "version": "1.0.2",
-  "description": "Entity Component System",
-  "main": "dist/ein.umd.js",
-  "module": "dist/ein.es.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "README*"
+  "version": "2.0.0",
+  "description": "A small, strongly typed Entity Component System for games",
+  "keywords": [
+    "ecs",
+    "entity-component-system",
+    "game",
+    "gamedev",
+    "typescript"
   ],
+  "license": "ISC",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ludic/ein.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "directories": {
-    "example": "example"
+  "homepage": "https://github.com/Ludic/ein#readme",
+  "bugs": {
+    "url": "https://github.com/Ludic/ein/issues"
   },
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "exports": {
     ".": {
-      "import": "./dist/ein.es.js",
-      "require": "./dist/ein.umd.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./reactivity": {
+      "types": "./dist/reactivity.d.ts",
+      "default": "./dist/reactivity.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "default": "./dist/vite.js"
+    },
+    "./hmr": {
+      "types": "./dist/hmr.d.ts",
+      "default": "./dist/hmr.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tests/tsconfig.json && tsc -p examples/tsconfig.json",
+    "lint": "oxlint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "bench": "vitest bench --run",
+    "examples": "vite --config examples/vite.config.ts",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build",
+    "prepublishOnly": "npm run check"
+  },
+  "peerDependencies": {
+    "@vue/reactivity": "^3.5.0",
+    "vite": "^6.0.0 || ^7.0.0 || ^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@vue/reactivity": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
     }
   },
-  "scripts": {
-    "dev": "run-p dev:tsc dev:vite",
-    "dev:vite": "vite build --watch --mode development",
-    "dev:tsc": "tsc -w --emitDeclarationOnly",
-    "build:tsc": "tsc",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
-    "bnt": "npm run build && npm run test",
-    "examples": "run-p dev:es serve",
-    "serve": "vite serve ./examples --config vite.config.js",
-    "test": "ts-mocha -p tests/tsconfig.json tests/**/*.spec.ts",
-    "test:e2e": "ts-mocha tests/e2e/**/*.spec.ts",
-    "test:performance": "ts-mocha tests/performance/**/*.spec.ts",
-    "prepublishOnly": "npm run build"
-  },
   "devDependencies": {
-    "@types/chai": "^4.3.0",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^16.7.1",
-    "chai": "^4.3.6",
-    "mocha": "^10.0.0",
-    "npm-run-all": "^4.1.5",
-    "ts-mocha": "^10.0.0",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.3"
-  },
-  "dependencies": {
-    "@vue/reactivity": "^3.2.37",
-    "vite": "^2.9.13"
+    "@arethetypeswrong/core": "^0.18.5",
+    "@vitest/coverage-v8": "^5.0.5",
+    "@vue/reactivity": "^3.5.44",
+    "oxlint": "^1.90.0",
+    "prettier": "^3.9.10",
+    "publint": "^0.3.25",
+    "tsdown": "^0.23.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
   }
 }

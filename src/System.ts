@@ -1,7 +1,6 @@
 import { Component } from './Component'
 import { Entity } from './Entity'
 import { Engine } from './Engine'
-
 export class System {
   /**
    * @internal  used for hmr

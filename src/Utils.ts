@@ -83,10 +83,4 @@ export type WritablePart<T> = Pick<T, WritableKeysOf<T>>;
 // export type ExcludeFunctionProps<T> = Omit<T, { [K in keyof T]-?: T[K] extends (...any: [])=>any ? K : never }[keyof T]>
 
 
-let perf = typeof window === 'undefined' ? undefined : window?.performance
-
-if(typeof perf === 'undefined' && typeof require !== 'undefined'){
-  perf = require('perf_hooks').performance
-}
-
-export const performance = perf as Performance
+export const performance: { now(): number } = globalThis.performance

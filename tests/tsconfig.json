@@ -1,32 +1,13 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2019",
-    "lib": [
-      "es6",
-      "webworker",
-      "dom",
-      "esnext"
-    ],
-    "module": "commonjs",
-    "sourceMap": true,
-    "baseUrl": ".",
-    "declaration": true,
-    "outDir": "build/",
-    "allowJs": false,
-    "alwaysStrict": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "experimentalDecorators": true,
-    "skipLibCheck": true
+    "rootDir": "..",
+    "paths": {
+      "@ludic/ein": ["../src/index.ts"],
+      "@ludic/ein/reactivity": ["../src/reactivity/index.ts"],
+      "@ludic/ein/vite": ["../src/vite/index.ts"],
+      "@ludic/ein/hmr": ["../src/hmr/index.ts"]
+    }
   },
-  "types": [
-    "node",
-    "mocha",
-    "chai",
-    "sinon"
-  ],
-  "include": [
-    "src"
-  ]
+  "include": ["../src", "../tests", "../bench"]
 }

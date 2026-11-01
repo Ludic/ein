@@ -1,8 +1,8 @@
-import { Component, ComponentConstructor } from './Component';
-import { Entity } from './Entity';
-import { Query } from './Query';
-import { System } from './System';
-
+import { Component } from './Component'
+import type { ComponentConstructor } from './Component'
+import { Entity } from './Entity'
+import { Query } from './Query'
+import { System } from './System'
 export const COMPONENT_ENTITY_ID_MAP: Map<
   ComponentConstructor,
   Map<number, Component>

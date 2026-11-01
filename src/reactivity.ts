@@ -1,7 +1,7 @@
 export * from '@vue/reactivity'
-import { effect, isReactive, isRef, Ref, stop } from '@vue/reactivity'
+import { effect, isReactive, isRef, stop } from '@vue/reactivity'
+import type { Ref } from '@vue/reactivity'
 import { isArray, isObject } from './Utils'
-
 // inspiration: https://antfu.me/posts/watch-with-reactivity
 export function traverse(value: any, seen = new Set()) {
   if(!isObject(value) || seen.has(value)){

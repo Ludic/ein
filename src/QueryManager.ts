@@ -1,14 +1,15 @@
-import { Component, ComponentConstructor } from './Component'
+import { Component } from './Component'
+import type { ComponentConstructor } from './Component'
 import { ComponentManager } from './ComponentManager'
 import { Entity } from './Entity'
 import { EntityManager } from './EntityManager'
 import { System } from './System'
-import { Query, QueryOptions } from './Query'
-import { Klass } from './Klass'
+import { Query } from './Query'
+import type { QueryOptions } from './Query'
+import type { Klass } from './Klass'
 import { Engine } from './Engine'
 import { isArray, setIntersection, setDifference, performance } from './Utils'
 import { ReactiveEffect } from '@vue/reactivity'
-
 export class QueryManager {
   queries: Set<Query> = new Set()
   // query_to_entities: Map<Query, Entity[]>

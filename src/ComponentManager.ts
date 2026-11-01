@@ -1,9 +1,9 @@
-import { Component, ComponentData, ComponentConstructor, ComponentInstance } from "./Component"
+import { Component } from "./Component"
+import type { ComponentData, ComponentConstructor, ComponentInstance } from "./Component"
 import { Engine } from "./Engine"
 import { registerComponent } from './hmr/hmr'
 import Pool from './pool'
 import { bitShift } from './Utils'
-
 export class ComponentManager {
 
   engine: Engine
@@ -26,7 +26,7 @@ export class ComponentManager {
     // }
     ctor.mask = bitShift(ctor.id)
 
-    if(import.meta.env.DEV){
+    if(import.meta.env?.DEV){
       registerComponent(ctor, allocate)
     }
   }
