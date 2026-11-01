@@ -27,8 +27,9 @@ export type QueryEvents<T extends object> = {
 }
 
 /**
- * A live set of entities matching component terms. Membership is updated when
- * the engine flushes (at the start of every `update()`), not when components change.
+ * A live set of entities matching component terms. Entities that match at
+ * creation are included right away; after that membership is updated when the
+ * engine flushes (at the start of every `update()`), not when components change.
  * `entities` is unordered: removal swaps the last entity into the removed slot.
  */
 export class Query<T extends object = never> implements Iterable<Entity<T>> {
@@ -197,10 +198,16 @@ export class QueryManager implements Iterable<Query> {
     this.engine = engine
   }
 
+  /**
+   * Create a query. Entities that already match are included immediately and
+   * listed in `added`; later changes are applied on flush.
+   */
   create<const A extends readonly QueryTerm[] = readonly []>(
     options: QueryOptions<A>,
   ): Query<QueryComponents<A>> {
     const query = new Query<QueryComponents<A>>(this.engine, options)
+    for (const entity of this.engine.entities) query._evaluate(entity)
+    query._finishFlush()
     this.queries.add(query)
     this.engine.events.emit('query:created', query)
     return query

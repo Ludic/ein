@@ -149,15 +149,37 @@ describe('queries', () => {
     expect(q.size).toBe(0)
   })
 
-  it('created after entities exist, picks them up on the next flush', () => {
+  it('created after entities exist, matches them immediately', () => {
+    const engine = setup()
+    const a = engine.createEntity().add(Position)
+    const b = engine.createEntity().add(Position).add(Velocity)
+    engine.createEntity().add(Velocity)
+    engine.update(0, 0)
+    const q = engine.createQuery({ all: [Position] })
+    expect(new Set(q.entities)).toEqual(new Set([a, b]))
+    expect(new Set(q.added)).toEqual(new Set([a, b]))
+    engine.update(0, 0)
+    engine.update(0, 0)
+    expect(q.added).toEqual([])
+    expect(q.size).toBe(2)
+    b.remove(Position)
+    engine.update(0, 0)
+    expect([...q]).toEqual([a])
+  })
+
+  it('populates queries created by a system added at runtime', () => {
     const engine = setup()
     const e = engine.createEntity().add(Position)
     engine.update(0, 0)
-    const q = engine.createQuery({ all: [Position] })
-    expect(q.size).toBe(0)
-    e.add(Velocity)
-    engine.update(0, 0)
-    expect([...q]).toEqual([e])
+    let size = -1
+    class Late extends System {
+      override onAdded(): void {
+        size = this.query({ all: [Position] }).size
+      }
+    }
+    engine.addSystem(Late)
+    expect(size).toBe(1)
+    expect(e.alive).toBe(true)
   })
 
   describe('flush modes', () => {
