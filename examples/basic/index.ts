@@ -1,88 +1,79 @@
-import { reactive, effect, System, Entity, Query, Engine, Component, ComponentInstance } from '../../dist/index.js'
-console.log("basic example")
+import { Component, Engine, System, type Query } from '@ludic/ein'
 
+class Position extends Component {
+  x = 0
+  y = 0
+}
+class Orbit extends Component {
+  angle = 0
+  radius = 100
+  /** radians per second */
+  speed = 1
+}
+class Style extends Component {
+  color = 'steelblue'
+  size = 8
+}
 
 class MovementSystem extends System {
-  angle: number
-  circles: Query
+  orbiting!: Query<Position | Orbit>
 
-  constructor(priority: number = 0, enabled: boolean = true) {
-    super(priority, enabled)
+  override onAdded(): void {
+    // Queries are created here, not in field initializers: `this.engine` is set just before onAdded().
+    this.orbiting = this.query({ all: [Position, Orbit] })
   }
 
-  onAdded(engine: Engine){
-    this.circles = engine.createQuery({
-      all: [PositionComponent]
-    })
-  }
-
-  update(delta: number, time: number): void {
-    this.circles.entities.forEach((entity: Entity)=>{
-      let pos: ComponentInstance<PositionComponent> = entity.getComponent(PositionComponent)
-      pos.x = 150 - Math.cos((Math.PI / 180) * pos.angle) * 100
-      pos.y = 150 + Math.sin((Math.PI / 180) * pos.angle) * 100
-      pos.angle -= 2
-    })
+  override update(delta: number): void {
+    for (const entity of this.orbiting) {
+      const orbit = entity.get(Orbit)
+      const position = entity.get(Position)
+      orbit.angle += (orbit.speed * delta) / 1000
+      position.x = 200 + Math.cos(orbit.angle) * orbit.radius
+      position.y = 200 + Math.sin(orbit.angle) * orbit.radius
+    }
   }
 }
 
 class RenderSystem extends System {
-  entities: Entity[] = []
-  ctx: CanvasRenderingContext2D
-  circles: Query
+  ctx!: CanvasRenderingContext2D
+  drawables!: Query<Position | Style>
 
-  constructor(priority: number = 0, enabled: boolean = true) {
-    super(priority, enabled)
+  override onAdded(): void {
+    const canvas = document.querySelector<HTMLCanvasElement>('#canvas')!
+    this.ctx = canvas.getContext('2d')!
+    this.drawables = this.query({ all: [Position, Style] })
   }
 
-  onAdded(engine: Engine): void {
-    let canvas: any = document.getElementById('canvas')
-    this.ctx = canvas.getContext('2d')
-    this.circles = engine.createQuery({all: [PositionComponent]})
-  }
-
-  update(delta: number, time: number): void {
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.fillStyle = "steelblue"
-    this.circles.entities.forEach((entity: Entity)=>{
-      const pos: ComponentInstance<PositionComponent> = entity.getComponent(PositionComponent)!
-      this.ctx.save()
-      this.ctx.beginPath();
-      this.ctx.arc(pos.x, pos.y, 10, 0, Math.PI * 2, true)
-      this.ctx.fill()
-      this.ctx.restore()
-    })
+  override update(): void {
+    const { ctx } = this
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    for (const entity of this.drawables) {
+      const position = entity.get(Position)
+      const style = entity.get(Style)
+      ctx.fillStyle = style.color
+      ctx.beginPath()
+      ctx.arc(position.x, position.y, style.size, 0, Math.PI * 2)
+      ctx.fill()
+    }
   }
 }
 
-class PositionComponent extends Component {
-  x: number
-  y: number
-  angle: number
-}
-
-const engine: Engine = new Engine()
+const engine = new Engine()
 engine.addSystem(MovementSystem)
 engine.addSystem(RenderSystem)
 
-engine.registerComponent(PositionComponent)
-
-engine
-  .createEntity("circle")
-  .addComponent(PositionComponent, {x: 50, y: 50, angle: 0})
-
-engine
-.createEntity("circle")
-.addComponent(PositionComponent, {x: 50, y: 50, angle: 180})
-
-
-let start: any = null
-function update(timestamp: number){
-  if(!start) start = timestamp
-  engine.update(timestamp-start, timestamp)
-
-  // engine.execute(timestamp-start, timestamp)
-  requestAnimationFrame(update)
+for (let i = 0; i < 12; i++) {
+  engine
+    .createEntity(`circle-${i}`)
+    .add(Position)
+    .add(Orbit, { angle: (i / 12) * Math.PI * 2, radius: 60 + i * 9, speed: 0.5 + i * 0.15 })
+    .add(Style, { color: `hsl(${i * 30} 70% 55%)`, size: 6 + (i % 3) * 3 })
 }
 
-requestAnimationFrame(update)
+let last = 0
+function frame(time: number): void {
+  engine.update(time - last, time)
+  last = time
+  requestAnimationFrame(frame)
+}
+requestAnimationFrame(frame)

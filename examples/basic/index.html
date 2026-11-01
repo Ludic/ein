@@ -1,27 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Ein</title>
-  </head>
-  <body>
-    <canvas id="canvas" width="300" height="300"></canvas>
-    <script src="./index.ts" type="module"></script>
-  </body>
-
-  <style>
-    body {
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ein: basic</title>
+    <style>
+      body {
         margin: 0;
-        width: 100vw;
-        height: 100vh;
-
+        min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    canvas {
-        border: 1px solid black;
-    }
-  </style>
+        background: #111;
+      }
+      canvas {
+        border: 1px solid #444;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <script type="module" src="./index.ts"></script>
+  </body>
 </html>

@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite'
 import { fileURLToPath } from 'node:url'
+import ein from '../src/vite/index.ts'
 
 const src = (p: string): string => fileURLToPath(new URL(`../src/${p}`, import.meta.url))
 
 export default defineConfig({
   root: fileURLToPath(new URL('.', import.meta.url)),
+  plugins: [ein()],
   resolve: {
     alias: {
       '@ludic/ein/reactivity': src('reactivity/index.ts'),
