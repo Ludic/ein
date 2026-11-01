@@ -25,6 +25,7 @@ export type EngineEvents = {
   'entity:created': [entity: Entity]
   'entity:destroyed': [entity: Entity]
   'component:registered': [info: ComponentInfo]
+  'component:replaced': [previous: ComponentInfo, next: ComponentInfo]
   'component:added': [entity: Entity, type: ComponentType, instance: object]
   'component:removed': [entity: Entity, type: ComponentType, instance: object]
   'system:added': [system: System]

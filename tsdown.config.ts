@@ -1,9 +1,11 @@
 import { defineConfig } from 'tsdown'
 
-// NOTE: the reactivity, vite and hmr entries are added in Phase 3.
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
+    reactivity: 'src/reactivity/index.ts',
+    vite: 'src/vite/index.ts',
+    hmr: 'src/hmr/index.ts',
   },
   format: ['esm'],
   platform: 'neutral',

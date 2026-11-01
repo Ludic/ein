@@ -64,6 +64,7 @@ export function serializeComponent(instance: object): ComponentSnapshot {
  */
 export class ComponentStore<T extends object = object> {
   readonly info: ComponentInfo<T>
+  readonly options: ComponentOptions<T>
   /** Instances indexed by entity slot. */
   readonly instances: Array<T | undefined> = []
   size: number = 0
@@ -75,6 +76,7 @@ export class ComponentStore<T extends object = object> {
 
   constructor(info: ComponentInfo<T>, options: ComponentOptions<T>) {
     this.info = info
+    this.options = options
     const type = info.type
     this.create = options.create ?? ((): T => new type())
     if (options.pool !== undefined) {
@@ -181,6 +183,47 @@ export class ComponentManager implements Iterable<ComponentInfo> {
     this.byName.set(name, store as ComponentStore)
     if (this.engine.masks.ensureBits(id + 1)) this.engine.queries._rebuildMasks()
     this.engine.events.emit('component:registered', info)
+    return info
+  }
+
+  /**
+   * Swap the class behind a registered component type, keeping its id, name and
+   * options. Existing instances are re-created from the new class with their
+   * fields copied over, so queries and entities are unaffected. Used by hot
+   * module replacement.
+   */
+  replace<T extends object>(prev: ComponentType, next: ComponentType<T>): ComponentInfo<T> {
+    const old = this.stores.get(prev)
+    if (!old) throw new Error('ein: cannot replace a component type that is not registered')
+    if ((prev as ComponentType) === next) return old.info as ComponentInfo<T>
+    if (this.stores.has(next))
+      throw new Error('ein: the replacement component type is already registered')
+    const info: ComponentInfo<T> = {
+      type: next,
+      id: old.info.id,
+      name: old.info.name,
+      isTag: old.info.isTag,
+    }
+    const store = new ComponentStore<T>(info, old.options as ComponentOptions<T>)
+    for (let slot = 0; slot < old.instances.length; slot++) {
+      const instance = old.instances[slot]
+      if (instance === undefined) continue
+      const fresh = store.acquire()
+      Object.assign(fresh, instance)
+      store.attach(slot, fresh)
+    }
+    this.stores.delete(prev)
+    this.stores.set(next, store as ComponentStore)
+    this.storesById[info.id] = store as ComponentStore
+    this.byName.set(info.name, store as ComponentStore)
+    this.pendingStores.delete(old)
+    const tagName = this.tagNames.get(prev)
+    if (tagName !== undefined) {
+      this.tags.set(tagName, next as ComponentType<Tag>)
+      this.tagNames.delete(prev)
+      this.tagNames.set(next, tagName)
+    }
+    this.engine.events.emit('component:replaced', old.info, info)
     return info
   }
 
